@@ -34,6 +34,7 @@ test("login: wrong password is rejected generically, the right one restores the 
   await finishProfiling(page, { goal: "pensie" });
   await page.goto("/invata/etf");
   await page.getByRole("button", { name: "Am citit — fac quiz-ul" }).click();
+  await expect(page).toHaveURL(/\/invata\/etf\/quiz$/);
   await (await openAccountMenu(page)).getByRole("button", { name: "Deconectare" }).click();
 
   await page.goto("/intra");
@@ -79,6 +80,7 @@ test("a second account sees none of the first account's data; usernames are uniq
 test("progress made before signing up moves into the new account", async ({ page }) => {
   await page.goto("/invata/inflatia");
   await page.getByRole("button", { name: "Am citit — fac quiz-ul" }).click();
+  await expect(page).toHaveURL(/\/quiz$/);
   await createAccount(page, "ana");
   await page.goto("/progres");
   await expect(page.getByTestId("modules-read")).toHaveText("1/8");

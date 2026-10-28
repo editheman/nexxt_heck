@@ -17,6 +17,7 @@ const valid: DemoState = {
   assumptions: { inflationPct: 6.5 },
   reality: { years: 10 },
   onboarding: { completedAt: "2026-10-28T10:00:00.000Z" },
+  riskProfile: { emergencyFund: "partial", riskTolerance: "medie", experience: "deloc", costlyDebt: "da" },
   progress: {
     visited: { reality: true },
     scams: { curier: { completed: true, correct: 2, total: 3 } },
@@ -65,11 +66,13 @@ describe("parseState", () => {
     const v1: Record<string, unknown> = { ...valid, version: 1, profile };
     delete v1.reality;
     delete v1.onboarding;
+    delete v1.riskProfile;
     expect(parseState(JSON.stringify(v1))).toEqual({
       ...valid,
       profile: { ...valid.profile, ageRange: null },
       reality: defaultState().reality,
       onboarding: { completedAt: null },
+      riskProfile: defaultState().riskProfile,
     });
   });
 
@@ -77,7 +80,7 @@ describe("parseState", () => {
     const profile: Record<string, unknown> = { ...valid.profile };
     delete profile.ageRange;
     const parsed = parseState(JSON.stringify({ ...valid, version: 2, profile }));
-    expect(parsed.version).toBe(5);
+    expect(parsed.version).toBe(7);
     expect(parsed.profile?.ageRange).toBeNull();
   });
 
@@ -95,7 +98,7 @@ describe("parseState", () => {
     const v3: Record<string, unknown> = { ...valid, version: 3 };
     delete v3.onboarding;
     const parsed = parseState(JSON.stringify(v3));
-    expect(parsed.version).toBe(5);
+    expect(parsed.version).toBe(7);
     expect(parsed.onboarding.completedAt).toBeNull();
   });
 
@@ -107,5 +110,19 @@ describe("parseState", () => {
 
   it("drops an invalid completion date", () => {
     expect(parseState(JSON.stringify({ ...valid, onboarding: { completedAt: "ieri" } })).onboarding.completedAt).toBeNull();
+  });
+
+  it("migrates a schema-v5 state with an empty risk profile and drops invalid answers", () => {
+    const v5: Record<string, unknown> = { ...valid, version: 5 };
+    delete v5.riskProfile;
+    expect(parseState(JSON.stringify(v5)).riskProfile).toEqual({ emergencyFund: null, riskTolerance: null, experience: null, costlyDebt: null });
+    const bad = parseState(JSON.stringify({ ...valid, riskProfile: { emergencyFund: "poate", riskTolerance: "medie", experience: 3, costlyDebt: "uneori" } }));
+    expect(bad.riskProfile).toEqual({ emergencyFund: null, riskTolerance: "medie", experience: null, costlyDebt: null });
+  });
+
+  it("migrates a schema-v6 risk profile without the costly-debt answer", () => {
+    const parsed = parseState(JSON.stringify({ ...valid, version: 6, riskProfile: { emergencyFund: "da", riskTolerance: "medie", experience: "deloc" } }));
+    expect(parsed.version).toBe(7);
+    expect(parsed.riskProfile.costlyDebt).toBeNull();
   });
 });

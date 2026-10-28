@@ -40,8 +40,8 @@ export function SiteHeader() {
         </Link>
 
         {done && (
-        <nav aria-label="Navigare principală" className="hidden md:block">
-          <ul className="flex items-center gap-1">
+        <nav aria-label="Navigare principală" className="hidden lg:block">
+          <ul className="flex items-center">
             {primaryNav.map((item) => {
               const active = isActive(pathname, item.href);
               return (
@@ -50,7 +50,7 @@ export function SiteHeader() {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-sm font-semibold transition-colors",
+                      "inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-2.5 text-sm font-semibold whitespace-nowrap transition-colors",
                       active ? "text-primary" : "text-ink-muted hover:text-ink",
                     )}
                   >
@@ -76,7 +76,7 @@ export function SiteHeader() {
           {done && (
             <button
               type="button"
-              className="inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] text-ink hover:bg-surface-muted md:hidden"
+              className="inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] text-ink hover:bg-surface-muted lg:hidden"
               aria-expanded={open}
               aria-controls="mobile-nav"
               onClick={() => setOpen((v) => !v)}
@@ -89,7 +89,7 @@ export function SiteHeader() {
       </div>
 
       {open && done && (
-        <nav id="mobile-nav" aria-label="Navigare principală" className="border-t border-border bg-surface md:hidden">
+        <nav id="mobile-nav" aria-label="Navigare principală" className="border-t border-border bg-surface lg:hidden">
           <ul className="mx-auto max-w-[1120px] px-4 py-2">
             {NAV_ITEMS.map((item) => {
               const active = isActive(pathname, item.href);

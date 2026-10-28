@@ -38,9 +38,10 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-col gap-4 border-t border-border pt-6 md:flex-row md:items-end md:justify-between">
           <p className="max-w-[80ch] font-mono text-xs leading-relaxed text-ink-muted">
-            Disclaimer: platformă exclusiv educațională. Nu suntem bancă, broker sau consultant de investiții și nu oferim
-            recomandări personalizate. Calculele sunt estimări bazate pe ipotezele afișate — nu prognoze și nu garanții.
-            Datele introduse rămân doar în browserul tău (localStorage); nu cerem CNP, IBAN, date de card sau parole.
+            Disclaimer: platformă educațională. Nu suntem bancă, broker sau consultant de investiții autorizat; recomandările
+            se referă la categorii de produse, nu la produse, fonduri sau instituții anume. Calculele sunt estimări bazate pe
+            ipotezele afișate — nu prognoze și nu garanții. Datele rămân doar în browserul tău (localStorage); nu cerem CNP,
+            IBAN sau date de card, iar parola contului nu se salvează, ci doar o amprentă criptografică.
           </p>
           <p className="flex shrink-0 items-center gap-2 font-mono text-xs text-ink-muted">
             <span aria-hidden className="size-1.5 rounded-full bg-accent" /> Zero date personale solicitate
