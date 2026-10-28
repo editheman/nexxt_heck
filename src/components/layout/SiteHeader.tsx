@@ -65,12 +65,12 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {!done && (
-            <Link
-              href={account ? resumeHref(state) : "/profil"}
-              className={buttonClass("primary", "hidden min-h-10 px-4 py-2 text-sm sm:inline-flex")}
-            >
-              {account ? "Continuă profilarea" : "Începe"}
-            </Link>
+            // The wrapper hides the CTA on phones (the button's own inline-flex would override `hidden`).
+            <span className="hidden sm:block">
+              <Link href={account ? resumeHref(state) : "/profil"} className={buttonClass("primary", "min-h-10 px-4 py-2 text-sm whitespace-nowrap")}>
+                {account ? "Continuă profilarea" : "Începe"}
+              </Link>
+            </span>
           )}
           <AccountMenu />
           {done && (

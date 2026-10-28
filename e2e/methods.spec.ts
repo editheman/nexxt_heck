@@ -45,6 +45,7 @@ test("choose methods as drafts, confirm one, re-profile and keep the old set in 
   await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
   await page.getByLabel("Obiectivul principal").selectOption("locuinta");
   await page.getByLabel("Orizont de timp").fill("4");
+  await page.getByLabel("Economii actuale").fill("25.000");
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   await expect(page).toHaveURL(/\/portal$/);
   await page.goto("/recomandari");
@@ -62,6 +63,10 @@ test("choose methods as drafts, confirm one, re-profile and keep the old set in 
   await expect(current.getByTestId("method-pilon3")).toHaveCount(0);
   const hist = page.getByTestId("methods-history");
   await expect(hist).toContainText("Pensie / termen lung");
+  // The history shows what was saved at that time and the change since.
+  await expect(hist.locator('[data-testid^="history-savings-"]')).toContainText("20.000 lei");
+  await expect(hist.locator('[data-testid^="history-savings-"]')).toContainText("Acum ai cu 5.000 lei mai mult");
+  await expect(current.getByTestId("current-savings")).toContainText("25.000 lei");
   await expect(hist.getByText("Folosită")).toBeVisible();
   await expect(hist.getByText("Draft")).toBeVisible();
 

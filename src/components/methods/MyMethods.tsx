@@ -7,9 +7,9 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PageSkeleton } from "@/components/ui/Skeleton";
-import { GOAL_LABELS } from "@/content/labels";
+import { GOAL_LABELS, PLACEMENT_LABELS } from "@/content/labels";
 import { productById } from "@/content/products";
-import { formatDateTime, formatYears } from "@/lib/format";
+import { formatDateTime, formatLei, formatYears } from "@/lib/format";
 import { currentGeneration, history, methodsOf, type Generation, type Method } from "@/lib/plans";
 import { useAuth } from "@/lib/useAuth";
 import { actions, useDemoState } from "@/lib/useDemoState";
@@ -53,6 +53,7 @@ export function MyMethods() {
             <p className="text-sm text-ink-muted">
               {setSummary(current)} · recomandări generate pe {formatDateTime(current.createdAt)}
             </p>
+            <SavingsLine snapshot={current.snapshot} testId="current-savings" label="Economii" />
           </div>
           <ButtonLink href="/recomandari" variant="secondary">
             Recomandările <ArrowRight aria-hidden className="size-4" />
@@ -118,7 +119,7 @@ export function MyMethods() {
           <ol className="space-y-4">
             {past.map((g) => (
               <li key={g.id}>
-                <HistoryEntry generation={g} methods={methodsOf(state.plans, g.id)} />
+                <HistoryEntry generation={g} methods={methodsOf(state.plans, g.id)} nowSavings={state.profile?.savings ?? null} />
               </li>
             ))}
           </ol>
@@ -160,13 +161,32 @@ function MethodList({
   );
 }
 
-function HistoryEntry({ generation: g, methods }: { generation: Generation; methods: Method[] }) {
+/** What the user had saved when a set was generated (from the set's snapshot). */
+function SavingsLine({ snapshot: s, nowSavings, testId, label = "Economii atunci" }: { snapshot: Generation["snapshot"]; nowSavings?: number | null; testId: string; label?: string }) {
+  const diff = nowSavings == null ? null : nowSavings - s.savings;
+  return (
+    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink" data-testid={testId}>
+      <Badge kind="user">{label}</Badge>
+      <span className="tabular font-semibold">{formatLei(s.savings)}</span>
+      <span className="text-ink-muted">{PLACEMENT_LABELS[s.placement]}</span>
+      {s.monthly > 0 && <span className="tabular text-ink-muted">+{formatLei(s.monthly)} pe lună</span>}
+      {diff !== null && diff !== 0 && (
+        <span className={diff > 0 ? "tabular text-success" : "tabular text-danger"}>
+          Acum ai cu {formatLei(Math.abs(diff))} {diff > 0 ? "mai mult" : "mai puțin"}
+        </span>
+      )}
+    </p>
+  );
+}
+
+function HistoryEntry({ generation: g, methods, nowSavings }: { generation: Generation; methods: Method[]; nowSavings: number | null }) {
   return (
     <Card className="space-y-3 bg-surface/80" data-testid={`history-${g.id}`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="font-semibold text-ink">{setSummary(g)}</p>
         <p className="text-xs text-ink-muted">{formatDateTime(g.createdAt)} · {g.source === "ai" ? `AI (${g.model})` : "după reguli"}</p>
       </div>
+      <SavingsLine snapshot={g.snapshot} nowSavings={nowSavings} testId={`history-savings-${g.id}`} />
       <ol className="flex flex-wrap gap-2">
         {g.items.map((it, i) => {
           const m = methods.find((x) => x.productId === it.id);
