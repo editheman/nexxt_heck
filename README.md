@@ -37,6 +37,10 @@ Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` �
 | Quiz | `/invata/[slug]/quiz` | Feedback la fiecare răspuns, link către secțiunea de recitit, reluarea doar a întrebărilor greșite |
 | Progres | `/progres` | Traseu, module, scoruri, resetare cu confirmare; totul persistă la reîncărcare |
 
+## Recomandări de categorii de produse (varianta A)
+
+`/recomandari` ordonează categoriile (cont de economii, depozit, Tezaur, Fidelis, ETF pe BET, ETF global cu acumulare, Pilonul III) după profil și trei răspunsuri despre risc. Regulile din `src/lib/productFit.ts` exclud categoriile nepotrivite (de exemplu acțiuni pe orizont scurt). Opțional, un model compatibil OpenAI (de exemplu Featherless) ordonează și formulează motivele: copiază `.env.example` în `.env.local` și completează `AI_API_KEY` și `AI_MODEL`. Fără cheie, se folosește clasamentul din reguli. Răspunsul modelului este validat (doar categorii permise, fără cifre sau promisiuni). Nu se recomandă produse, fonduri sau instituții anume.
+
 ## Calcule și ipoteze
 
 - Valoare nominală: `P × (1 + r)^n`; depunerile lunare la **sfârșitul** fiecărei luni, cu rata lunară echivalentă `(1 + r)^(1/12) − 1`.

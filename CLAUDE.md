@@ -59,7 +59,7 @@ Build a complete core journey before adding secondary features.
 - Never claim that inflation caused an exact personal financial loss unless the calculation and its assumptions support that claim.
 - Show nominal amounts and purchasing power in today's RON separately.
 - Explain the assumptions used in all financial calculations.
-- Do not provide personalized buy/sell recommendations or execute financial transactions.
+- Category-level recommendations are allowed (variant A, owner's decision 2026-10-28): which types of products fit the user's goal, horizon and risk answers, with reasons and risks. Never recommend a specific fund, issuer, bank or broker, never promise returns, never state rates as current facts, and never execute financial transactions. Recommendations must pass the fit engine's guardrails (`src/lib/productFit.ts`) and carry the „nu este consultanță de investiții autorizată” disclaimer.
 - Do not request CNPs, bank credentials, account numbers or unnecessary sensitive information.
 - Never expose a user's income, savings, debt or financial profile through social features.
 - Clearly label demo and fictional data.
@@ -164,3 +164,4 @@ Prefer a working, coherent end-to-end product over a large collection of incompl
 - Reality Check is historical and read-only: official INS CPI and BNR EUR/RON series live only in `src/content/macro-ro.ts` (cite source and period in the UI; update `LATEST_DATA_YEAR` and tests together). Future-inflation assumptions belong only in the simulator.
 - Guided profiling is profil → Reality Check → simulator → `/portal` (`onboarding.completedAt` in `DemoState`). After it, pages are reached from the portal, not chained; Fraude and Învață are portal options. Learning is personalised by `profile.goal` via `src/content/goalPaths.ts` (every goal → existing modules). The „account” is the local demo profile — there is no backend.
 - Accounts are **local demo accounts** (`src/lib/auth.ts`, `src/lib/useAuth.ts`): PBKDF2-SHA-256 hash + salt only, never the password; per-account storage keys `pcac:acct:<id>:…`; guest data moves into a new account at sign-up. Never describe them as secure server accounts. Production requirements: `docs/superpowers/specs/2026-10-28-accounts-design.md`.
+- Product categories: verified catalogue in `src/content/products.ts` (no numeric rates — test-enforced); fit rules in `src/lib/productFit.ts`; variant A ranking via `POST /api/recomandari` (`src/lib/recommend.ts`, OpenAI-compatible model from `AI_BASE_URL`/`AI_API_KEY`/`AI_MODEL`, server-only, rule-based fallback). See `docs/superpowers/specs/2026-10-28-products-design.md`.

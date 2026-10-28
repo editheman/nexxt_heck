@@ -87,6 +87,19 @@ export function Portal() {
         </div>
       )}
 
+      <Link
+        href="/recomandari"
+        data-testid="portal-recommendations"
+        className="group flex flex-col gap-3 rounded-[var(--radius-card)] border border-primary/30 bg-primary-soft p-5 transition-colors hover:border-primary sm:flex-row sm:items-center sm:justify-between"
+      >
+        <span className="space-y-1">
+          <Eyebrow dot>Recomandări</Eyebrow>
+          <span className="block text-lg font-semibold text-ink">Ce te ajută să-ți păstrezi puterea de cumpărare</span>
+          <span className="block text-sm text-ink-muted">Categoriile de produse potrivite profilului tău, în ordine, cu motivul fiecăreia.</span>
+        </span>
+        <ArrowRight aria-hidden className="size-5 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+      </Link>
+
       <section aria-labelledby="recomandate" className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1">
