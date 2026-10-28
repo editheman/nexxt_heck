@@ -17,7 +17,10 @@ test("full journey persists across reloads", async ({ page }) => {
   await page.getByRole("button", { name: "Sari peste" }).click();
   await expect(page).toHaveURL(/\/profil$/);
 
-  // Profile
+  // Profile, step 1 → step 2
+  await page.getByLabel("Cum să-ți spunem").fill("Ana");
+  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
+  await expect(page.getByTestId("onboarding-step")).toHaveText("Pasul 2 din 2: Banii tăi");
   await page.getByLabel("Economii actuale").fill("20.000");
   await page.getByLabel("Cât pui deoparte lunar").fill("0");
   await page.getByLabel("Orizont de timp").fill("10");
@@ -109,6 +112,8 @@ test("full journey persists across reloads", async ({ page }) => {
 test("profile validation shows an error summary and inline errors", async ({ page }) => {
   await freshStart(page);
   await page.goto("/profil");
+  await page.getByLabel("Cum să-ți spunem").fill("Ana");
+  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
   await page.getByLabel("Orizont de timp").fill("2,5");
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   const summary = page.getByRole("alert").filter({ hasText: "Verifică" });
@@ -151,7 +156,8 @@ test("schema-v1 saved data is migrated in place under pcac:v1", async ({ page })
   await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
   await page.getByRole("radio", { name: /Ultimii 3 ani/ }).check({ force: true });
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("pcac:v1")!));
-  expect(saved.version).toBe(2);
+  expect(saved.version).toBe(3);
+  expect(saved.profile.ageRange).toBeNull();
   expect(saved.reality.years).toBe(3);
   await page.goto("/progres");
   await expect(page.getByTestId("modules-read")).toHaveText("1/7");

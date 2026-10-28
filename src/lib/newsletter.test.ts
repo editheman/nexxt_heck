@@ -174,6 +174,11 @@ describe("storage parsing", () => {
     expect(parseConsentLog("nope")).toEqual([]);
   });
 
+  it("accepts consent given during onboarding", () => {
+    const c = { subscriberId: "a", purpose: "newsletter", granted: true, at: NOW.toISOString(), textVersion: "v", source: "onboarding" };
+    expect(parseConsentLog(JSON.stringify([c]))).toEqual([c]);
+  });
+
   it("drops malformed consent entries and subscribers without a valid email", () => {
     const good = { subscriberId: "a", purpose: "newsletter", granted: true, at: NOW.toISOString(), textVersion: "v", source: "article-prompt" };
     expect(parseConsentLog(JSON.stringify([good, { granted: "da" }]))).toEqual([good]);

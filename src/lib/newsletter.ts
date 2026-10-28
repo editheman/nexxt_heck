@@ -27,7 +27,7 @@ export type PromptState = {
 
 export type Subscriber = { id: string; email: string; createdAt: string; delivery: "demo" };
 
-export type ConsentSource = "article-prompt" | "progress-page" | "unsubscribe-page";
+export type ConsentSource = "onboarding" | "article-prompt" | "progress-page" | "unsubscribe-page";
 
 export type ConsentRecord = {
   subscriberId: string;
@@ -164,7 +164,7 @@ export function parseSubscriber(raw: string | null): Subscriber | null {
   return { id: d.id, email: d.email, createdAt: d.createdAt, delivery: "demo" };
 }
 
-const SOURCES: ConsentSource[] = ["article-prompt", "progress-page", "unsubscribe-page"];
+const SOURCES: ConsentSource[] = ["onboarding", "article-prompt", "progress-page", "unsubscribe-page"];
 
 export function parseConsentLog(raw: string | null): ConsentRecord[] {
   const d = json(raw);

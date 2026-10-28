@@ -16,6 +16,7 @@ The app has no news feed (by design — CLAUDE.md forbids invented live data). T
    - Subscribing stays possible from the Progres page ("Datele tale"), so declining is not a dead end. Unsubscribing lives at `/dezabonare` and on the Progres page.
 4. **Form:** email (`type=email`, visible label) and a **separate, unchecked** marketing-consent checkbox whose text is versioned (`CONSENT_TEXT_VERSION`). Submitting with an email but no consent stores **nothing** and shows an inline error on the checkbox. Privacy notice linked (`/confidentialitate`).
 5. **No financial data:** the form asks for an email address only.
+6. **Onboarding (added later):** step 1 of `/profil` offers the same optional email + separate unchecked consent; consent records use `source: "onboarding"`. An email without consent is rejected and nothing is stored.
 
 ## Data model (separate localStorage keys)
 | Key | Contents | Never contains |

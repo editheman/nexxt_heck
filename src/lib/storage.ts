@@ -11,6 +11,9 @@ export type Placement = (typeof PLACEMENTS)[number];
 export const GOALS = ["fond-urgenta", "locuinta", "educatie", "pensie", "altul"] as const;
 export type Goal = (typeof GOALS)[number];
 
+export const AGE_RANGES = ["20-25", "26-30", "31-35"] as const;
+export type AgeRange = (typeof AGE_RANGES)[number];
+
 export type Profile = {
   alias: string;
   /** Current savings, RON. */
@@ -22,6 +25,8 @@ export type Profile = {
   monthly: number;
   years: number;
   goal: Goal;
+  /** Optional, chosen in onboarding step 1; null when not given. */
+  ageRange: AgeRange | null;
   /** True when loaded from the fictional example profile. */
   isDemo: boolean;
 };
@@ -30,7 +35,7 @@ export type QuizResult = { best: number; total: number; lastWrong: string[] };
 export type ScamResult = { completed: true; correct: number; total: number };
 
 export type DemoState = {
-  version: 2;
+  version: 3;
   profile: Profile | null;
   /** Simulator only: illustrative, user-editable future inflation. */
   assumptions: { inflationPct: number };
@@ -46,7 +51,7 @@ export type DemoState = {
 
 export function defaultState(): DemoState {
   return {
-    version: 2,
+    version: 3,
     profile: null,
     assumptions: { inflationPct: DEFAULT_INFLATION_PCT },
     reality: { years: DEFAULT_REALITY_WINDOW },
@@ -62,6 +67,9 @@ const inRange = (v: unknown, min: number, max: number): v is number => isNum(v) 
 function parseProfile(v: unknown): Profile | null {
   if (!isObj(v)) return null;
   const { alias, savings, placement, nominalPct, monthly, years, goal, isDemo } = v;
+  // Schema v1/v2 profiles have no age range: treat missing as "not given".
+  const ageRange = v.ageRange === undefined || v.ageRange === null ? null : v.ageRange;
+  if (ageRange !== null && !AGE_RANGES.includes(ageRange as AgeRange)) return null;
   if (
     typeof alias !== "string" ||
     alias.length > 40 ||
@@ -75,7 +83,17 @@ function parseProfile(v: unknown): Profile | null {
     typeof isDemo !== "boolean"
   )
     return null;
-  return { alias, savings, placement: placement as Placement, nominalPct, monthly, years, goal: goal as Goal, isDemo };
+  return {
+    alias,
+    savings,
+    placement: placement as Placement,
+    nominalPct,
+    monthly,
+    years,
+    goal: goal as Goal,
+    ageRange: ageRange as AgeRange | null,
+    isDemo,
+  };
 }
 
 function filterRecord<T>(v: unknown, parse: (entry: unknown) => T | null): Record<string, T> {
@@ -103,7 +121,7 @@ function parseScam(v: unknown): ScamResult | null {
 
 /**
  * Never throws: anything unreadable falls back to defaults, field by field.
- * Accepts schema v1 (no `reality`) and migrates it to v2.
+ * Accepts schema v1 (no `reality`) and v2 (no `profile.ageRange`) and migrates them to v3.
  */
 export function parseState(raw: string | null): DemoState {
   const fallback = defaultState();
@@ -114,7 +132,7 @@ export function parseState(raw: string | null): DemoState {
   } catch {
     return fallback;
   }
-  if (!isObj(data) || (data.version !== 1 && data.version !== 2)) return fallback;
+  if (!isObj(data) || ![1, 2, 3].includes(data.version as number)) return fallback;
 
   const assumptions = isObj(data.assumptions) ? data.assumptions : {};
   const reality = isObj(data.reality) ? data.reality : {};
@@ -122,7 +140,7 @@ export function parseState(raw: string | null): DemoState {
   const visited = isObj(progress.visited) ? progress.visited : {};
 
   return {
-    version: 2,
+    version: 3,
     profile: parseProfile(data.profile),
     assumptions: {
       inflationPct: inRange(assumptions.inflationPct, LIMITS.ratePctMin, LIMITS.ratePctMax)

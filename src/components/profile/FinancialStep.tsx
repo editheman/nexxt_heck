@@ -1,27 +1,25 @@
 "use client";
 
-import { Lock } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ArrowLeft, Lock } from "lucide-react";
 import { useRef, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { NumberField } from "@/components/ui/NumberField";
-import { cn } from "@/components/ui/cn";
 import { GOAL_LABELS, PLACEMENT_LABELS } from "@/content/labels";
 import { validateSimInput } from "@/lib/finance";
 import { GOALS, PLACEMENTS, type Goal, type Placement, type Profile } from "@/lib/storage";
-import { actions } from "@/lib/useDemoState";
+import { cn } from "@/components/ui/cn";
 
 type NumKey = "savings" | "nominalPct" | "monthly" | "years";
-type Draft = { alias: string; placement: Placement; goal: Goal } & Record<NumKey, number | null>;
-type Errors = Partial<Record<NumKey | "alias", string>>;
+export type FinancialDraft = { placement: Placement; goal: Goal } & Record<NumKey, number | null>;
+type Draft = FinancialDraft;
+type Errors = Partial<Record<NumKey, string>>;
 
-const FIELD_ORDER: Array<NumKey | "alias"> = ["alias", "savings", "nominalPct", "monthly", "years"];
+const FIELD_ORDER: NumKey[] = ["savings", "nominalPct", "monthly", "years"];
 
-const FIELD_LABELS: Record<NumKey | "alias", string> = {
-  alias: "Cum să te numim",
+const FIELD_LABELS: Record<NumKey, string> = {
   savings: "Economii actuale",
   nominalPct: "Randament anual estimat",
   monthly: "Cât pui deoparte lunar",
@@ -30,7 +28,6 @@ const FIELD_LABELS: Record<NumKey | "alias", string> = {
 
 function validate(d: Draft): Errors {
   const errors: Errors = {};
-  if (d.alias.trim().length > 40) errors.alias = "Folosește cel mult 40 de caractere.";
   if (d.savings === null) errors.savings = "Introdu suma aproximativă a economiilor (poate fi 0).";
   if (d.years === null) errors.years = "Introdu numărul de ani.";
   if (d.nominalPct === null) errors.nominalPct = "Introdu un procent (poate fi 0).";
@@ -51,25 +48,37 @@ function validate(d: Draft): Errors {
   return errors;
 }
 
-export function ProfileForm({ initial }: { initial: Profile | null }) {
-  const router = useRouter();
-  const summaryRef = useRef<HTMLDivElement>(null);
-  const [draft, setDraft] = useState<Draft>(() => ({
-    alias: initial && !initial.isDemo ? initial.alias : "",
+export function initialFinancial(initial: Profile | null): FinancialDraft {
+  return {
     savings: initial?.savings ?? null,
     placement: initial?.placement ?? "cont-curent",
     nominalPct: initial?.nominalPct ?? 0,
     monthly: initial?.monthly ?? 0,
     years: initial?.years ?? 10,
     goal: initial?.goal ?? "fond-urgenta",
-  }));
+  };
+}
+
+/** Onboarding step 2: the financial questions. Values live in the wizard so "Înapoi" keeps them. */
+export function FinancialStep({
+  draft,
+  onChange,
+  onBack,
+  onSave,
+}: {
+  draft: FinancialDraft;
+  onChange: (d: FinancialDraft) => void;
+  onBack: () => void;
+  onSave: (p: Omit<Profile, "alias" | "ageRange" | "isDemo">) => void;
+}) {
+  const summaryRef = useRef<HTMLDivElement>(null);
   const [touched, setTouched] = useState<Partial<Record<keyof Errors, true>>>({});
   const [submitted, setSubmitted] = useState(false);
 
   const errors = validate(draft);
   const visible = (k: keyof Errors) => (submitted || touched[k] ? errors[k] : undefined);
   const touch = (k: keyof Errors) => setTouched((t) => ({ ...t, [k]: true }));
-  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => onChange({ ...draft, [k]: v });
   const summaryErrors = FIELD_ORDER.filter((k) => errors[k]);
 
   function onSubmit(e: React.FormEvent) {
@@ -79,21 +88,18 @@ export function ProfileForm({ initial }: { initial: Profile | null }) {
       requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
-    actions.saveProfile({
-      alias: draft.alias.trim(),
+    onSave({
       savings: draft.savings!,
       placement: draft.placement,
       nominalPct: draft.nominalPct!,
       monthly: draft.monthly ?? 0,
       years: draft.years!,
       goal: draft.goal,
-      isDemo: false,
     });
-    router.push("/reality-check");
   }
 
   return (
-    <form noValidate onSubmit={onSubmit} className="space-y-6" aria-label="Profil financiar">
+    <form noValidate onSubmit={onSubmit} className="space-y-6" aria-label="Pasul 2: datele financiare">
       {submitted && summaryErrors.length > 0 && (
         <div
           ref={summaryRef}
@@ -118,35 +124,6 @@ export function ProfileForm({ initial }: { initial: Profile | null }) {
       )}
 
       <Card className="space-y-6">
-        <div className="space-y-1.5">
-          <label htmlFor="alias" className="font-semibold">
-            {FIELD_LABELS.alias} <span className="font-normal text-ink-muted">(opțional)</span>
-          </label>
-          <p id="alias-helper" className="text-sm text-ink-muted">
-            Un prenume sau un pseudonim. Nu folosi numele complet.
-          </p>
-          <input
-            id="alias"
-            name="alias"
-            autoComplete="nickname"
-            maxLength={60}
-            value={draft.alias}
-            onChange={(e) => set("alias", e.target.value)}
-            onBlur={() => touch("alias")}
-            aria-invalid={visible("alias") ? true : undefined}
-            aria-describedby={cn("alias-helper", visible("alias") && "alias-error")}
-            className={cn(
-              "min-h-11 w-full rounded-[var(--radius-control)] border bg-surface px-3 py-2",
-              visible("alias") ? "border-danger" : "border-border-strong",
-            )}
-          />
-          {visible("alias") && (
-            <p id="alias-error" className="text-sm font-medium text-danger">
-              {errors.alias}
-            </p>
-          )}
-        </div>
-
         <NumberField
           id="savings"
           label={FIELD_LABELS.savings}
@@ -245,7 +222,10 @@ export function ProfileForm({ initial }: { initial: Profile | null }) {
         </span>
       </Alert>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+        <Button variant="secondary" onClick={onBack}>
+          <ArrowLeft aria-hidden className="size-4" /> Înapoi
+        </Button>
         {/* preventDefault on mousedown keeps focus in the field until click, so a blur-triggered
             inline error cannot shift the button away between mousedown and mouseup. */}
         <Button type="submit" onMouseDown={(e) => e.preventDefault()}>
