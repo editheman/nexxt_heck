@@ -24,12 +24,21 @@ test("ranks categories from the profile and risk answers (rule-based without an 
   await expect(page.getByText("Fără fond de urgență, ai putea fi nevoit să vinzi").first()).toBeVisible();
 
   // Changing the answers invalidates the old list; regenerating reflects them.
-  await page.getByRole("button", { name: "Da", exact: true }).click();
+  await page.getByRole("group", { name: /fond de urgență/ }).getByRole("button", { name: "Da", exact: true }).click();
   await page.getByRole("button", { name: "Aș pune mai mulți bani" }).click();
   await expect(recs).toHaveCount(0);
   await page.getByRole("button", { name: "Generează recomandările" }).click();
   await expect(page.getByTestId("rec-etf-global")).toBeVisible();
   await expect(page.getByTestId("rec-pilon3")).toBeVisible();
+
+  // An expensive loan moves early repayment to the top; caution/check categories are explained apart.
+  await page.getByRole("group", { name: /credit cu dobândă mare/ }).getByRole("button", { name: "Da", exact: true }).click();
+  await page.getByRole("button", { name: "Generează recomandările" }).click();
+  await expect(recs.locator("li").first()).toContainText("Rambursarea anticipată a unui credit scump");
+  const toKnow = page.getByTestId("to-know");
+  await expect(toKnow.getByTestId("know-cripto")).toContainText("MiCA");
+  await expect(toKnow.getByTestId("know-pilon2")).toContainText("De verificat");
+  await expect(recs.getByTestId("rec-cripto")).toHaveCount(0);
 
   // Answers are saved in the account.
   await page.reload();

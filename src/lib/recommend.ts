@@ -5,7 +5,7 @@
  */
 import { PRODUCTS, PRODUCT_IDS, type ProductId } from "@/content/products";
 import { assessProducts, type FitInput, type ProductFit } from "./productFit";
-import { AGE_RANGES, EMERGENCY_FUND, EXPERIENCE, GOALS, PLACEMENTS, RISK_TOLERANCE, type AgeRange, type Placement } from "./storage";
+import { AGE_RANGES, COSTLY_DEBT, EMERGENCY_FUND, EXPERIENCE, GOALS, PLACEMENTS, RISK_TOLERANCE, type AgeRange, type Placement } from "./storage";
 
 export const MAX_RECOMMENDATIONS = 4;
 
@@ -35,6 +35,7 @@ export function anonymize(r: RecommendRequest) {
     emergencyFund: r.emergencyFund,
     riskTolerance: r.riskTolerance,
     experience: r.experience,
+    costlyDebt: r.costlyDebt,
     savings: bucket(r.savings, [1_000, 10_000, 50_000, 200_000], "lei"),
     monthly: bucket(r.monthly, [100, 500, 1_000, 3_000], "lei/lună"),
   };
@@ -124,7 +125,9 @@ export function validateRequest(body: unknown): RecommendRequest | null {
   if (!oneOf(b.goal, GOALS, false) || !oneOf(b.placement, PLACEMENTS, false)) return null;
   if (!oneOf(b.ageRange, AGE_RANGES) || !oneOf(b.emergencyFund, EMERGENCY_FUND)) return null;
   if (!oneOf(b.riskTolerance, RISK_TOLERANCE) || !oneOf(b.experience, EXPERIENCE)) return null;
-  return b as unknown as RecommendRequest;
+  const costlyDebt = b.costlyDebt ?? null; // older clients did not send it
+  if (!oneOf(costlyDebt, COSTLY_DEBT)) return null;
+  return { ...(b as unknown as RecommendRequest), costlyDebt: costlyDebt as RecommendRequest["costlyDebt"] };
 }
 
 export function rulesFor(req: RecommendRequest) {

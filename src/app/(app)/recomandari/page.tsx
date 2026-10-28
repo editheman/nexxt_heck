@@ -11,7 +11,7 @@ export default function Page() {
       <PageHeader
         step={<PortalBackLink />}
         title="Ce te ajută să-ți păstrezi puterea de cumpărare"
-        lead="Pe baza profilului tău și a trei răspunsuri scurte, îți arătăm în ce ordine merită să iei în calcul categoriile de produse — și de ce."
+        lead="Pe baza profilului tău și a patru răspunsuri scurte, îți arătăm în ce ordine merită să iei în calcul categoriile de produse — și de ce."
       />
       <Recommendations />
     </div>

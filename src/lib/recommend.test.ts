@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { assessProducts, type FitInput } from "./productFit";
 import { anonymize, buildMessages, fallbackRecommendations, parseModelOutput, validateRequest } from "./recommend";
 
-const input: FitInput = { horizonYears: 10, goal: "pensie", emergencyFund: "da", riskTolerance: "medie", experience: "putina" };
+const input: FitInput = { horizonYears: 10, goal: "pensie", emergencyFund: "da", riskTolerance: "medie", experience: "putina", costlyDebt: "nu" };
 const fits = assessProducts(input);
 const eligible = fits.filter((f) => f.eligible).map((f) => f.id);
 

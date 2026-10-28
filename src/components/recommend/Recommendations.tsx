@@ -11,7 +11,7 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PageSkeleton } from "@/components/ui/Skeleton";
-import { productById } from "@/content/products";
+import { PRODUCTS, productById } from "@/content/products";
 import { assessProducts, fitInputFromState } from "@/lib/productFit";
 import type { RecommendRequest, RecommendResponse } from "@/lib/recommend";
 import { useAuth } from "@/lib/useAuth";
@@ -38,7 +38,10 @@ export function Recommendations() {
     );
   }
 
-  const excluded = assessProducts(input).filter((f) => !f.eligible);
+  const fits = assessProducts(input);
+  // Only "consider" categories can be ranked; the others are explained separately.
+  const excluded = fits.filter((f) => !f.eligible && productById(f.id).kind === "consider");
+  const toKnow = fits.filter((f) => productById(f.id).kind !== "consider");
 
   async function generate() {
     setStatus({ kind: "loading" });
@@ -56,7 +59,7 @@ export function Recommendations() {
     <div className="space-y-8">
       <Card className="space-y-5">
         <div className="space-y-1">
-          <h2 className="text-xl text-ink">Trei întrebări despre tine</h2>
+          <h2 className="text-xl text-ink">Patru întrebări despre tine</h2>
           <p className="text-sm text-ink-muted">
             Folosim și profilul tău: orizont de {p.years} ani, obiectivul ales și unde ții acum banii.{" "}
             <Link href="/profil" className="font-semibold text-primary underline underline-offset-2">Modifică profilul</Link>
@@ -96,6 +99,40 @@ export function Recommendations() {
             ))}
           </ul>
         </details>
+      )}
+
+      {status.kind === "done" && (
+        <section aria-labelledby="de-stiut" className="space-y-3" data-testid="to-know">
+          <h2 id="de-stiut" className="text-xl text-ink">De știut înainte — nu le recomandăm</h2>
+          <p className="text-sm text-ink-muted">Categorii despre care auzi des. Le explicăm ca să le înțelegi riscurile, dar nu le includem în recomandări.</p>
+          <ul className="grid gap-3 md:grid-cols-2">
+            {toKnow.map((f) => {
+              const prod = PRODUCTS.find((x) => x.id === f.id)!;
+              return (
+                <li key={f.id}>
+                  <Card className="h-full space-y-2 p-5" data-testid={`know-${f.id}`}>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="text-base text-ink">{prod.name}</h3>
+                      <Badge kind={prod.kind === "caution" ? "assumption" : "user"}>{prod.kind === "caution" ? "Cu atenție" : "De verificat"}</Badge>
+                    </div>
+                    <p className="flex gap-2 text-sm text-ink">
+                      <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0 text-danger" />
+                      <span>{f.cautions.join(" ")}</span>
+                    </p>
+                    <details className="group rounded-[var(--radius-control)] bg-bg px-3 py-1.5">
+                      <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between text-sm font-semibold text-primary [&::-webkit-details-marker]:hidden">
+                        Fișa categoriei <ChevronDown aria-hidden className="size-4 transition-transform group-open:rotate-180" />
+                      </summary>
+                      <div className="pb-2">
+                        <ProductFacts product={prod} />
+                      </div>
+                    </details>
+                  </Card>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       )}
 
       <Alert tone="info" title="Ce sunt și ce nu sunt aceste recomandări">
