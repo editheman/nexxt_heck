@@ -23,6 +23,9 @@ Necesită Node.js 20.9+ (testat cu Node 26). Nu are nevoie de chei API sau servi
 
 ## Parcursul principal
 
+Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/interese` → `/simulator` → `/portal`. După profilare, toate secțiunile se deschid din portal (nu mai sunt înlănțuite), iar Fraude și Învață apar ca opțiuni acolo. „Contul” este profilul local din browser; nu există încă server sau autentificare.
+
+
 | Pas | Rută | Ce face |
 |---|---|---|
 | Intrare | `/` | Promisiunea produsului, „Începe demo-ul” sau „Folosește un profil exemplu” (fictiv) |

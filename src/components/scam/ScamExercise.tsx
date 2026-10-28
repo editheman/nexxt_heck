@@ -2,7 +2,7 @@
 
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
-import { NextStep } from "@/components/journey/NextStep";
+import { PortalNext } from "@/components/journey/Onboarding";
 import { Alert } from "@/components/ui/Alert";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 import { cn } from "@/components/ui/cn";
@@ -77,7 +77,7 @@ export function ScamExercise() {
         </ul>
       </Alert>
 
-      <NextStep href="/invata" label="Învață conceptele, pe scurt" hint="Șapte module de câteva minute, fiecare cu un quiz." />
+      <PortalNext />
     </div>
   );
 }

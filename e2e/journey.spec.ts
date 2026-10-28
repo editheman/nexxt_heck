@@ -99,7 +99,7 @@ test("full journey persists across reloads", async ({ page }) => {
   // Persistence
   await page.goto("/progres");
   await page.reload();
-  await expect(page.getByTestId("modules-read")).toHaveText("1/7");
+  await expect(page.getByTestId("modules-read")).toHaveText("1/8");
   await expect(page.getByRole("row", { name: /Inflația și puterea de cumpărare/ })).toContainText("4/4 · trecut");
   const percent = Number((await page.getByTestId("progress-percent").textContent())!.replace("%", ""));
   expect(percent).toBeGreaterThan(0);
@@ -159,11 +159,11 @@ test("schema-v1 saved data is migrated in place under pcac:v1", async ({ page })
   await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
   await page.getByRole("radio", { name: /Ultimii 3 ani/ }).check({ force: true });
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("pcac:v1")!));
-  expect(saved.version).toBe(3);
+  expect(saved.version).toBe(4);
   expect(saved.profile.ageRange).toBeNull();
   expect(saved.reality.years).toBe(3);
   await page.goto("/progres");
-  await expect(page.getByTestId("modules-read")).toHaveText("1/7");
+  await expect(page.getByTestId("modules-read")).toHaveText("1/8");
 });
 
 test("corrupt saved data falls back to defaults", async ({ page }) => {
@@ -187,6 +187,12 @@ test("reset clears progress after confirmation", async ({ page }) => {
 test("mobile menu navigates", async ({ page, isMobile }) => {
   test.skip(!isMobile, "mobile only");
   await page.goto("/");
+  // The menu exists only after the guided profiling is finished.
+  await expect(page.getByRole("button", { name: "Meniu" })).toHaveCount(0);
+  await page.evaluate(() =>
+    localStorage.setItem("pcac:v1", JSON.stringify({ version: 4, onboarding: { completedAt: "2026-10-28T10:00:00.000Z" } })),
+  );
+  await page.reload();
   await page.getByRole("button", { name: "Meniu" }).click();
   await page.locator("#mobile-nav").getByRole("link", { name: "Progres" }).click();
   await expect(page).toHaveURL(/\/progres$/);

@@ -68,6 +68,6 @@ test("Înapoi keeps step-1 answers; the saved profile has the alias and age rang
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   await expect(page).toHaveURL(/\/reality-check$/);
   const saved = await storage(page, "pcac:v1");
-  expect(saved.version).toBe(3);
+  expect(saved.version).toBe(4);
   expect(saved.profile).toMatchObject({ alias: "Ana", ageRange: "26-30", savings: 10000 });
 });

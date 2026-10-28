@@ -33,6 +33,7 @@ export function computeProgress(
   const journey: JourneyItem[] = [
     { id: "profil", label: "Completează profilul financiar", href: "/profil", done: state.profile !== null },
     { id: "reality", label: "Vezi Reality Check", href: "/reality-check", done: Boolean(p.visited.reality) },
+    { id: "interese", label: "Alege ce vrei să înveți", href: "/interese", done: state.interests.length > 0 },
     { id: "simulator", label: "Explorează simulatorul", href: "/simulator", done: Boolean(p.visited.simulator) },
     { id: "fraude", label: "Parcurge un scenariu de fraudă", href: "/fraude", done: scamsDone > 0 },
     { id: "modul", label: "Citește un modul", href: "/invata", done: modulesRead > 0 },

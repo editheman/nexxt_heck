@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { cn } from "@/components/ui/cn";
 import type { Profile } from "@/lib/storage";
-import { actions } from "@/lib/useDemoState";
+import { actions, useDemoState } from "@/lib/useDemoState";
 import { newsletter } from "@/lib/useNewsletter";
 import type { Subscriber } from "@/lib/newsletter";
 import { FinancialStep, initialFinancial, type FinancialDraft } from "./FinancialStep";
@@ -17,6 +17,7 @@ const STEPS = [
 
 export function OnboardingWizard({ initial, subscriber }: { initial: Profile | null; subscriber: Subscriber | null }) {
   const router = useRouter();
+  const { state } = useDemoState();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [step, setStep] = useState<0 | 1>(0);
   const [identity, setIdentity] = useState<Identity>(() => ({
@@ -45,7 +46,8 @@ export function OnboardingWizard({ initial, subscriber }: { initial: Profile | n
 
   function save(f: Omit<Profile, "alias" | "ageRange" | "isDemo">) {
     actions.saveProfile({ ...f, alias: identity.alias.trim(), ageRange: identity.ageRange, isDemo: false });
-    router.push("/reality-check");
+    // During profiling continue the chain; when editing later, return to the portal.
+    router.push(state.onboarding.completedAt ? "/portal" : "/reality-check");
   }
 
   return (

@@ -32,6 +32,7 @@ describe("computeProgress", () => {
       modulesRead: { a: true, b: true },
       quizzes: { a: { best: 4, total: 4, lastWrong: [] }, b: { best: 3, total: 4, lastWrong: [] } },
     };
+    s.interests = ["etf"];
     expect(computeProgress(s, catalog).percent).toBe(100);
   });
 });

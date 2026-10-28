@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { NextStep } from "@/components/journey/NextStep";
+import { OnboardingNext } from "@/components/journey/Onboarding";
 import { UseDemoProfileButton } from "@/components/profile/UseDemoProfileButton";
 import { StatCard } from "@/components/sim/StatCard";
 import { Badge } from "@/components/ui/Badge";
@@ -171,11 +171,7 @@ export function RealityCheck() {
         </div>
       </details>
 
-      <NextStep
-        href="/simulator"
-        label="Proiectează viitorul în simulator"
-        hint="Acolo alegi tu ipotezele de randament și inflație — sunt ipoteze, nu date oficiale."
-      />
+      <OnboardingNext href="/interese" label="Alege ce vrei să înveți" hint="Câteva teme care te interesează — le folosim ca să-ți recomandăm module." />
     </div>
   );
 }
