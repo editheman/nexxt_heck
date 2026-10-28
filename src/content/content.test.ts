@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { MODULES } from "./modules";
 import { MODULE_SLUGS } from "./moduleSlugs";
-import { SCAMS } from "./scams";
 
 describe("learning modules", () => {
   it("have unique slugs and question ids", () => {
@@ -23,12 +22,6 @@ describe("learning modules", () => {
       expect(q.options.map((o) => o.id)).toContain(q.correctId);
       expect(sectionIds.has(q.sectionId)).toBe(true);
     }
-  });
-});
-
-describe("scam scenarios", () => {
-  it.each(SCAMS.map((s) => [s.id, s] as const))("%s: each step has exactly one correct choice", (_, s) => {
-    for (const step of s.steps) expect(step.choices.filter((c) => c.correct)).toHaveLength(1);
   });
 });
 

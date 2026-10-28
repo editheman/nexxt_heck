@@ -50,7 +50,7 @@ export function buildMessages(user: ReturnType<typeof anonymize>, fits: ProductF
     return { id: p.id, nume: p.name, ce_este: p.short, risc: p.risk.text, lichiditate: p.liquidity.text, orizont: p.horizon, motive_reguli: f.reasons, atentie_reguli: f.cautions };
   });
   const system = [
-    "Ești asistentul educațional al aplicației „Protejează ce ai construit”, pentru adulți din România.",
+    "Ești asistentul educațional al aplicației „Llamora” (Protejează ce ai construit), pentru adulți din România.",
     "Scopul utilizatorului: să-și păstreze puterea de cumpărare a economiilor față de inflație, în acord cu obiectivul și orizontul lui.",
     `Alege și ordonează cel mult ${MAX_RECOMMENDATIONS} CATEGORII de produse din lista primită, cele mai potrivite situației lui.`,
     "Reguli stricte:",

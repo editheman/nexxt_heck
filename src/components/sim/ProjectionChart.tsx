@@ -16,7 +16,7 @@ const SERIES = {
 export function ProjectionChart({ rows, showContributed }: { rows: ProjectionRow[]; showContributed: boolean }) {
   const reduced = useReducedMotion();
   return (
-    <div className="h-[320px] w-full sm:h-[360px]" aria-hidden>
+    <div className="h-[320px] w-full sm:h-[360px] lg:short:h-[220px]" aria-hidden>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={rows} margin={{ top: 8, right: 16, bottom: 8, left: 8 }}>
           <CartesianGrid stroke="var(--color-border)" strokeDasharray="0" vertical={false} />

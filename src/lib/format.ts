@@ -76,3 +76,10 @@ export function formatCount(n: number, one: string, many: string): string {
 export function formatYears(n: number): string {
   return formatCount(n, "an", "ani");
 }
+
+const dateTime = new Intl.DateTimeFormat("ro-RO", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+/** "29 octombrie 2026, 10:05" (local time). */
+export function formatDateTime(iso: string): string {
+  return dateTime.format(new Date(iso));
+}

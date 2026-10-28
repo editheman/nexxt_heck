@@ -9,7 +9,8 @@ const body = Hanken_Grotesk({ variable: "--font-body", subsets: ["latin", "latin
 const code = JetBrains_Mono({ variable: "--font-code", subsets: ["latin", "latin-ext"], weight: ["400", "500"] });
 
 export const metadata: Metadata = {
-  title: { default: "Protejează ce ai construit", template: "%s · Protejează ce ai construit" },
+  title: { default: "Llamora — Protejează ce ai construit", template: "%s · Llamora" },
+  applicationName: "Llamora",
   description:
     "Învață să-ți protejezi banii, să recunoști fraudele și să înțelegi riscurile înainte să iei o decizie financiară.",
 };

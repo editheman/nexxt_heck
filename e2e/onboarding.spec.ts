@@ -48,32 +48,10 @@ test("creating the account stores a hash, never the password, and logs in", asyn
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("pcac:session:v1")!).accountId)).toBe(accounts[0].id);
 });
 
-test("email is optional; without consent it is rejected and nothing is stored", async ({ page }) => {
+test("there is no e-mail or newsletter field", async ({ page }) => {
   await credentials(page);
-  await page.getByLabel("Adresă de e-mail").fill("ana@exemplu.ro");
-  const consent = page.getByRole("checkbox");
-  await expect(consent).not.toBeChecked();
-  await next(page);
-  await expect(page.getByText("Bifează acordul pentru digest sau lasă adresa de e-mail goală.")).toBeVisible();
-  await expect(consent).toBeFocused();
-  expect(await page.evaluate(() => localStorage.getItem("pcac:accounts:v1"))).toBeNull();
-});
-
-test("email with explicit consent subscribes under the new account (source: onboarding)", async ({ page }) => {
-  await credentials(page);
-  await page.getByLabel("Adresă de e-mail").fill("ana@exemplu.ro");
-  await page.getByRole("checkbox").check();
-  await next(page);
-  await expect(page.getByTestId("onboarding-step")).toHaveText("Pasul 2 din 2: Banii tăi");
-  expect((await accountItem(page, "subscriber:v1")).email).toBe("ana@exemplu.ro");
-  const log = await accountItem(page, "consent:v1");
-  expect(log[0]).toMatchObject({ granted: true, source: "onboarding" });
-  expect(JSON.stringify(log)).not.toContain("ana@");
-  expect(await page.evaluate(() => localStorage.getItem("pcac:subscriber:v1"))).toBeNull();
-
-  await page.getByRole("button", { name: "Înapoi" }).click();
-  await expect(page.getByTestId("onboarding-subscribed")).toContainText("a•••@exemplu.ro");
-  await expect(page.getByText("Conectat ca")).toBeVisible();
+  await expect(page.getByLabel(/e-mail/i)).toHaveCount(0);
+  await expect(page.getByRole("checkbox")).toHaveCount(0);
 });
 
 test("Înapoi keeps the answers without asking for the password again; the profile is saved", async ({ page }) => {
@@ -89,6 +67,6 @@ test("Înapoi keeps the answers without asking for the password again; the profi
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   await expect(page).toHaveURL(/\/reality-check$/);
   const saved = await accountItem(page, "v1");
-  expect(saved.version).toBe(7);
+  expect(saved.version).toBe(9);
   expect(saved.profile).toMatchObject({ alias: "ana", ageRange: "26-30", savings: 10000 });
 });

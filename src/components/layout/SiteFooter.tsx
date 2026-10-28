@@ -8,17 +8,15 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1120px] space-y-10 px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-[1.2fr_1fr]">
           <div className="space-y-2">
-            <p className="flex items-center gap-2 font-bold text-ink">
+            <p className="flex items-center gap-2 text-ink">
               <Logo size={28} />
-              Protejează ce ai construit
+              <span className="font-bold tracking-[0.14em] uppercase">Llamora</span>
+              <span className="text-sm text-ink-muted">· Protejează ce ai construit</span>
             </p>
             <p className="text-sm text-ink-muted">Platformă educațională pentru decizii financiare informate.</p>
             <ul className="flex flex-wrap gap-x-5 gap-y-1 pt-2 text-sm">
               <li>
                 <Link href="/confidentialitate" className="font-semibold text-ink hover:text-primary">Confidențialitate</Link>
-              </li>
-              <li>
-                <Link href="/dezabonare" className="font-semibold text-ink hover:text-primary">Dezabonare</Link>
               </li>
             </ul>
           </div>
@@ -36,13 +34,7 @@ export function SiteFooter() {
             </ul>
           </div>
         </div>
-        <div className="flex flex-col gap-4 border-t border-border pt-6 md:flex-row md:items-end md:justify-between">
-          <p className="max-w-[80ch] font-mono text-xs leading-relaxed text-ink-muted">
-            Disclaimer: platformă educațională. Nu suntem bancă, broker sau consultant de investiții autorizat; recomandările
-            se referă la categorii de produse, nu la produse, fonduri sau instituții anume. Calculele sunt estimări bazate pe
-            ipotezele afișate — nu prognoze și nu garanții. Datele rămân doar în browserul tău (localStorage); nu cerem CNP,
-            IBAN sau date de card, iar parola contului nu se salvează, ci doar o amprentă criptografică.
-          </p>
+        <div className="flex justify-end border-t border-border pt-6">
           <p className="flex shrink-0 items-center gap-2 font-mono text-xs text-ink-muted">
             <span aria-hidden className="size-1.5 rounded-full bg-accent" /> Zero date personale solicitate
           </p>

@@ -20,7 +20,6 @@ const valid: DemoState = {
   riskProfile: { emergencyFund: "partial", riskTolerance: "medie", experience: "deloc", costlyDebt: "da" },
   progress: {
     visited: { reality: true },
-    scams: { curier: { completed: true, correct: 2, total: 3 } },
     modulesRead: { inflatia: true },
     quizzes: { inflatia: { best: 3, total: 4, lastWrong: ["q2"] } },
   },
@@ -80,7 +79,7 @@ describe("parseState", () => {
     const profile: Record<string, unknown> = { ...valid.profile };
     delete profile.ageRange;
     const parsed = parseState(JSON.stringify({ ...valid, version: 2, profile }));
-    expect(parsed.version).toBe(7);
+    expect(parsed.version).toBe(9);
     expect(parsed.profile?.ageRange).toBeNull();
   });
 
@@ -98,7 +97,7 @@ describe("parseState", () => {
     const v3: Record<string, unknown> = { ...valid, version: 3 };
     delete v3.onboarding;
     const parsed = parseState(JSON.stringify(v3));
-    expect(parsed.version).toBe(7);
+    expect(parsed.version).toBe(9);
     expect(parsed.onboarding.completedAt).toBeNull();
   });
 
@@ -122,7 +121,39 @@ describe("parseState", () => {
 
   it("migrates a schema-v6 risk profile without the costly-debt answer", () => {
     const parsed = parseState(JSON.stringify({ ...valid, version: 6, riskProfile: { emergencyFund: "da", riskTolerance: "medie", experience: "deloc" } }));
-    expect(parsed.version).toBe(7);
+    expect(parsed.version).toBe(9);
     expect(parsed.riskProfile.costlyDebt).toBeNull();
+  });
+
+  it("keeps saved plans and drops malformed generations and methods", () => {
+    const gen = {
+      id: "g1", createdAt: "2026-10-29T10:00:00.000Z", source: "reguli",
+      snapshot: { horizonYears: 10, goal: "pensie", placement: "cont-curent", savings: 1, monthly: 0, ageRange: null, emergencyFund: "da", riskTolerance: "medie", experience: "putina", costlyDebt: "nu" },
+      items: [{ id: "pilon3", why: "w", watchOut: "c" }, { id: "nu-exista", why: "x" }],
+    };
+    const plans = {
+      generations: [gen, { id: "bad" }],
+      methods: [
+        { productId: "pilon3", generationId: "g1", status: "confirmed", addedAt: "2026-10-29T10:01:00.000Z", confirmedAt: "2026-10-29T10:02:00.000Z" },
+        { productId: "pilon3", generationId: "lipsa", status: "draft", addedAt: "2026-10-29T10:01:00.000Z" },
+        { productId: "cripto", generationId: "g1", status: "poate", addedAt: "x" },
+      ],
+    };
+    const parsed = parseState(JSON.stringify({ ...valid, plans }));
+    expect(parsed.plans.generations.map((g) => g.id)).toEqual(["g1"]);
+    expect(parsed.plans.generations[0].items.map((i) => i.id)).toEqual(["pilon3"]);
+    expect(parsed.plans.methods).toHaveLength(1);
+  });
+
+  it("migrates a schema-v7 state with empty plans", () => {
+    const parsed = parseState(JSON.stringify({ ...valid, version: 7 }));
+    expect(parsed.version).toBe(9);
+    expect(parsed.plans).toEqual({ generations: [], methods: [] });
+  });
+
+  it("drops the retired scam-scenario progress from a v8 state", () => {
+    const parsed = parseState(JSON.stringify({ ...valid, version: 8, progress: { ...valid.progress, scams: { curier: { completed: true, correct: 2, total: 3 } } } }));
+    expect(parsed.version).toBe(9);
+    expect(parsed.progress).toEqual(valid.progress);
   });
 });

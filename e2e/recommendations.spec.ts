@@ -23,17 +23,17 @@ test("ranks categories from the profile and risk answers (rule-based without an 
   await page.getByText(/De ce nu îți recomandăm acum celelalte categorii/).click();
   await expect(page.getByText("Fără fond de urgență, ai putea fi nevoit să vinzi").first()).toBeVisible();
 
-  // Changing the answers invalidates the old list; regenerating reflects them.
+  // Changing the answers marks the saved set as out of date; regenerating reflects them.
   await page.getByRole("group", { name: /fond de urgență/ }).getByRole("button", { name: "Da", exact: true }).click();
   await page.getByRole("button", { name: "Aș pune mai mulți bani" }).click();
-  await expect(recs).toHaveCount(0);
-  await page.getByRole("button", { name: "Generează recomandările" }).click();
+  await expect(page.getByTestId("stale-notice")).toBeVisible();
+  await page.getByRole("button", { name: /^Generează/ }).click();
   await expect(page.getByTestId("rec-etf-global")).toBeVisible();
   await expect(page.getByTestId("rec-pilon3")).toBeVisible();
 
   // An expensive loan moves early repayment to the top; caution/check categories are explained apart.
   await page.getByRole("group", { name: /credit cu dobândă mare/ }).getByRole("button", { name: "Da", exact: true }).click();
-  await page.getByRole("button", { name: "Generează recomandările" }).click();
+  await page.getByRole("button", { name: /^Generează/ }).click();
   await expect(recs.locator("li").first()).toContainText("Rambursarea anticipată a unui credit scump");
   const toKnow = page.getByTestId("to-know");
   await expect(toKnow.getByTestId("know-cripto")).toContainText("MiCA");
@@ -45,7 +45,7 @@ test("ranks categories from the profile and risk answers (rule-based without an 
   await expect(page.getByRole("button", { name: "Aș pune mai mulți bani" })).toHaveAttribute("aria-pressed", "true");
 
   // The fact sheet opens and cites sources; the disclaimer is always there.
-  await page.getByRole("button", { name: "Generează recomandările" }).click();
+  await page.getByRole("button", { name: /^Generează/ }).click();
   await page.getByTestId("rec-etf-global").getByText("Fișa categoriei").click();
   await expect(page.getByTestId("rec-etf-global").getByRole("link", { name: /ASF/ })).toBeVisible();
   await expect(page.getByText("nu este consultanță de investiții autorizată")).toBeVisible();

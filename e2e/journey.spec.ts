@@ -60,18 +60,9 @@ test("full journey persists across reloads", async ({ page }) => {
   await expect(page.getByTestId("sim-real")).toHaveText("12.278 lei");
   await page.getByRole("button", { name: "Randament egal cu inflația" }).click();
   await expect(page.getByTestId("sim-real")).toHaveText("20.000 lei");
-  await expect(page.getByTestId("sim-explanation")).toContainText("aproximativ aceeași putere de cumpărare");
+  await expect(page.getByTestId("sim-explanation")).toContainText("Randamentul real anual este de 0%");
   await page.getByRole("button", { name: "Vezi tabelul" }).click();
   await expect(page.getByRole("table")).toContainText("Putere de cumpărare (lei de azi)");
-
-  // Scam scenario
-  await page.goto("/fraude");
-  await page.getByRole("button", { name: "Linkul necunoscut și termenul de 24h" }).click();
-  await expect(page.getByText("Corect", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Continuă" }).click();
-  await page.getByRole("button", { name: /Verific în aplicația sau pe site-ul oficial/ }).click();
-  await page.getByRole("button", { name: "Vezi rezumatul" }).click();
-  await expect(page.getByRole("heading", { name: /Rezumat: 2 din 2/ })).toBeVisible();
 
   // Module + quiz with one wrong answer
   await page.goto("/invata/inflatia");
@@ -164,7 +155,7 @@ test("schema-v1 saved data is migrated in place under pcac:v1", async ({ page })
   await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
   await page.getByRole("radio", { name: /Ultimii 3 ani/ }).check({ force: true });
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("pcac:v1")!));
-  expect(saved.version).toBe(7);
+  expect(saved.version).toBe(9);
   expect(saved.profile.ageRange).toBeNull();
   expect(saved.reality.years).toBe(3);
   await page.goto("/progres");
@@ -199,8 +190,8 @@ test("mobile menu navigates", async ({ page, isMobile }) => {
   );
   await page.reload();
   await page.getByRole("button", { name: "Meniu" }).click();
-  await page.locator("#mobile-nav").getByRole("link", { name: "Progres" }).click();
-  await expect(page).toHaveURL(/\/progres$/);
+  await page.locator("#mobile-nav").getByRole("link", { name: "Învață" }).click();
+  await expect(page).toHaveURL(/\/invata$/);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
 });
@@ -216,6 +207,6 @@ test("home is a single screen with working pillar links", async ({ page, isMobil
   const pillars = page.getByRole("navigation", { name: "Teme principale" });
   await expect(pillars.getByRole("link")).toHaveCount(3);
   await pillars.getByRole("link", { name: /Protecție anti-fraudă/ }).click();
-  await expect(page).toHaveURL(/\/fraude$/);
+  await expect(page).toHaveURL(/\/invata\/fraude$/);
   await expect(page.locator("footer")).toHaveCount(1);
 });

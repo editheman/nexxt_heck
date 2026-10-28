@@ -34,13 +34,17 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-[1120px] items-center gap-8 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex min-h-11 items-center gap-2.5 font-bold text-ink">
+        <Link href="/" className="flex min-h-11 shrink-0 items-center gap-2.5 text-ink" aria-label="Llamora — Protejează ce ai construit, pagina de start">
           <Logo size={36} />
-          <span className="text-[1.05rem] leading-tight tracking-tight">Protejează ce ai construit</span>
+          <span className="flex flex-col leading-none">
+            <span className="text-[1.15rem] font-bold tracking-[0.14em] uppercase">Llamora</span>
+            <span className="mt-1 hidden text-[0.7rem] font-medium text-ink-muted sm:block">Protejează ce ai construit</span>
+          </span>
         </Link>
 
+        {/* Fills the space between logo and account button, links centred in it. */}
         {done && (
-        <nav aria-label="Navigare principală" className="hidden lg:block">
+        <nav aria-label="Navigare principală" className="hidden flex-1 justify-center lg:flex">
           <ul className="flex items-center">
             {primaryNav.map((item) => {
               const active = isActive(pathname, item.href);
@@ -65,12 +69,12 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {!done && (
-            <Link
-              href={account ? resumeHref(state) : "/profil"}
-              className={buttonClass("primary", "hidden min-h-10 px-4 py-2 text-sm sm:inline-flex")}
-            >
-              {account ? "Continuă profilarea" : "Începe"}
-            </Link>
+            // The wrapper hides the CTA on phones (the button's own inline-flex would override `hidden`).
+            <span className="hidden sm:block">
+              <Link href={account ? resumeHref(state) : "/profil"} className={buttonClass("primary", "min-h-10 px-4 py-2 text-sm whitespace-nowrap")}>
+                {account ? "Continuă profilarea" : "Începe"}
+              </Link>
+            </span>
           )}
           <AccountMenu />
           {done && (

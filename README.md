@@ -1,4 +1,4 @@
-# Protejează ce ai construit
+# Llamora — Protejează ce ai construit
 
 O aplicație web educațională, în limba română, care te ajută să înțelegi cum îți afectează inflația economiile, să explorezi scenarii ipotetice transparente, să recunoști fraudele financiare și să-ți verifici cunoștințele.
 
@@ -23,7 +23,7 @@ Necesită Node.js 20.9+ (testat cu Node 26). Nu are nevoie de chei API sau servi
 
 ## Parcursul principal
 
-Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` → `/portal`. După profilare, toate secțiunile se deschid din portal (nu mai sunt înlănțuite), iar Fraude și Învață apar ca opțiuni acolo. Învață și portalul recomandă modulele după obiectivul de economisire ales în profil. Profilarea începe cu crearea unui cont (nume de utilizator + parolă); `/intra` este pagina de autentificare, iar iconița din dreapta sus deschide meniul contului. Conturile sunt **locale, de demo**: parola nu se salvează, ci doar un hash PBKDF2-SHA-256 cu sare, iar datele fiecărui cont stau separat în browser. Pentru conturi reale e nevoie de server — vezi `docs/superpowers/specs/2026-10-28-accounts-design.md`.
+Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` → `/portal`. După profilare, toate secțiunile se deschid din portal (nu mai sunt înlănțuite), iar Învață apare ca opțiune acolo. Învață și portalul recomandă modulele după obiectivul de economisire ales în profil. Profilarea începe cu crearea unui cont (nume de utilizator + parolă); `/intra` este pagina de autentificare, iar iconița din dreapta sus deschide meniul contului. Conturile sunt **locale, de demo**: parola nu se salvează, ci doar un hash PBKDF2-SHA-256 cu sare, iar datele fiecărui cont stau separat în browser. Pentru conturi reale e nevoie de server — vezi `docs/superpowers/specs/2026-10-28-accounts-design.md`.
 
 
 | Pas | Rută | Ce face |
@@ -32,14 +32,17 @@ Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` �
 | 1 | `/profil` | Profil minim: economii, unde sunt ținute, randament estimat de tine, depunere lunară, orizont, obiectiv |
 | 2 | `/reality-check` | Valoare nominală vs. putere de cumpărare în lei de azi; inflația este o ipoteză editabilă |
 | 3 | `/simulator` | Glisoare + câmpuri numerice, scenarii rapide, grafic (nominal continuu / real întrerupt) și tabel |
-| 4 | `/fraude` | 4 scenarii fictive (SMS curier, platformă „garantată”, apel „de la bancă”, prieten pe WhatsApp) |
-| 5 | `/invata`, `/invata/[slug]` | 7 module: inflație, randament real, lichiditate, diversificare, comisioane, taxe, fraude |
+| 4 | `/invata`, `/invata/[slug]` | 7 module: inflație, randament real, lichiditate, diversificare, comisioane, taxe, fraude |
 | Quiz | `/invata/[slug]/quiz` | Feedback la fiecare răspuns, link către secțiunea de recitit, reluarea doar a întrebărilor greșite |
 | Progres | `/progres` | Traseu, module, scoruri, resetare cu confirmare; totul persistă la reîncărcare |
 
 ## Recomandări de categorii de produse (varianta A)
 
 `/recomandari` ordonează categoriile (cont de economii, depozit, Tezaur, Fidelis, ETF pe BET, ETF global cu acumulare, Pilonul III) după profil și trei răspunsuri despre risc. Regulile din `src/lib/productFit.ts` exclud categoriile nepotrivite (de exemplu acțiuni pe orizont scurt). Opțional, un model compatibil OpenAI (de exemplu Featherless) ordonează și formulează motivele: copiază `.env.example` în `.env.local` și completează `AI_API_KEY` și `AI_MODEL`. Fără cheie, se folosește clasamentul din reguli. Răspunsul modelului este validat (doar categorii permise, fără cifre sau promisiuni). Nu se recomandă produse, fonduri sau instituții anume.
+
+## Metodele mele
+
+Din `/recomandari` poți alege categorii („Aleg această metodă”) — apar ca draft în `/metode`, unde le confirmi pe cele pe care le folosești. Recomandările se salvează în cont; când îți schimbi profilul sau răspunsurile și generezi din nou, setul vechi, cu metodele alese din el, trece în istoric (cel mai nou primul), iar setul nou devine cel actual.
 
 ## Calcule și ipoteze
 
@@ -65,13 +68,8 @@ Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` �
 - Un quiz este „trecut” la ≥ 75%. La reluarea întrebărilor greșite, cele corecte anterior rămân corecte.
 - Sumele se afișează ca „12.346 lei” (convenția obișnuită în interfețele financiare); anii respectă acordul („10 ani”, „20 de ani”).
 
-## Digest pe e-mail (mod demo)
-
-După ce deschizi două module diferite, la finalul articolului apare o propunere discretă de abonare la un digest săptămânal. Acordul de marketing este o căsuță separată, nebifată implicit; fără el nu se salvează nimic. Închiderea amână propunerea 14, apoi 30 de zile; „Nu, mulțumesc” o oprește definitiv; maximum 3 afișări. Nu există încă un serviciu de e-mail: totul rămâne în browser și interfața spune asta explicit. Cerințele pentru producție sunt în `docs/newsletter.md`; nota de confidențialitate e la `/confidentialitate`, dezabonarea la `/dezabonare`.
-
 ## Limitări cunoscute
 
-- Digestul pe e-mail funcționează doar în mod demo (fără trimitere reală).
 - Funcția opțională „Prieteni” (comparații de progres pe bază de alias) nu este implementată.
 - Fără mod întunecat; fără export de rezultate.
 - Calculele ignoră costurile și impozitele (explicat în aplicație); ratele sunt constante pe toată perioada.

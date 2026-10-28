@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ChevronDown, Info, Sparkles } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, History, Info, Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { LevelMeter, ProductFacts } from "@/components/products/ProductFacts";
@@ -12,12 +12,14 @@ import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 import { PRODUCTS, productById } from "@/content/products";
+import { formatDateTime } from "@/lib/format";
+import { currentGeneration, methodsOf, sameSnapshot, type Generation, type Method } from "@/lib/plans";
 import { assessProducts, fitInputFromState } from "@/lib/productFit";
 import type { RecommendRequest, RecommendResponse } from "@/lib/recommend";
 import { useAuth } from "@/lib/useAuth";
 import { actions, useDemoState } from "@/lib/useDemoState";
 
-type Status = { kind: "idle" } | { kind: "loading" } | { kind: "done"; data: RecommendResponse } | { kind: "error" };
+type Status = { kind: "idle" } | { kind: "loading" } | { kind: "done"; fallbackReason?: string } | { kind: "error" };
 
 export function Recommendations() {
   const { state, hydrated } = useDemoState();
@@ -43,13 +45,20 @@ export function Recommendations() {
   const excluded = fits.filter((f) => !f.eligible && productById(f.id).kind === "consider");
   const toKnow = fits.filter((f) => productById(f.id).kind !== "consider");
 
+  const snapshot: RecommendRequest = { ...input, savings: p.savings, monthly: p.monthly, placement: p.placement, ageRange: p.ageRange };
+  const current = currentGeneration(state.plans);
+  // The saved set was generated from other inputs: the user has been re-profiled.
+  const stale = current !== undefined && !sameSnapshot(current.snapshot, snapshot);
+  const chosen = current ? methodsOf(state.plans, current.id) : [];
+
   async function generate() {
     setStatus({ kind: "loading" });
-    const body: RecommendRequest = { ...input!, savings: p!.savings, monthly: p!.monthly, placement: p!.placement, ageRange: p!.ageRange };
     try {
-      const res = await fetch("/api/recomandari", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const res = await fetch("/api/recomandari", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(snapshot) });
       if (!res.ok) throw new Error(String(res.status));
-      setStatus({ kind: "done", data: (await res.json()) as RecommendResponse });
+      const data = (await res.json()) as RecommendResponse;
+      actions.saveGeneration(snapshot, data);
+      setStatus({ kind: "done", fallbackReason: data.fallbackReason });
     } catch {
       setStatus({ kind: "error" });
     }
@@ -74,7 +83,7 @@ export function Recommendations() {
         />
         <Button onClick={generate} aria-disabled={status.kind === "loading" || undefined} className="w-full sm:w-auto">
           <Sparkles aria-hidden className="size-4" />
-          {status.kind === "loading" ? "Se pregătesc recomandările… (poate dura până la un minut)" : status.kind === "done" ? "Generează din nou" : "Generează recomandările"}
+          {status.kind === "loading" ? "Se pregătesc recomandările… (poate dura până la un minut)" : current ? "Generează din nou" : "Generează recomandările"}
         </Button>
       </Card>
 
@@ -84,10 +93,26 @@ export function Recommendations() {
             Verifică conexiunea și încearcă din nou.
           </Alert>
         )}
-        {status.kind === "done" && <Ranked data={status.data} />}
+        {stale && (
+          <Alert tone="assumption" title="Profilul tău s-a schimbat" className="mb-4">
+            <span data-testid="stale-notice">
+              Recomandările de mai jos au fost generate pe {formatDateTime(current!.createdAt)}, cu alte date. Generează din nou: setul de
+              acum, cu metodele alese din el, trece în istoricul din{" "}
+              <Link href="/metode" className="font-semibold text-primary underline underline-offset-2">Metodele mele</Link>.
+            </span>
+          </Alert>
+        )}
+        {current && (
+          <Ranked
+            generation={current}
+            chosen={chosen}
+            readOnly={stale}
+            fallbackReason={status.kind === "done" ? status.fallbackReason : undefined}
+          />
+        )}
       </div>
 
-      {status.kind === "done" && excluded.length > 0 && (
+      {current && excluded.length > 0 && (
         <details className="rounded-[var(--radius-card)] border border-border bg-surface p-5">
           <summary className="min-h-11 cursor-pointer font-semibold text-ink">De ce nu îți recomandăm acum celelalte categorii ({excluded.length})</summary>
           <ul className="mt-3 space-y-3 text-sm">
@@ -101,7 +126,7 @@ export function Recommendations() {
         </details>
       )}
 
-      {status.kind === "done" && (
+      {current && (
         <section aria-labelledby="de-stiut" className="space-y-3" data-testid="to-know">
           <h2 id="de-stiut" className="text-xl text-ink">De știut înainte — nu le recomandăm</h2>
           <p className="text-sm text-ink-muted">Categorii despre care auzi des. Le explicăm ca să le înțelegi riscurile, dar nu le includem în recomandări.</p>
@@ -145,25 +170,46 @@ export function Recommendations() {
   );
 }
 
-function Ranked({ data }: { data: RecommendResponse }) {
+function Ranked({
+  generation: data,
+  chosen,
+  readOnly,
+  fallbackReason,
+}: {
+  generation: Generation;
+  chosen: Method[];
+  readOnly: boolean;
+  fallbackReason?: string;
+}) {
   return (
     <section aria-labelledby="clasament" className="space-y-4" data-testid="recommendations">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="clasament" className="text-2xl text-ink">Recomandările tale</h2>
+        <div className="space-y-0.5">
+          <h2 id="clasament" className="text-2xl text-ink">Recomandările tale</h2>
+          <p className="text-xs text-ink-muted">Generate pe {formatDateTime(data.createdAt)}</p>
+        </div>
         {data.source === "ai" ? (
           <Badge kind="estimate">Generat cu AI ({data.model}) · verificat după reguli</Badge>
         ) : (
           <Badge kind="estimate">Calculat după reguli</Badge>
         )}
       </div>
-      {data.source === "reguli" && data.fallbackReason && (
+      {data.source === "reguli" && fallbackReason && (
         <p className="text-sm text-ink-muted" data-testid="fallback-reason">
-          Am folosit regulile pentru că: {data.fallbackReason}
+          Am folosit regulile pentru că: {fallbackReason}
+        </p>
+      )}
+      {chosen.length > 0 && (
+        <p className="flex flex-wrap items-center gap-2 text-sm text-ink">
+          <History aria-hidden className="size-4 text-primary" />
+          Ai ales {chosen.length === 1 ? "o metodă" : `${chosen.length} metode`} din acest set.{" "}
+          <Link href="/metode" className="font-semibold text-primary underline underline-offset-2">Vezi Metodele mele</Link>
         </p>
       )}
       <ol className="space-y-4">
         {data.items.map((r, i) => {
           const p = productById(r.id);
+          const method = chosen.find((m) => m.productId === r.id);
           return (
             <li key={r.id}>
               <Card className="space-y-3" data-testid={`rec-${r.id}`}>
@@ -176,7 +222,7 @@ function Ranked({ data }: { data: RecommendResponse }) {
                     <h3 className="text-xl text-ink">{p.name}</h3>
                     <p className="text-sm text-ink-muted">{p.short}</p>
                   </div>
-                  <div className="flex flex-col gap-1">
+                  <div className="flex w-full flex-row flex-wrap gap-x-5 gap-y-1 pl-14 sm:w-auto sm:flex-col sm:pl-0">
                     <LevelMeter label="Risc" level={p.risk.level} />
                     <LevelMeter label="Lichiditate" level={p.liquidity.level} />
                   </div>
@@ -199,6 +245,25 @@ function Ranked({ data }: { data: RecommendResponse }) {
                     <ProductFacts product={p} />
                   </div>
                 </details>
+                {!readOnly && (
+                  <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
+                    {method?.status === "confirmed" ? (
+                      <span className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-success">
+                        <Check aria-hidden className="size-4" /> O folosești · confirmată în Metodele mele
+                      </span>
+                    ) : (
+                      <Button
+                        variant={method ? "secondary" : "primary"}
+                        aria-pressed={Boolean(method)}
+                        onClick={() => actions.toggleMethod(r.id)}
+                        data-testid={`choose-${r.id}`}
+                      >
+                        {method ? <Check aria-hidden className="size-4" /> : <Plus aria-hidden className="size-4" />}
+                        {method ? "Aleasă · în Metodele mele" : "Aleg această metodă"}
+                      </Button>
+                    )}
+                  </div>
+                )}
               </Card>
             </li>
           );

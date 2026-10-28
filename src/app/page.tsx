@@ -4,7 +4,7 @@ import { StartDemoButton } from "@/components/home/StartDemoDialog";
 
 const PILLARS = [
   { n: "01", icon: Landmark, title: "Fond de urgență", text: "3–6 luni de cheltuieli esențiale", href: "/invata/lichiditate" },
-  { n: "02", icon: ShieldCheck, title: "Protecție anti-fraudă", text: "SMS-uri, apeluri și oferte false", href: "/fraude" },
+  { n: "02", icon: ShieldCheck, title: "Protecție anti-fraudă", text: "SMS-uri, apeluri și oferte false", href: "/invata/fraude" },
   { n: "03", icon: TrendingDown, title: "Inflație & putere de cumpărare", text: "Cât valorează azi economiile tale", href: "/reality-check" },
 ] as const;
 
@@ -17,7 +17,7 @@ const TRUST = [
 export default function Home() {
   return (
     // One screen on laptop/desktop; on very short or narrow screens it may scroll rather than clip content.
-    <section className="hero-wash flex min-h-[calc(100dvh-4rem-1px)] flex-col" data-testid="home">
+    <section className="hero-photo flex min-h-[calc(100dvh-4rem-1px)] flex-col" data-testid="home">
       <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col px-4 py-5 short:py-3 sm:px-6 lg:px-8">
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center short:py-4">
           <h1 className="max-w-[20ch] text-[2.4rem] leading-[1.08] text-ink sm:text-6xl sm:short:text-5xl">
@@ -41,23 +41,23 @@ export default function Home() {
           </ul>
         </div>
 
-        <nav aria-label="Teme principale" className="mx-auto w-full max-w-[1040px]">
-          <ul className="grid gap-3 rounded-[var(--radius-card)] border border-border bg-surface/90 p-3 shadow-[var(--shadow-card)] md:grid-cols-3">
+        <nav aria-label="Teme principale" className="mx-auto w-full max-w-[960px]">
+          <ul className="grid gap-2 rounded-[var(--radius-card)] border border-white/50 bg-surface/35 p-2 shadow-[var(--shadow-card)] backdrop-blur-sm md:grid-cols-3">
             {PILLARS.map((p) => (
               <li key={p.n}>
                 <Link
                   href={p.href}
-                  className="group flex h-full min-h-16 items-center gap-4 rounded-[var(--radius-control)] border border-border bg-bg/60 px-4 py-3 transition-colors hover:border-primary hover:bg-primary-soft"
+                  className="group flex h-full min-h-14 items-center gap-3 rounded-[var(--radius-control)] border border-white/60 bg-surface/55 px-3 py-2 transition-colors hover:border-primary hover:bg-primary-soft"
                 >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-border bg-surface text-primary">
-                    <p.icon aria-hidden className="size-5" />
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-border bg-surface text-primary">
+                    <p.icon aria-hidden className="size-4" />
                   </span>
                   <span className="min-w-0 text-left">
-                    <span className="flex flex-wrap items-baseline gap-x-2 text-sm">
-                      <span className="font-mono text-xs text-ink-muted">PILON {p.n}</span>
+                    <span className="flex flex-wrap items-baseline gap-x-1.5 text-[0.8125rem]">
+                      <span className="font-mono text-[0.6875rem] text-ink-muted">PILON {p.n}</span>
                       <span className="font-semibold text-primary">{p.title}</span>
                     </span>
-                    <span className="block text-sm text-ink-muted">{p.text}</span>
+                    <span className="block text-xs text-ink-muted">{p.text}</span>
                   </span>
                   <ArrowRight aria-hidden className="ml-auto size-4 shrink-0 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                 </Link>

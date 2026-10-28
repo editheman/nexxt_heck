@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { computeProgress, isPassed } from "./progress";
 import { defaultState } from "./storage";
 
-const catalog = { moduleSlugs: ["a", "b"], scamIds: ["x"] };
+const catalog = { moduleSlugs: ["a", "b"] };
 
 describe("computeProgress", () => {
   it("is 0% for a fresh state", () => {
@@ -28,7 +28,6 @@ describe("computeProgress", () => {
     s.profile = { alias: "", savings: 1, placement: "numerar", nominalPct: 0, monthly: 0, years: 1, goal: "altul", ageRange: null, isDemo: false };
     s.progress = {
       visited: { reality: true, simulator: true },
-      scams: { x: { completed: true, correct: 2, total: 2 } },
       modulesRead: { a: true, b: true },
       quizzes: { a: { best: 4, total: 4, lastWrong: [] }, b: { best: 3, total: 4, lastWrong: [] } },
     };

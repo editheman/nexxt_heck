@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-Build a polished, functional financial education web application for Romania called "Protejează ce ai construit".
+Build a polished, functional financial education web application for Romania called "Llamora" (brand name chosen by the owner, 2026-10-29), with the tagline "Protejează ce ai construit".
 
 Core promise:
 "Învață să-ți protejezi banii, să recunoști fraudele și să înțelegi riscurile înainte să iei o decizie financiară."
@@ -33,7 +33,7 @@ Prioritize the following end-to-end user journey:
 2. Complete a minimal financial profile.
 3. View the Reality Check.
 4. Change assumptions and explore purchasing power.
-5. Complete an interactive financial scam scenario.
+5. ~~Complete an interactive financial scam scenario.~~ Removed at the owner's request (2026-10-29); fraud awareness stays as the „fraude” learning module.
 6. Study a learning module.
 7. Complete a quiz and receive useful feedback.
 8. Refresh the page and confirm progress persists.
@@ -44,7 +44,7 @@ Core modules:
 - Reality Check: financial profile and purchasing-power analysis.
 - Scenario Simulator: nominal balances versus real purchasing power.
 - Learning Roadmap: inflation, returns, liquidity, diversification, fees, taxes and fraud awareness.
-- Scam Awareness: realistic fictional scenarios and explanations.
+- ~~Scam Awareness (interactive scenarios)~~: removed at the owner's request (2026-10-29); do not re-add `/fraude` without asking.
 - Adaptive Quiz: answer-level feedback and concept-specific revision.
 - Progress: persistent learning progress and completed modules.
 - Friends: opt-in, alias-based educational comparisons.
@@ -156,12 +156,13 @@ Prefer a working, coherent end-to-end product over a large collection of incompl
 - Design system (tokens, components, anti-patterns): `docs/design-system.md`. Tokens live in `src/app/globals.css`; never use raw hex in components.
 - Product/technical spec: `docs/superpowers/specs/2026-10-28-protejeaza-design.md`. Implementation plan: `docs/superpowers/plans/`.
 - Financial math lives only in `src/lib/finance.ts` (annual effective rates, end-of-month contributions at `(1+r)^(1/12)−1`). Change conventions there and in the spec together.
-- Romanian content (modules, quizzes, scam scenarios) is typed data in `src/content/`. Use comma-below ș/ț; a unit test rejects cedilla ş/ţ.
+- Romanian content (modules, quizzes) is typed data in `src/content/`. Use comma-below ș/ț; a unit test rejects cedilla ş/ţ.
 - Demo state is one versioned object in localStorage (`pcac:v1`, `src/lib/storage.ts`). Bump the version and add parsing for any shape change; parsing must never throw.
 - This is Next.js 16 with Cache Components: read `node_modules/next/dist/docs/` before using unfamiliar APIs (see `AGENTS.md`).
 - Checks: `npm run verify` (lint, typecheck, unit tests, build) and `npm run test:e2e` (Playwright, desktop + mobile).
-- Newsletter/email capture is **demo-only** (no backend, nothing sent): rules in `src/lib/newsletter.ts`, production requirements in `docs/newsletter.md`. Never claim emails were sent; bump `CONSENT_TEXT_VERSION` (`src/content/consent.ts`) on any consent-text change; email, consent log, prompt state and reading events stay in separate storage keys.
+- Newsletter/email capture was **removed from the UI** at the owner's request (2026-10-29): no article prompt, Progress card, onboarding e-mail field or `/dezabonare`. `src/lib/newsletter.ts` / `useNewsletter.ts` remain only so „Resetează demo-ul” and account sign-up still clear or move data saved earlier; `docs/newsletter.md` keeps the requirements if it returns. Do not ask for e-mail addresses.
 - Reality Check is historical and read-only: official INS CPI and BNR EUR/RON series live only in `src/content/macro-ro.ts` (cite source and period in the UI; update `LATEST_DATA_YEAR` and tests together). Future-inflation assumptions belong only in the simulator.
-- Guided profiling is profil → Reality Check → simulator → `/portal` (`onboarding.completedAt` in `DemoState`). After it, pages are reached from the portal, not chained; Fraude and Învață are portal options. Learning is personalised by `profile.goal` via `src/content/goalPaths.ts` (every goal → existing modules). The „account” is the local demo profile — there is no backend.
+- Guided profiling is profil → Reality Check → simulator → `/portal` (`onboarding.completedAt` in `DemoState`). After it, pages are reached from the portal, not chained; Învață is a portal option. Learning is personalised by `profile.goal` via `src/content/goalPaths.ts` (every goal → existing modules). The „account” is the local demo profile — there is no backend.
 - Accounts are **local demo accounts** (`src/lib/auth.ts`, `src/lib/useAuth.ts`): PBKDF2-SHA-256 hash + salt only, never the password; per-account storage keys `pcac:acct:<id>:…`; guest data moves into a new account at sign-up. Never describe them as secure server accounts. Production requirements: `docs/superpowers/specs/2026-10-28-accounts-design.md`.
 - Product categories: verified catalogue in `src/content/products.ts` (no numeric rates — test-enforced); fit rules in `src/lib/productFit.ts`; variant A ranking via `POST /api/recomandari` (`src/lib/recommend.ts`, OpenAI-compatible model from `AI_BASE_URL`/`AI_API_KEY`/`AI_MODEL`, server-only, rule-based fallback). See `docs/superpowers/specs/2026-10-28-products-design.md`.
+- „Metodele mele” (`/metode`, `src/lib/plans.ts`): recommendation sets are saved per account as a stack (newest = current, older = history); users pick categories as drafts and confirm the ones they use. A changed profile/risk snapshot makes the current set stale; regenerating pushes a new set and keeps the old one read-only in history. `DemoState` v8.

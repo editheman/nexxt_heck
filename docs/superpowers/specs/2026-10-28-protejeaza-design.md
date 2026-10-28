@@ -43,6 +43,7 @@ Persistent top nav (desktop) / compact menu (mobile): Reality Check · Simulator
 - **Real value:** `FV_real = FV_nominal / (1+i)^t`, t in years (monthly t = m/12).
 - **Real rate:** `(1+r)/(1+i) − 1` (exact Fisher, not r − i).
 - Yearly series for charts: year 0…n with nominal, real, total contributed.
+- **Contributions in today's RON (2026-10-29):** each end-of-month payment is deflated when it is made, with `im = (1+i)^(1/12) − 1`: `C_real = P + C·(1 − (1+im)^(−12n)) / im` (linear when `im = 0`). The explanation compares the balance in today's RON with `C_real` (like with like) — never with nominal contributions. Real annual return is Fisher: `(1+r)/(1+i) − 1`. Baseline check (39.000 lei, 800 lei/lună, 5%, 5%, 15 ani): contributed 183.000, nominal ≈ 292.938, today's RON ≈ 140.908 = `C_real`, real return 0%.
 - "Pierdere de putere de cumpărare" is shown only as `nominal − real` *under the stated assumptions*, worded as an estimate.
 
 ### 3b. Historical Reality Check
