@@ -19,6 +19,11 @@ const SECTIONS: Array<{ id: string; title: string; body: React.ReactNode }> = [
           propunerea.
         </p>
         <p>
+          <strong>Contul demo:</strong> numele de utilizator și o amprentă criptografică a parolei (hash PBKDF2 cu
+          „sare” aleatoare) — parola în sine nu se salvează. Profilul și progresul fiecărui cont sunt păstrate separat,
+          tot doar în acest browser. Nu putem recupera o parolă uitată.
+        </p>
+        <p>
           <strong>Doar dacă te abonezi:</strong> adresa de e-mail și, separat de ea, o înregistrare a acordului tău (data
           și ora, versiunea textului de acord și locul din aplicație unde l-ai dat). Nu cerem nume, venit, economii,
           datorii sau alte informații financiare pentru abonare.

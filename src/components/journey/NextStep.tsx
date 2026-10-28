@@ -20,10 +20,10 @@ export function NextStep({ href, label, hint }: { href: string; label: string; h
   );
 }
 
-export function PageHeader({ step, title, lead }: { step?: string; title: string; lead?: React.ReactNode }) {
+export function PageHeader({ step, title, lead }: { step?: React.ReactNode; title: string; lead?: React.ReactNode }) {
   return (
     <header className="space-y-3">
-      {step && <Eyebrow dot>{step}</Eyebrow>}
+      {typeof step === "string" ? <Eyebrow dot>{step}</Eyebrow> : step}
       <h1 className="text-3xl text-ink sm:text-[2.6rem]">{title}</h1>
       {lead && <p className="max-w-[68ch] text-lg text-ink-muted">{lead}</p>}
     </header>

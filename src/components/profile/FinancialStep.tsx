@@ -207,7 +207,7 @@ export function FinancialStep({
             <label htmlFor="goal" className="font-semibold">
               Obiectivul principal
             </label>
-            <p className="text-sm text-ink-muted">Pentru ce economisești.</p>
+            <p className="text-sm text-ink-muted">Pentru ce economisești — după asta îți alegem modulele.</p>
             <select
               id="goal"
               value={draft.goal}

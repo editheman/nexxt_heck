@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OnboardingStep } from "@/components/journey/Onboarding";
 import { PageHeader } from "@/components/journey/NextStep";
 import { Simulator } from "@/components/sim/Simulator";
 
@@ -8,7 +9,7 @@ export default function Page() {
   return (
     <div className="space-y-8">
       <PageHeader
-        step="Pasul 3 din 5"
+        step={<OnboardingStep n={3} />}
         title="Simulator: nominal vs. putere de cumpărare"
         lead="Schimbă ipotezele și compară câți lei ai avea cu ce ai putea cumpăra cu ei, la prețurile de azi."
       />

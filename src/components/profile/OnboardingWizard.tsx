@@ -4,11 +4,12 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { cn } from "@/components/ui/cn";
 import type { Profile } from "@/lib/storage";
-import { actions } from "@/lib/useDemoState";
+import { useAuth, auth } from "@/lib/useAuth";
+import { actions, useDemoState } from "@/lib/useDemoState";
 import { newsletter } from "@/lib/useNewsletter";
 import type { Subscriber } from "@/lib/newsletter";
 import { FinancialStep, initialFinancial, type FinancialDraft } from "./FinancialStep";
-import { IdentityStep, type Identity } from "./IdentityStep";
+import { IdentityStep, type Identity, type IdentityErrors } from "./IdentityStep";
 
 const STEPS = [
   { title: "Să facem cunoștință", label: "Cine ești?" },
@@ -17,10 +18,16 @@ const STEPS = [
 
 export function OnboardingWizard({ initial, subscriber }: { initial: Profile | null; subscriber: Subscriber | null }) {
   const router = useRouter();
+  const { state } = useDemoState();
+  const { account } = useAuth();
+  // Whether this wizard run creates the account (label only); the fields follow the live login state.
+  const [mode] = useState<"signup" | "edit">(() => (account ? "edit" : "signup"));
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [step, setStep] = useState<0 | 1>(0);
   const [identity, setIdentity] = useState<Identity>(() => ({
-    alias: initial && !initial.isDemo ? initial.alias : "",
+    username: account?.username ?? "",
+    password: "",
+    confirm: "",
     email: "",
     consent: false,
     ageRange: initial?.ageRange ?? null,
@@ -34,25 +41,32 @@ export function OnboardingWizard({ initial, subscriber }: { initial: Profile | n
     requestAnimationFrame(() => headingRef.current?.focus());
   }
 
-  function next() {
-    // Email is optional; it is stored only together with explicit marketing consent.
+  async function next(): Promise<IdentityErrors | null> {
+    if (!account) {
+      const r = await auth.signUp({ username: identity.username, password: identity.password, confirm: identity.confirm });
+      if (!r.ok) return r.errors;
+    }
+    // Email is optional; it is stored only together with explicit marketing consent (under the new account).
     if (!subscriber && identity.email.trim() !== "" && identity.consent) {
       newsletter.subscribe(identity.email, true, "onboarding");
-      setIdentity((v) => ({ ...v, email: "", consent: false }));
     }
+    // Never keep the password in memory longer than needed.
+    setIdentity((v) => ({ ...v, password: "", confirm: "", email: "", consent: false }));
     go(1);
+    return null;
   }
 
   function save(f: Omit<Profile, "alias" | "ageRange" | "isDemo">) {
-    actions.saveProfile({ ...f, alias: identity.alias.trim(), ageRange: identity.ageRange, isDemo: false });
-    router.push("/reality-check");
+    actions.saveProfile({ ...f, alias: account?.username ?? identity.username.trim(), ageRange: identity.ageRange, isDemo: false });
+    // During profiling continue the chain; when editing later, return to the portal.
+    router.push(state.onboarding.completedAt ? "/portal" : "/reality-check");
   }
 
   return (
     <div className="mx-auto w-full max-w-[680px] space-y-6 short:space-y-4">
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="eyebrow text-ink-muted">Profilul tău</span>
+          <span className="eyebrow text-ink-muted">{mode === "signup" ? "Creează cont" : "Profilul tău"}</span>
           <span className="flex items-center gap-2 font-semibold text-primary" data-testid="onboarding-step">
             <span aria-hidden className="size-2 rounded-full bg-primary" />
             Pasul {step + 1} din 2: {s.label}
@@ -77,7 +91,7 @@ export function OnboardingWizard({ initial, subscriber }: { initial: Profile | n
       </h1>
 
       {step === 0 ? (
-        <IdentityStep value={identity} onChange={setIdentity} onNext={next} subscriber={subscriber} />
+        <IdentityStep value={identity} onChange={setIdentity} onNext={next} subscriber={subscriber} mode={account ? "edit" : "signup"} />
       ) : (
         <FinancialStep draft={financial} onChange={setFinancial} onBack={() => go(0)} onSave={save} />
       )}

@@ -2,8 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 import type { RealityWindow } from "@/content/macro-ro";
+import { SESSION_KEY, accountStateKey, parseSession } from "./auth";
 import {
-  STORAGE_KEY,
   defaultState,
   parseState,
   serializeState,
@@ -12,14 +12,27 @@ import {
 } from "./storage";
 
 let cache: DemoState | null = null;
+let cacheKey: string | null = null;
 let storageAvailable = true;
 const listeners = new Set<() => void>();
 const SERVER_SNAPSHOT = defaultState();
 
+/** The logged-in account's state key, or the guest key (`pcac:v1`) when logged out. */
+export function currentStateKey(): string {
+  let accountId: string | null = null;
+  try {
+    accountId = parseSession(window.localStorage.getItem(SESSION_KEY))?.accountId ?? null;
+  } catch {
+    /* storage blocked: guest */
+  }
+  return accountStateKey(accountId, "v1");
+}
+
 function read(): DemoState {
   if (cache === null) {
+    cacheKey = currentStateKey();
     try {
-      cache = parseState(window.localStorage.getItem(STORAGE_KEY));
+      cache = parseState(window.localStorage.getItem(cacheKey));
     } catch {
       storageAvailable = false;
       cache = defaultState();
@@ -35,7 +48,7 @@ function notify() {
 function write(next: DemoState) {
   cache = next;
   try {
-    window.localStorage.setItem(STORAGE_KEY, serializeState(next));
+    window.localStorage.setItem(cacheKey ?? currentStateKey(), serializeState(next));
     storageAvailable = true;
   } catch {
     storageAvailable = false;
@@ -43,10 +56,20 @@ function write(next: DemoState) {
   notify();
 }
 
-function onStorage(e: StorageEvent) {
-  if (e.key !== STORAGE_KEY && e.key !== null) return;
-  cache = parseState(e.newValue);
+/** Current state outside React (e.g. right after login, before the next render). */
+export function getDemoState(): DemoState {
+  return read();
+}
+
+/** Re-reads from storage, e.g. after login/logout switched the active account. */
+export function refreshDemoState() {
+  cache = null;
   notify();
+}
+
+function onStorage(e: StorageEvent) {
+  if (e.key !== null && e.key !== cacheKey && e.key !== SESSION_KEY) return;
+  refreshDemoState();
 }
 
 function subscribe(listener: () => void) {
@@ -67,6 +90,10 @@ export function updateState(fn: (s: DemoState) => DemoState) {
 export const actions = {
   saveProfile(profile: Profile) {
     updateState((s) => ({ ...s, profile }));
+  },
+  completeOnboarding() {
+    if (read().onboarding.completedAt) return;
+    updateState((s) => ({ ...s, onboarding: { completedAt: new Date().toISOString() } }));
   },
   setRealityYears(years: RealityWindow) {
     updateState((s) => ({ ...s, reality: { years } }));

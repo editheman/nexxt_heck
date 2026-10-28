@@ -16,6 +16,7 @@ const valid: DemoState = {
   },
   assumptions: { inflationPct: 6.5 },
   reality: { years: 10 },
+  onboarding: { completedAt: "2026-10-28T10:00:00.000Z" },
   progress: {
     visited: { reality: true },
     scams: { curier: { completed: true, correct: 2, total: 3 } },
@@ -63,14 +64,20 @@ describe("parseState", () => {
     delete profile.ageRange;
     const v1: Record<string, unknown> = { ...valid, version: 1, profile };
     delete v1.reality;
-    expect(parseState(JSON.stringify(v1))).toEqual({ ...valid, profile: { ...valid.profile, ageRange: null }, reality: defaultState().reality });
+    delete v1.onboarding;
+    expect(parseState(JSON.stringify(v1))).toEqual({
+      ...valid,
+      profile: { ...valid.profile, ageRange: null },
+      reality: defaultState().reality,
+      onboarding: { completedAt: null },
+    });
   });
 
   it("migrates a schema-v2 profile without an age range to ageRange: null", () => {
     const profile: Record<string, unknown> = { ...valid.profile };
     delete profile.ageRange;
     const parsed = parseState(JSON.stringify({ ...valid, version: 2, profile }));
-    expect(parsed.version).toBe(3);
+    expect(parsed.version).toBe(5);
     expect(parsed.profile?.ageRange).toBeNull();
   });
 
@@ -82,5 +89,23 @@ describe("parseState", () => {
     for (const years of [4, "5", null]) {
       expect(parseState(JSON.stringify({ ...valid, reality: { years } })).reality.years).toBe(defaultState().reality.years);
     }
+  });
+
+  it("migrates a schema-v3 state without onboarding", () => {
+    const v3: Record<string, unknown> = { ...valid, version: 3 };
+    delete v3.onboarding;
+    const parsed = parseState(JSON.stringify(v3));
+    expect(parsed.version).toBe(5);
+    expect(parsed.onboarding.completedAt).toBeNull();
+  });
+
+  it("migrates a schema-v4 state and drops the retired interests list", () => {
+    const parsed = parseState(JSON.stringify({ ...valid, version: 4, interests: ["etf"] }));
+    expect(parsed).toEqual(valid);
+    expect("interests" in parsed).toBe(false);
+  });
+
+  it("drops an invalid completion date", () => {
+    expect(parseState(JSON.stringify({ ...valid, onboarding: { completedAt: "ieri" } })).onboarding.completedAt).toBeNull();
   });
 });

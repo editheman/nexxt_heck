@@ -14,8 +14,14 @@ describe("MARKET_FACTS", () => {
   it("derives its numbers from the official series (no hand-typed figures)", () => {
     const text = MARKET_FACTS.map((f) => `${f.headline} ${f.detail}`).join(" ");
     expect(text).toContain("7,3%"); // INS 2025: 107,32 − 100
-    expect(text).toContain("49,6%"); // 2021–2025 cumulative
+    expect(text).toContain("49,6%"); // 2020 → 2025 cumulative (rates of 2021–2025)
     expect(text).toContain("5,0415"); // BNR 2025 average
     expect(text).toContain("13,8%"); // highest year in the series: 2022
+  });
+
+  it("uses the same period in headline and source line", () => {
+    const five = MARKET_FACTS.find((f) => f.id === "inflatie-5-ani")!;
+    expect(five.headline).toContain("Între 2020 și 2025");
+    expect(five.period).toBe("2020–2025");
   });
 });

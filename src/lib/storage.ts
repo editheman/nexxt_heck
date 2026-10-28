@@ -35,8 +35,10 @@ export type QuizResult = { best: number; total: number; lastWrong: string[] };
 export type ScamResult = { completed: true; correct: number; total: number };
 
 export type DemoState = {
-  version: 3;
+  version: 5;
   profile: Profile | null;
+  /** Guided profiling (profil → Reality Check → simulator) finished. Learning is personalised by `profile.goal`. */
+  onboarding: { completedAt: string | null };
   /** Simulator only: illustrative, user-editable future inflation. */
   assumptions: { inflationPct: number };
   /** Reality Check: which official history window is shown. */
@@ -51,8 +53,9 @@ export type DemoState = {
 
 export function defaultState(): DemoState {
   return {
-    version: 3,
+    version: 5,
     profile: null,
+    onboarding: { completedAt: null },
     assumptions: { inflationPct: DEFAULT_INFLATION_PCT },
     reality: { years: DEFAULT_REALITY_WINDOW },
     progress: { visited: {}, scams: {}, modulesRead: {}, quizzes: {} },
@@ -121,7 +124,8 @@ function parseScam(v: unknown): ScamResult | null {
 
 /**
  * Never throws: anything unreadable falls back to defaults, field by field.
- * Accepts schema v1 (no `reality`) and v2 (no `profile.ageRange`) and migrates them to v3.
+ * Accepts schema v1 (no `reality`), v2 (no `profile.ageRange`), v3 (no `onboarding`) and v4 (with the
+ * retired `interests` list, which is dropped) and migrates them to v5.
  */
 export function parseState(raw: string | null): DemoState {
   const fallback = defaultState();
@@ -132,16 +136,22 @@ export function parseState(raw: string | null): DemoState {
   } catch {
     return fallback;
   }
-  if (!isObj(data) || ![1, 2, 3].includes(data.version as number)) return fallback;
+  if (!isObj(data) || ![1, 2, 3, 4, 5].includes(data.version as number)) return fallback;
 
   const assumptions = isObj(data.assumptions) ? data.assumptions : {};
   const reality = isObj(data.reality) ? data.reality : {};
   const progress = isObj(data.progress) ? data.progress : {};
   const visited = isObj(progress.visited) ? progress.visited : {};
 
+  const onboarding = isObj(data.onboarding) ? data.onboarding : {};
+  const completedAt = onboarding.completedAt;
+
   return {
-    version: 3,
+    version: 5,
     profile: parseProfile(data.profile),
+    onboarding: {
+      completedAt: typeof completedAt === "string" && !Number.isNaN(Date.parse(completedAt)) ? completedAt : null,
+    },
     assumptions: {
       inflationPct: inRange(assumptions.inflationPct, LIMITS.ratePctMin, LIMITS.ratePctMax)
         ? assumptions.inflationPct

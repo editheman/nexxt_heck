@@ -430,6 +430,78 @@ export const MODULES: LearningModule[] = [
       ]),
     ],
   },
+  {
+    slug: "etf",
+    title: "Ce înseamnă să investești în ETF-uri",
+    summary: "Ce este un ETF, ce costuri are, ce riscuri implică și ce verifici înainte să cumperi.",
+    minutes: 7,
+    tool: { href: "/simulator", label: "Vezi în simulator efectul costurilor și al timpului" },
+    sections: [
+      {
+        id: "ce-este",
+        title: "Ce este un ETF",
+        body: [
+          "Un ETF (exchange-traded fund) este un fond de investiții ale cărui unități se cumpără și se vând la bursă, la fel ca acțiunile. Fondul deține un coș de active — de exemplu acțiuni ale multor companii sau obligațiuni — iar cine cumpără o unitate deține indirect o parte din acel coș.",
+          "Multe ETF-uri urmăresc un indice: încearcă să reproducă evoluția unui grup de active, nu să „bată” piața. De aceea sunt numite, adesea, fonduri pasive.",
+          "În Uniunea Europeană, multe ETF-uri sunt organizate ca fonduri UCITS, care au reguli de diversificare și de informare a investitorilor. Asta nu înseamnă că nu pot pierde valoare.",
+        ],
+      },
+      {
+        id: "costuri",
+        title: "Ce costuri ai",
+        body: [
+          "Fondul are costuri anuale (numite costuri curente sau TER), exprimate ca procent din suma investită și descrise în documentul cu informații esențiale (KID). Ele se scad din valoarea fondului în fiecare an.",
+          "La acestea se adaugă costurile intermediarului (brokerului): comisioane de tranzacționare, eventual de administrare a contului, și costuri de schimb valutar dacă ETF-ul este cotat în altă monedă decât leul.",
+          "Pe termen lung, diferențele mici de cost se adună. În simulator poți vedea efectul scăzând costul anual din randamentul ipotetic.",
+        ],
+      },
+      {
+        id: "riscuri",
+        title: "Ce riscuri implică",
+        body: [
+          "Valoarea unui ETF urcă și coboară odată cu activele pe care le deține. Poți pierde o parte din bani, mai ales pe perioade scurte. Randamentele din trecut nu garantează randamentele viitoare.",
+          "Dacă ETF-ul investește în active în altă monedă, câștigul sau pierderea în lei depinde și de cursul de schimb.",
+          "Spre deosebire de depozitele bancare, investițiile în ETF-uri nu sunt garantate de Fondul de Garantare a Depozitelor Bancare. Diversificarea dintr-un ETF reduce riscul unei singure companii, dar nu și riscul general al pieței.",
+        ],
+      },
+      {
+        id: "verificare",
+        title: "Ce verifici înainte",
+        body: [
+          "Verifică dacă intermediarul prin care cumperi este autorizat de Autoritatea de Supraveghere Financiară (ASF) sau de autoritatea unui alt stat UE și notificat pentru România. ASF publică registre și avertizări despre entități neautorizate.",
+          "Citește documentul cu informații esențiale (KID): ce deține fondul, ce costuri are, ce nivel de risc indică.",
+          "Gândește-te la orizontul de timp: banii de care ai nevoie curând sau fondul de urgență nu sunt, de regulă, potriviți pentru active volatile. Regulile fiscale le verifici pe site-ul ANAF.",
+        ],
+      },
+    ],
+    takeaways: [
+      "Un ETF este un coș de active tranzacționat la bursă, nu o investiție garantată.",
+      "Compară costurile totale: costurile curente ale fondului plus cele ale brokerului.",
+      "Cumpără doar prin intermediari autorizați și citește KID-ul înainte.",
+    ],
+    quiz: [
+      q("etf-1", "ce-este", "Ce primești când cumperi o unitate dintr-un ETF?", "b", [
+        ["a", "O dobândă fixă, garantată", "Nu. Un ETF nu plătește o dobândă garantată; valoarea lui variază."],
+        ["b", "O parte indirectă dintr-un coș de active", "Corect. Fondul deține activele, iar tu deții unități din fond."],
+        ["c", "Un cont de economii la bancă", "Nu. Un ETF este un fond de investiții, nu un cont bancar."],
+      ]),
+      q("etf-2", "costuri", "Unde găsești costurile anuale ale unui ETF?", "a", [
+        ["a", "În documentul cu informații esențiale (KID)", "Corect. Acolo sunt descrise costurile curente ale fondului."],
+        ["b", "Doar în reclamele brokerului", "Nu. Reclamele pot omite costuri; sursa de referință este KID-ul."],
+        ["c", "Un ETF nu are costuri", "Nu. Orice fond are costuri anuale, chiar dacă sunt mici."],
+      ]),
+      q("etf-3", "riscuri", "Sunt investițiile în ETF-uri garantate ca depozitele bancare?", "c", [
+        ["a", "Da, de Fondul de Garantare a Depozitelor Bancare", "Nu. Acesta garantează depozite bancare, nu investiții în fonduri."],
+        ["b", "Da, dacă fondul urmărește un indice", "Nu. Un indice poate scădea, iar fondul odată cu el."],
+        ["c", "Nu, valoarea lor poate scădea", "Corect. Poți pierde bani, mai ales pe termen scurt."],
+      ]),
+      q("etf-4", "verificare", "Care este un prim pas bun înainte să cumperi un ETF?", "b", [
+        ["a", "Să alegi ETF-ul cu cel mai mare randament de anul trecut", "Nu. Randamentele trecute nu garantează rezultate viitoare."],
+        ["b", "Să verifici că brokerul este autorizat și să citești KID-ul", "Corect. Așa reduci riscul de fraudă și înțelegi ce cumperi."],
+        ["c", "Să investești fondul de urgență", "Nu. Banii de urgență trebuie să fie disponibili și cu risc scăzut."],
+      ]),
+    ],
+  },
 ];
 
 export function getModule(slug: string): LearningModule | undefined {

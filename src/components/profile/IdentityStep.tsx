@@ -7,19 +7,34 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/components/ui/cn";
 import { CONSENT_TEXT } from "@/content/consent";
+import { validatePassword, validateUsername } from "@/lib/auth";
 import { maskEmail, validateEmail, type Subscriber } from "@/lib/newsletter";
+import { PasswordField } from "./PasswordField";
 import { AGE_RANGES, type AgeRange } from "@/lib/storage";
 
-export type Identity = { alias: string; email: string; consent: boolean; ageRange: AgeRange | null };
-type Errors = Partial<Record<"alias" | "email" | "consent", string>>;
+export type Identity = {
+  username: string;
+  password: string;
+  confirm: string;
+  email: string;
+  consent: boolean;
+  ageRange: AgeRange | null;
+};
+export type IdentityErrors = Partial<Record<"username" | "password" | "confirm" | "email" | "consent", string>>;
+type Errors = IdentityErrors;
 
 const AGE_LABELS: Record<AgeRange, string> = { "20-25": "20–25 ani", "26-30": "26–30 ani", "31-35": "31–35 ani" };
 
-export function validateIdentity(d: Identity, subscribed: boolean): Errors {
+/** `signup` validates the new account's credentials; `edit` (logged in) only the optional fields. */
+export function validateIdentity(d: Identity, subscribed: boolean, mode: "signup" | "edit"): Errors {
   const e: Errors = {};
-  const alias = d.alias.trim();
-  if (alias === "") e.alias = "Spune-ne cum să-ți spunem — un prenume sau un pseudonim.";
-  else if (alias.length > 40) e.alias = "Folosește cel mult 40 de caractere.";
+  if (mode === "signup") {
+    const u = validateUsername(d.username);
+    if (u) e.username = u;
+    const p = validatePassword(d.password);
+    if (p) e.password = p;
+    if (d.confirm !== d.password) e.confirm = "Parolele nu coincid.";
+  }
   if (!subscribed && d.email.trim() !== "") {
     const v = validateEmail(d.email);
     if (!v.ok) e.email = v.error;
@@ -39,65 +54,125 @@ export function IdentityStep({
   onChange,
   onNext,
   subscriber,
+  mode,
 }: {
   value: Identity;
   onChange: (v: Identity) => void;
-  onNext: () => void;
+  /** Resolves with errors the form cannot know upfront (e.g. username already taken). */
+  onNext: () => Promise<Errors | null>;
   subscriber: Subscriber | null;
+  mode: "signup" | "edit";
 }) {
   const [submitted, setSubmitted] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [serverErrors, setServerErrors] = useState<Errors>({});
   const aliasRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const consentRef = useRef<HTMLInputElement>(null);
-  const errors = submitted ? validateIdentity(value, subscriber !== null) : {};
-  const set = <K extends keyof Identity>(k: K, v: Identity[K]) => onChange({ ...value, [k]: v });
+  const errors: Errors = submitted ? { ...serverErrors, ...validateIdentity(value, subscriber !== null, mode) } : {};
+  const set = <K extends keyof Identity>(k: K, v: Identity[K]) => {
+    if (k === "username") setServerErrors({});
+    onChange({ ...value, [k]: v });
+  };
   const showConsent = !subscriber && value.email.trim() !== "";
 
-  function submit(e: React.FormEvent) {
+  function focusFirst(errs: Errors) {
+    const first = errs.username
+      ? aliasRef
+      : errs.password
+        ? passwordRef
+        : errs.confirm
+          ? confirmRef
+          : errs.email
+            ? emailRef
+            : errs.consent
+              ? consentRef
+              : null;
+    first?.current?.focus();
+    return first !== null;
+  }
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setSubmitted(true);
-    const errs = validateIdentity(value, subscriber !== null);
-    const first = errs.alias ? aliasRef : errs.email ? emailRef : errs.consent ? consentRef : null;
-    if (first) {
-      first.current?.focus();
-      return;
+    setServerErrors({});
+    if (focusFirst(validateIdentity(value, subscriber !== null, mode))) return;
+    setBusy(true);
+    const result = await onNext();
+    setBusy(false);
+    if (result) {
+      setServerErrors(result);
+      focusFirst(result);
     }
-    onNext();
   }
 
   return (
     <form noValidate onSubmit={submit} aria-label="Pasul 1: cine ești">
       <Card className="space-y-5 p-5 sm:p-7 short:space-y-4 short:sm:p-6">
-        <div className="space-y-2">
-          <label htmlFor="alias" className="flex items-center gap-1.5 font-semibold text-ink">
-            Cum să-ți spunem <span aria-hidden className="size-1.5 rounded-full bg-accent" />
-            <span className="sr-only">(obligatoriu)</span>
-          </label>
-          <div className={fieldShell(Boolean(errors.alias))}>
-            <UserRound aria-hidden className="size-5 shrink-0 text-ink-muted" />
-            <input
-              ref={aliasRef}
-              id="alias"
-              autoComplete="given-name"
-              maxLength={60}
-              placeholder="ex. Andrei"
-              value={value.alias}
-              onChange={(e) => set("alias", e.target.value)}
-              aria-required="true"
-              aria-invalid={errors.alias ? true : undefined}
-              aria-describedby={cn("alias-help", errors.alias && "alias-error")}
-              className="w-full min-w-0 bg-transparent py-2.5 text-base text-ink outline-none placeholder:text-ink-muted/70"
-            />
-          </div>
-          <p id="alias-help" className="text-sm text-ink-muted">
-            Un prenume sau un pseudonim — nu avem nevoie de numele complet.
+        {mode === "signup" ? (
+          <>
+            <div className="space-y-2">
+              <label htmlFor="username" className="flex items-center gap-1.5 font-semibold text-ink">
+                Nume de utilizator <span aria-hidden className="size-1.5 rounded-full bg-accent" />
+                <span className="sr-only">(obligatoriu)</span>
+              </label>
+              <div className={fieldShell(Boolean(errors.username))}>
+                <UserRound aria-hidden className="size-5 shrink-0 text-ink-muted" />
+                <input
+                  ref={aliasRef}
+                  id="username"
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  maxLength={40}
+                  placeholder="ex. andrei.p"
+                  value={value.username}
+                  onChange={(e) => set("username", e.target.value)}
+                  aria-required="true"
+                  aria-invalid={errors.username ? true : undefined}
+                  aria-describedby={cn("username-help", errors.username && "username-error")}
+                  className="w-full min-w-0 bg-transparent py-2.5 text-base text-ink outline-none placeholder:text-ink-muted/70"
+                />
+              </div>
+              <p id="username-help" className="text-sm text-ink-muted">
+                Îl folosești la autentificare și așa îți spunem. Poate fi un pseudonim.
+              </p>
+              {errors.username && (
+                <p id="username-error" className="text-sm font-medium text-danger">
+                  {errors.username}
+                </p>
+              )}
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <PasswordField
+                ref={passwordRef}
+                id="password"
+                label="Parolă"
+                autoComplete="new-password"
+                helper="Minimum 8 caractere, cu o literă și o cifră."
+                value={value.password}
+                onChange={(v) => set("password", v)}
+                error={errors.password}
+              />
+              <PasswordField
+                ref={confirmRef}
+                id="confirm"
+                label="Confirmă parola"
+                autoComplete="new-password"
+                value={value.confirm}
+                onChange={(v) => set("confirm", v)}
+                error={errors.confirm}
+              />
+            </div>
+          </>
+        ) : (
+          <p className="flex items-center gap-2 rounded-[var(--radius-control)] bg-surface-muted px-3 py-2.5 text-sm text-ink">
+            <UserRound aria-hidden className="size-4 text-primary" /> Conectat ca <strong>{value.username}</strong>
           </p>
-          {errors.alias && (
-            <p id="alias-error" className="text-sm font-medium text-danger">
-              {errors.alias}
-            </p>
-          )}
-        </div>
+        )}
 
         {subscriber ? (
           <p className="flex items-center gap-2 rounded-[var(--radius-control)] bg-surface-muted px-3 py-2.5 text-sm text-ink" data-testid="onboarding-subscribed">
@@ -196,13 +271,23 @@ export function IdentityStep({
 
         <p className="flex gap-2.5 rounded-[var(--radius-control)] border border-border bg-bg px-4 py-3 text-sm text-ink-muted">
           <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-primary" />
-          Datele rămân doar în acest browser. Nu cerem CNP, IBAN sau date de card, iar adresa de e-mail o folosim doar
-          pentru digest, dacă îți dai acordul.
+          {mode === "signup"
+            ? "Cont demo: datele rămân doar în acest browser, iar parola nu se salvează — păstrăm doar o amprentă criptografică (hash). Nu cerem CNP, IBAN sau date de card."
+            : "Datele rămân doar în acest browser. Nu cerem CNP, IBAN sau date de card, iar adresa de e-mail o folosim doar pentru digest, dacă îți dai acordul."}
         </p>
 
-        <Button type="submit" onMouseDown={(e) => e.preventDefault()} className="min-h-12 w-full text-base">
-          Continuă spre datele financiare <ArrowRight aria-hidden className="size-4" />
+        <Button type="submit" onMouseDown={(e) => e.preventDefault()} aria-disabled={busy || undefined} className="min-h-12 w-full text-base">
+          {busy ? "Se creează contul…" : mode === "signup" ? "Creează contul și continuă" : "Continuă spre datele financiare"}
+          {!busy && <ArrowRight aria-hidden className="size-4" />}
         </Button>
+        {mode === "signup" && (
+          <p className="text-center text-sm text-ink-muted">
+            Ai deja cont?{" "}
+            <Link href="/intra" className="font-semibold text-primary underline underline-offset-2">
+              Intră în cont
+            </Link>
+          </p>
+        )}
       </Card>
     </form>
   );

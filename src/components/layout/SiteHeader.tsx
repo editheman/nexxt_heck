@@ -1,12 +1,17 @@
 "use client";
 
-import { Menu, UserRound, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { buttonClass } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
 import { Logo } from "./Logo";
+import { useOnboardingDone } from "@/components/journey/Onboarding";
+import { resumeHref } from "@/lib/resume";
+import { useAuth } from "@/lib/useAuth";
+import { useDemoState } from "@/lib/useDemoState";
+import { AccountMenu } from "./AccountMenu";
 import { NAV_ITEMS } from "./nav";
 
 function isActive(pathname: string, href: string) {
@@ -21,7 +26,10 @@ export function SiteHeader() {
     setLastPath(pathname);
     setOpen(false);
   }
-  const primaryNav = NAV_ITEMS.filter((i) => i.href !== "/progres");
+  const { done } = useOnboardingDone();
+  const { account } = useAuth();
+  const { state } = useDemoState();
+  const primaryNav = NAV_ITEMS;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/90 backdrop-blur">
@@ -31,6 +39,7 @@ export function SiteHeader() {
           <span className="text-[1.05rem] leading-tight tracking-tight">Protejează ce ai construit</span>
         </Link>
 
+        {done && (
         <nav aria-label="Navigare principală" className="hidden md:block">
           <ul className="flex items-center gap-1">
             {primaryNav.map((item) => {
@@ -52,34 +61,34 @@ export function SiteHeader() {
             })}
           </ul>
         </nav>
+        )}
 
-        <div className="ml-auto hidden items-center gap-3 md:flex">
-          <Link href="/profil" className={buttonClass("primary", "min-h-10 px-4 py-2 text-sm")}>
-            Începe
-          </Link>
-          <Link
-            href="/progres"
-            aria-current={isActive(pathname, "/progres") ? "page" : undefined}
-            className="flex size-10 items-center justify-center rounded-full bg-primary text-on-primary transition-colors hover:bg-primary-hover"
-          >
-            <UserRound aria-hidden className="size-[18px]" />
-            <span className="sr-only">Progresul tău</span>
-          </Link>
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          {!done && (
+            <Link
+              href={account ? resumeHref(state) : "/profil"}
+              className={buttonClass("primary", "hidden min-h-10 px-4 py-2 text-sm sm:inline-flex")}
+            >
+              {account ? "Continuă profilarea" : "Începe"}
+            </Link>
+          )}
+          <AccountMenu />
+          {done && (
+            <button
+              type="button"
+              className="inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] text-ink hover:bg-surface-muted md:hidden"
+              aria-expanded={open}
+              aria-controls="mobile-nav"
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? <X aria-hidden className="size-6" /> : <Menu aria-hidden className="size-6" />}
+              <span className="sr-only">{open ? "Închide meniul" : "Meniu"}</span>
+            </button>
+          )}
         </div>
-
-        <button
-          type="button"
-          className="ml-auto inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] text-ink hover:bg-surface-muted md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X aria-hidden className="size-6" /> : <Menu aria-hidden className="size-6" />}
-          <span className="sr-only">{open ? "Închide meniul" : "Meniu"}</span>
-        </button>
       </div>
 
-      {open && (
+      {open && done && (
         <nav id="mobile-nav" aria-label="Navigare principală" className="border-t border-border bg-surface md:hidden">
           <ul className="mx-auto max-w-[1120px] px-4 py-2">
             {NAV_ITEMS.map((item) => {

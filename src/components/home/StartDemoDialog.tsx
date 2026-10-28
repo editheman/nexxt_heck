@@ -4,7 +4,8 @@ import { ArrowRight, Newspaper, Pause, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { useOnboardingDone } from "@/components/journey/Onboarding";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { MARKET_FACTS, type MarketFact } from "@/content/marketFacts";
 import { sourceByName } from "@/content/sources";
@@ -23,6 +24,7 @@ export function StartDemoButton() {
   const router = useRouter();
   const ref = useRef<HTMLDialogElement>(null);
   const [fact, setFact] = useState<MarketFact | null>(null);
+  const { done } = useOnboardingDone();
 
   function open() {
     router.prefetch(NEXT);
@@ -33,6 +35,14 @@ export function StartDemoButton() {
   function close() {
     ref.current?.close();
     setFact(null);
+  }
+
+  if (done) {
+    return (
+      <ButtonLink href="/portal" className="min-h-12 px-7 text-base">
+        Deschide portalul tău <ArrowRight aria-hidden className="size-4" />
+      </ButtonLink>
+    );
   }
 
   return (

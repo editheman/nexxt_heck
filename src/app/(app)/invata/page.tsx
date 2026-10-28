@@ -8,9 +8,8 @@ export default function Page() {
   return (
     <div className="space-y-8">
       <PageHeader
-        step="Pasul 5 din 5"
         title="Traseul de învățare"
-        lead="Șapte module scurte despre inflație, randamente, lichiditate, diversificare, costuri, taxe și fraude. Fiecare se încheie cu un quiz cu explicații."
+        lead="Module scurte, ordonate după obiectivul tău de economisire. Fiecare se încheie cu un quiz cu explicații."
       />
       <ModuleList />
     </div>
