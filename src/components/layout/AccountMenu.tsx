@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, LogIn, LogOut, UserPlus, UserRound } from "lucide-react";
+import { LayoutDashboard, ListChecks, LogIn, LogOut, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -54,6 +54,9 @@ export function AccountMenu() {
               </p>
               <Link href="/portal" className={item}>
                 <LayoutDashboard aria-hidden className="size-4 text-primary" /> Portalul meu
+              </Link>
+              <Link href="/metode" className={item}>
+                <ListChecks aria-hidden className="size-4 text-primary" /> Metodele mele
               </Link>
               <button
                 type="button"

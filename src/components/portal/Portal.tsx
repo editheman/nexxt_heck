@@ -15,6 +15,7 @@ import { GOAL_LABELS } from "@/content/labels";
 import { computeProgress, isPassed } from "@/lib/progress";
 import { modulesForGoal } from "@/lib/goals";
 import type { DemoState } from "@/lib/storage";
+import { currentGeneration, history, methodsOf, type Plans } from "@/lib/plans";
 import { useAuth } from "@/lib/useAuth";
 import { useDemoState } from "@/lib/useDemoState";
 
@@ -86,6 +87,8 @@ export function Portal() {
           <ButtonLink href={resumeHref(state)}>Continuă profilarea</ButtonLink>
         </div>
       )}
+
+      <MethodsCard plans={state.plans} />
 
       <Link
         href="/recomandari"
@@ -207,6 +210,31 @@ function PortalCard({
         </span>
         <ArrowRight aria-hidden className="mt-1 size-5 shrink-0 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
       </Card>
+    </Link>
+  );
+}
+
+/** Special portal category: the user's chosen (draft) and confirmed methods, plus history size. */
+function MethodsCard({ plans }: { plans: Plans }) {
+  const cur = currentGeneration(plans);
+  const mine = cur ? methodsOf(plans, cur.id) : [];
+  const drafts = mine.filter((m) => m.status === "draft").length;
+  const used = mine.length - drafts;
+  const past = history(plans).length;
+  return (
+    <Link
+      href="/metode"
+      data-testid="portal-methods"
+      className="group flex flex-col gap-3 rounded-[var(--radius-card)] border-2 border-accent/40 bg-accent-soft p-5 transition-colors hover:border-accent sm:flex-row sm:items-center sm:justify-between"
+    >
+      <span className="space-y-1">
+        <Eyebrow dot tone="accent">Metodele mele</Eyebrow>
+        <span className="block text-lg font-semibold text-ink">Ce ai ales și ce folosești deja</span>
+        <span className="tabular block text-sm text-ink-muted" data-testid="portal-methods-counts">
+          {drafts} în draft · {used} folosite{past > 0 ? ` · ${past} ${past === 1 ? "profil anterior" : "profiluri anterioare"} în istoric` : ""}
+        </span>
+      </span>
+      <ArrowRight aria-hidden className="size-5 shrink-0 text-accent transition-transform group-hover:translate-x-0.5" />
     </Link>
   );
 }

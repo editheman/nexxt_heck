@@ -1,5 +1,6 @@
 import { DEFAULT_REALITY_WINDOW, REALITY_WINDOWS, type RealityWindow } from "@/content/macro-ro";
 import { LIMITS } from "./finance";
+import { emptyPlans, parsePlans, type Plans } from "./plans";
 import type { CostlyDebt, EmergencyFund, Experience, RiskTolerance } from "./productFit";
 
 /** Schema changes bump `DemoState.version`, not the key. */
@@ -48,12 +49,14 @@ export type RiskProfile = {
 };
 
 export type DemoState = {
-  version: 7;
+  version: 8;
   profile: Profile | null;
   /** Guided profiling (profil → Reality Check → simulator) finished. Learning is personalised by `profile.goal`. */
   onboarding: { completedAt: string | null };
   /** Answers used to match product categories; null = not answered. */
   riskProfile: RiskProfile;
+  /** „Metodele mele”: saved recommendation sets (stack) and the methods picked from them. */
+  plans: Plans;
   /** Simulator only: illustrative, user-editable future inflation. */
   assumptions: { inflationPct: number };
   /** Reality Check: which official history window is shown. */
@@ -68,10 +71,11 @@ export type DemoState = {
 
 export function defaultState(): DemoState {
   return {
-    version: 7,
+    version: 8,
     profile: null,
     onboarding: { completedAt: null },
     riskProfile: { emergencyFund: null, riskTolerance: null, experience: null, costlyDebt: null },
+    plans: emptyPlans(),
     assumptions: { inflationPct: DEFAULT_INFLATION_PCT },
     reality: { years: DEFAULT_REALITY_WINDOW },
     progress: { visited: {}, scams: {}, modulesRead: {}, quizzes: {} },
@@ -141,7 +145,7 @@ function parseScam(v: unknown): ScamResult | null {
 /**
  * Never throws: anything unreadable falls back to defaults, field by field.
  * Accepts schema v1 (no `reality`), v2 (no `profile.ageRange`), v3 (no `onboarding`) and v4 (with the
- * retired `interests` list, which is dropped) v5 (no `riskProfile`) and v6 (no `riskProfile.costlyDebt`) and migrates them to v7.
+ * retired `interests` list, which is dropped) v5 (no `riskProfile`), v6 (no `riskProfile.costlyDebt`) and v7 (no `plans`) and migrates them to v8.
  */
 export function parseState(raw: string | null): DemoState {
   const fallback = defaultState();
@@ -152,7 +156,7 @@ export function parseState(raw: string | null): DemoState {
   } catch {
     return fallback;
   }
-  if (!isObj(data) || ![1, 2, 3, 4, 5, 6, 7].includes(data.version as number)) return fallback;
+  if (!isObj(data) || ![1, 2, 3, 4, 5, 6, 7, 8].includes(data.version as number)) return fallback;
 
   const assumptions = isObj(data.assumptions) ? data.assumptions : {};
   const reality = isObj(data.reality) ? data.reality : {};
@@ -165,7 +169,7 @@ export function parseState(raw: string | null): DemoState {
   const pick = <T extends string>(v: unknown, allowed: readonly T[]): T | null => (allowed.includes(v as T) ? (v as T) : null);
 
   return {
-    version: 7,
+    version: 8,
     profile: parseProfile(data.profile),
     onboarding: {
       completedAt: typeof completedAt === "string" && !Number.isNaN(Date.parse(completedAt)) ? completedAt : null,
@@ -176,6 +180,7 @@ export function parseState(raw: string | null): DemoState {
       experience: pick(risk.experience, EXPERIENCE),
       costlyDebt: pick(risk.costlyDebt, COSTLY_DEBT),
     },
+    plans: parsePlans(data.plans),
     assumptions: {
       inflationPct: inRange(assumptions.inflationPct, LIMITS.ratePctMin, LIMITS.ratePctMax)
         ? assumptions.inflationPct

@@ -41,6 +41,10 @@ Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` �
 
 `/recomandari` ordonează categoriile (cont de economii, depozit, Tezaur, Fidelis, ETF pe BET, ETF global cu acumulare, Pilonul III) după profil și trei răspunsuri despre risc. Regulile din `src/lib/productFit.ts` exclud categoriile nepotrivite (de exemplu acțiuni pe orizont scurt). Opțional, un model compatibil OpenAI (de exemplu Featherless) ordonează și formulează motivele: copiază `.env.example` în `.env.local` și completează `AI_API_KEY` și `AI_MODEL`. Fără cheie, se folosește clasamentul din reguli. Răspunsul modelului este validat (doar categorii permise, fără cifre sau promisiuni). Nu se recomandă produse, fonduri sau instituții anume.
 
+## Metodele mele
+
+Din `/recomandari` poți alege categorii („Aleg această metodă”) — apar ca draft în `/metode`, unde le confirmi pe cele pe care le folosești. Recomandările se salvează în cont; când îți schimbi profilul sau răspunsurile și generezi din nou, setul vechi, cu metodele alese din el, trece în istoric (cel mai nou primul), iar setul nou devine cel actual.
+
 ## Calcule și ipoteze
 
 - Valoare nominală: `P × (1 + r)^n`; depunerile lunare la **sfârșitul** fiecărei luni, cu rata lunară echivalentă `(1 + r)^(1/12) − 1`.

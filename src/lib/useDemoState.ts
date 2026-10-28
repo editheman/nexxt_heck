@@ -2,6 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 import type { RealityWindow } from "@/content/macro-ro";
+import type { ProductId } from "@/content/products";
+import { addGeneration, confirmMethod, removeMethod, toggleDraft, unconfirmMethod, type PlanSnapshot } from "./plans";
+import type { RecommendResponse } from "./recommend";
 import { SESSION_KEY, accountStateKey, parseSession } from "./auth";
 import {
   defaultState,
@@ -93,6 +96,22 @@ export const actions = {
   },
   setRiskProfile(riskProfile: DemoState["riskProfile"]) {
     updateState((s) => ({ ...s, riskProfile }));
+  },
+  saveGeneration(snapshot: PlanSnapshot, r: RecommendResponse) {
+    const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `g-${Date.now().toString(36)}`;
+    updateState((s) => ({ ...s, plans: addGeneration(s.plans, { snapshot, items: r.items, source: r.source, model: r.model }, new Date().toISOString(), id) }));
+  },
+  toggleMethod(productId: ProductId) {
+    updateState((s) => ({ ...s, plans: toggleDraft(s.plans, productId, new Date().toISOString()) }));
+  },
+  confirmMethod(generationId: string, productId: ProductId) {
+    updateState((s) => ({ ...s, plans: confirmMethod(s.plans, generationId, productId, new Date().toISOString()) }));
+  },
+  unconfirmMethod(generationId: string, productId: ProductId) {
+    updateState((s) => ({ ...s, plans: unconfirmMethod(s.plans, generationId, productId) }));
+  },
+  removeMethod(generationId: string, productId: ProductId) {
+    updateState((s) => ({ ...s, plans: removeMethod(s.plans, generationId, productId) }));
   },
   completeOnboarding() {
     if (read().onboarding.completedAt) return;
