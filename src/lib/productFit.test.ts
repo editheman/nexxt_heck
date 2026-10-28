@@ -2,12 +2,16 @@ import { describe, expect, it } from "vitest";
 import { PRODUCTS, PRODUCT_IDS } from "@/content/products";
 import { assessProducts, type FitInput } from "./productFit";
 
-const base: FitInput = { horizonYears: 10, goal: "pensie", emergencyFund: "da", riskTolerance: "medie", experience: "putina" };
+const base: FitInput = { horizonYears: 10, goal: "pensie", emergencyFund: "da", riskTolerance: "medie", experience: "putina", costlyDebt: "nu" };
 const byId = (input: FitInput) => Object.fromEntries(assessProducts(input).map((a) => [a.id, a]));
 
 describe("catalogue", () => {
-  it("has the seven categories, each with facts, checks and at least one official source", () => {
-    expect(PRODUCT_IDS).toHaveLength(7);
+  it("has the seventeen categories, each with a kind, facts, checks and at least one official source", () => {
+    expect(PRODUCT_IDS).toHaveLength(17);
+    const kinds = PRODUCTS.map((p) => p.kind);
+    expect(kinds.filter((k) => k === "consider")).toHaveLength(11);
+    expect(kinds.filter((k) => k === "caution")).toHaveLength(4);
+    expect(kinds.filter((k) => k === "check")).toHaveLength(2);
     for (const p of PRODUCTS) {
       expect(p.name.length).toBeGreaterThan(3);
       expect(p.what.length).toBeGreaterThan(40);
@@ -44,6 +48,7 @@ describe("assessProducts — guardrails", () => {
     expect(a.tezaur.eligible).toBe(false);
     expect(a.fidelis.eligible).toBe(false);
     expect(a.pilon3.eligible).toBe(false);
+    expect(a["obligatiuni-corporative"].eligible).toBe(false);
     expect(byId({ ...base, horizonYears: 4, goal: "altul" }).pilon3.eligible).toBe(false);
     expect(byId({ ...base, horizonYears: 12, goal: "altul" }).pilon3.eligible).toBe(true);
   });
@@ -52,6 +57,31 @@ describe("assessProducts — guardrails", () => {
     for (const input of [base, { ...base, horizonYears: 0 }, { ...base, riskTolerance: "ridicata" as const }]) {
       expect(byId(input)["cont-economii"].eligible).toBe(true);
     }
+  });
+});
+
+describe("assessProducts — new categories", () => {
+  it("never recommends 'caution' or 'check' categories, but explains why", () => {
+    const a = byId({ ...base, horizonYears: 30, riskTolerance: "ridicata", experience: "multa" });
+    for (const id of ["aur", "actiuni", "unit-linked", "cripto", "pilon2", "imobiliare"] as const) {
+      expect(a[id].eligible).toBe(false);
+      expect(a[id].cautions.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("puts repaying an expensive loan first when there is one (after a missing emergency fund)", () => {
+    expect(assessProducts({ ...base, costlyDebt: "da" })[0].id).toBe("rambursare-credit");
+    const both = assessProducts({ ...base, costlyDebt: "da", emergencyFund: "nu" }).map((a) => a.id);
+    expect(both.slice(0, 2)).toEqual(["cont-economii", "rambursare-credit"]);
+    expect(byId({ ...base, costlyDebt: "nu" })["rambursare-credit"].eligible).toBe(false);
+  });
+
+  it("offers money-market/bond funds and euro savings broadly, corporate bonds only with some horizon and tolerance", () => {
+    const a = byId({ ...base, horizonYears: 1, riskTolerance: "scazuta" });
+    expect(a["fonduri-deschise"].eligible).toBe(true);
+    expect(a["economii-euro"].eligible).toBe(true);
+    expect(a["obligatiuni-corporative"].eligible).toBe(false);
+    expect(byId({ ...base, horizonYears: 3 })["obligatiuni-corporative"].eligible).toBe(true);
   });
 });
 
@@ -91,7 +121,7 @@ describe("fitInputFromState", () => {
     const s = defaultState();
     expect(fitInputFromState(s)).toBeNull();
     s.profile = { alias: "a", savings: 1, placement: "numerar", nominalPct: 0, monthly: 0, years: 7, goal: "pensie", ageRange: null, isDemo: false };
-    s.riskProfile = { emergencyFund: "da", riskTolerance: null, experience: "multa" };
-    expect(fitInputFromState(s)).toEqual({ horizonYears: 7, goal: "pensie", emergencyFund: "da", riskTolerance: null, experience: "multa" });
+    s.riskProfile = { emergencyFund: "da", riskTolerance: null, experience: "multa", costlyDebt: null };
+    expect(fitInputFromState(s)).toEqual({ horizonYears: 7, goal: "pensie", emergencyFund: "da", riskTolerance: null, experience: "multa", costlyDebt: null });
   });
 });

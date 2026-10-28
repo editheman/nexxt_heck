@@ -41,9 +41,18 @@ const QUESTIONS = [
       { value: "multa", label: "Da, des" },
     ],
   } satisfies Q<"experience">,
+  {
+    key: "costlyDebt",
+    legend: "Ai un credit cu dobândă mare (card de credit, credit de nevoi personale)?",
+    help: "Nu-ți cerem sume — doar dacă există. Rambursarea lui e adesea primul pas.",
+    options: [
+      { value: "da", label: "Da" },
+      { value: "nu", label: "Nu" },
+    ],
+  } satisfies Q<"costlyDebt">,
 ] as const;
 
-/** Three short questions stored in `riskProfile`; each answer can be cleared by clicking it again. */
+/** Four short questions stored in `riskProfile`; each answer can be cleared by clicking it again. */
 export function RiskQuestions({ value, onChange }: { value: RiskProfile; onChange: (v: RiskProfile) => void }) {
   return (
     <div className="space-y-6">
