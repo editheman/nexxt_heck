@@ -8,9 +8,10 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1120px] space-y-10 px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-[1.2fr_1fr]">
           <div className="space-y-2">
-            <p className="flex items-center gap-2 font-bold text-ink">
+            <p className="flex items-center gap-2 text-ink">
               <Logo size={28} />
-              Protejează ce ai construit
+              <span className="font-bold tracking-[0.14em] uppercase">Llamora</span>
+              <span className="text-sm text-ink-muted">· Protejează ce ai construit</span>
             </p>
             <p className="text-sm text-ink-muted">Platformă educațională pentru decizii financiare informate.</p>
             <ul className="flex flex-wrap gap-x-5 gap-y-1 pt-2 text-sm">

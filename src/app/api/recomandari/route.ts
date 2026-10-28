@@ -93,7 +93,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${AI_API_KEY}`,
         "HTTP-Referer": "https://protejeaza.demo",
-        "X-Title": "Protejeaza ce ai construit",
+        "X-Title": "Llamora",
       },
       body: JSON.stringify({ model: AI_MODEL, messages: msgs, temperature: 0.2, max_tokens: MAX_TOKENS }),
     });

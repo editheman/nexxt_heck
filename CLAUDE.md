@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-Build a polished, functional financial education web application for Romania called "Protejează ce ai construit".
+Build a polished, functional financial education web application for Romania called "Llamora" (brand name chosen by the owner, 2026-10-29), with the tagline "Protejează ce ai construit".
 
 Core promise:
 "Învață să-ți protejezi banii, să recunoști fraudele și să înțelegi riscurile înainte să iei o decizie financiară."

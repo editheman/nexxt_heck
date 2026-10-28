@@ -1,4 +1,4 @@
-# Protejează ce ai construit
+# Llamora — Protejează ce ai construit
 
 O aplicație web educațională, în limba română, care te ajută să înțelegi cum îți afectează inflația economiile, să explorezi scenarii ipotetice transparente, să recunoști fraudele financiare și să-ți verifici cunoștințele.
 
