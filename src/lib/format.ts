@@ -6,6 +6,12 @@ export function formatLei(value: number): string {
   return `${leiFormatter.format(rounded === 0 ? 0 : rounded)} lei`;
 }
 
+/** 4012.4 → "4.012 €" */
+export function formatEur(value: number): string {
+  const rounded = Math.round(value);
+  return `${leiFormatter.format(rounded === 0 ? 0 : rounded)} €`;
+}
+
 /** 5 → "5,0%" */
 export function formatPct(value: number, digits = 1): string {
   const fixed = Number(value.toFixed(digits));
@@ -52,10 +58,38 @@ export function parseRoNumber(input: string): number | null {
   return negative ? -n : n;
 }
 
-/** Romanian count agreement: "1 an", "10 ani", "20 de ani" ("de" when the last two digits are 00 or ≥ 20, n ≥ 20). */
-export function formatYears(n: number): string {
-  if (n === 1) return "1 an";
+const countFormatter = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 0 });
+
+/**
+ * Romanian count agreement for whole numbers: "1 pachet", "4 pachete",
+ * "20 de pachete", "101 pachete", "1.234 de pachete" ("de" when n ≥ 20 and the
+ * last two digits are 00 or ≥ 20).
+ */
+export function formatCount(n: number, one: string, many: string): string {
+  if (n === 1) return `1 ${one}`;
   const lastTwo = n % 100;
   const needsDe = n >= 20 && (lastTwo === 0 || lastTwo >= 20);
-  return `${n} ${needsDe ? "de " : ""}ani`;
+  return `${countFormatter.format(n)} ${needsDe ? "de " : ""}${many}`;
+}
+
+/** "1 an", "10 ani", "20 de ani". */
+export function formatYears(n: number): string {
+  return formatCount(n, "an", "ani");
+}
+
+/**
+ * A loss as a share of monthly net income: "40% dintr-un venit net lunar",
+ * "2,4 venituri nete lunare", "21 de venituri nete lunare". Empty for income ≤ 0.
+ */
+export function formatIncomeShare(loss: number, income: number): string {
+  if (!(income > 0) || !Number.isFinite(loss) || loss <= 0) return "";
+  const ratio = loss / income;
+  if (ratio < 0.995) return `${formatPct(Math.max(1, ratio * 100), 0)} dintr-un venit net lunar`;
+  const one = "venit net lunar";
+  const many = "venituri nete lunare";
+  if (ratio >= 9.95) return formatCount(Math.round(ratio), one, many);
+  const rounded = Math.round(ratio * 10) / 10;
+  return Number.isInteger(rounded)
+    ? formatCount(rounded, one, many)
+    : `${rounded.toLocaleString("ro-RO", { minimumFractionDigits: 1 })} ${many}`;
 }

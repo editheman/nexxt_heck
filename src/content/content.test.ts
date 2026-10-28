@@ -37,7 +37,7 @@ describe("Romanian copy", () => {
   it("uses comma-below diacritics everywhere in src", () => {
     const walk = (dir: string): string[] =>
       readdirSync(dir, { withFileTypes: true }).flatMap((d) =>
-        d.isDirectory() ? walk(join(dir, d.name)) : /\.(ts|tsx)$/.test(d.name) ? [join(dir, d.name)] : [],
+        d.isDirectory() ? walk(join(dir, d.name)) : /\.(ts|tsx|json)$/.test(d.name) ? [join(dir, d.name)] : [],
       );
     const offenders = walk(join(__dirname, "..")).filter((f) => f !== __filename && /[şţŞŢ]/.test(readFileSync(f, "utf8")));
     expect(offenders).toEqual([]);

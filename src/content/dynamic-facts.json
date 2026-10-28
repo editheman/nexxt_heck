@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-28",
+  "dataYear": 2025,
+  "macroFacts": [
+    {
+      "id": "inflatie-2025",
+      "kicker": "Inflație 2025",
+      "text": "Prețurile de consum au crescut în medie cu 7,32% în 2025 față de 2024.",
+      "sources": [
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    },
+    {
+      "id": "cumulat-2020-2025",
+      "kicker": "Din 2020 până în 2025",
+      "text": "Ce costa 100 lei în 2020 a costat în medie 150 lei în 2025 (+49,6%).",
+      "sources": [
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    },
+    {
+      "id": "salariu-real-2025",
+      "kicker": "Salariul mediu, în termeni reali",
+      "text": "Salariul mediu net a crescut nominal cu 6,2% în 2025, la 5.266 lei, dar prețurile cu 7,32%: puterea lui de cumpărare a scăzut cu aproximativ 1,0%.",
+      "sources": [
+        {
+          "label": "INS, comunicate „Câștigul salarial mediu”",
+          "url": "https://insse.ro/cms/ro/tags/comunicat-castig-salarial"
+        },
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    },
+    {
+      "id": "euro-2020-2025",
+      "kicker": "Leul față de euro",
+      "text": "Un euro a costat în medie 4,8371 lei în 2020 și 5,0415 lei în 2025.",
+      "sources": [
+        {
+          "label": "BNR, cursul mediu anual EUR/RON",
+          "url": "https://www.bnr.ro"
+        }
+      ]
+    },
+    {
+      "id": "varf-2022",
+      "kicker": "Anul de vârf",
+      "text": "2022 a avut cea mai mare inflație medie din ultimii 10 ani: 13,8%.",
+      "sources": [
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    }
+  ],
+  "industries": [
+    {
+      "industry": "it",
+      "label": "IT & Tech",
+      "headline": "Cel mai bine plătit sector din economie. Inflația nu face excepții.",
+      "stat": {
+        "value": "11.810 lei",
+        "caption": "salariul mediu net în IT, octombrie 2025"
+      },
+      "body": "Este de 2,2 ori media pe economie (5.492 lei). Dar prețurile au crescut cu 49,6% între 2020 și 2025: 11.810 lei cumpără azi cât cumpărau 7.897 lei în 2020.",
+      "kind": "official",
+      "sources": [
+        {
+          "label": "INS, câștigul salarial mediu, octombrie 2025",
+          "url": "https://insse.ro/cms/sites/default/files/com_presa/com_pdf/cs10r25.pdf"
+        },
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    },
+    {
+      "industry": "horeca",
+      "label": "HoReCa",
+      "headline": "Tu faci cafeaua de specialitate. Inflația o bea.",
+      "stat": {
+        "value": "3.396 lei",
+        "caption": "salariul mediu net în hoteluri și restaurante, octombrie 2025"
+      },
+      "body": "Adică 62% din media pe economie. Cu inflația de 7,32% din 2025, un salariu care nu crește pierde într-un an aproximativ 232 lei pe lună din puterea de cumpărare — cam 12 cafele de specialitate (metaforă, preț orientativ 18 lei).",
+      "kind": "official",
+      "sources": [
+        {
+          "label": "INS, câștigul salarial mediu, octombrie 2025",
+          "url": "https://insse.ro/cms/sites/default/files/com_presa/com_pdf/cs10r25.pdf"
+        },
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    },
+    {
+      "industry": "sanatate",
+      "label": "Sănătate",
+      "headline": "Ture lungi, majorări — și totuși pe minus în termeni reali?",
+      "stat": {
+        "value": "−1,0%",
+        "caption": "puterea de cumpărare a salariului mediu net pe economie în 2025"
+      },
+      "body": "Salariul mediu net pe economie a crescut nominal cu 6,2% în 2025, iar prețurile cu 7,32%. Nu avem aici o cifră INS separată pentru sănătate, așa că folosim media: dacă venitul tău a crescut cu mai puțin de 7,32% în 2025, ai pierdut putere de cumpărare.",
+      "kind": "estimate",
+      "sources": [
+        {
+          "label": "INS, comunicate „Câștigul salarial mediu”",
+          "url": "https://insse.ro/cms/ro/tags/comunicat-castig-salarial"
+        },
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    },
+    {
+      "industry": "corporate",
+      "label": "Corporate & Servicii",
+      "headline": "Bonusul care „a rămas la fel” e, de fapt, mai mic.",
+      "stat": {
+        "value": "14.956 lei",
+        "caption": "cât ar trebui să fie în 2025 un bonus de 10.000 lei din 2020, ca să cumpere la fel"
+      },
+      "body": "Prețurile medii au crescut cu 49,6% între 2020 și 2025. O mărire sau un bonus care n-a ținut pasul a pierdut din valoare, chiar dacă cifra din fluturaș arată la fel. Pragul minim doar pentru 2025: 7,32%.",
+      "kind": "estimate",
+      "sources": [
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    },
+    {
+      "industry": "constructii",
+      "label": "Construcții",
+      "headline": "Materiale în euro, salariu în lei.",
+      "stat": {
+        "value": "−4,1%",
+        "caption": "leul față de euro, 2020 → 2025 (curs mediu anual BNR)"
+      },
+      "body": "Un euro a costat în medie 4,8371 lei în 2020 și 5,0415 lei în 2025. Tot ce e cotat în euro — utilaje, materiale importate, avansul la un apartament — cere mai mulți lei, iar prețurile în lei au crescut cu 49,6% în aceeași perioadă.",
+      "kind": "estimate",
+      "sources": [
+        {
+          "label": "BNR, cursul mediu anual EUR/RON",
+          "url": "https://www.bnr.ro"
+        },
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    },
+    {
+      "industry": "freelancer",
+      "label": "Freelancer / Student",
+      "headline": "Fără grilă de salarizare, indexarea ți-o faci singur.",
+      "stat": {
+        "value": "−33,1%",
+        "caption": "puterea de cumpărare a unui tarif (sau a unei burse) neschimbat din 2020"
+      },
+      "body": "Dacă tariful tău orar sau bursa sunt aceleași ca în 2020, în 2025 cumpără cu 33,1% mai puțin. Doar ca să rămâi pe loc, ar fi trebuit să crească cu 49,6%.",
+      "kind": "estimate",
+      "sources": [
+        {
+          "label": "INS, IPC – serie de date anuală",
+          "url": "https://insse.ro/cms/ro/content/ipc%E2%80%93serie-de-date-anuala"
+        }
+      ]
+    }
+  ]
+}

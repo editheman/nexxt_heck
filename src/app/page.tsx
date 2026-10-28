@@ -1,58 +1,44 @@
-import { BookOpen, ChartLine, ShieldAlert, Target, UserRound } from "lucide-react";
+import { BookOpen, Briefcase, ShieldAlert, Target, Users } from "lucide-react";
+import { IndustryFunnel } from "@/components/home/IndustryFunnel";
+import { MacroTicker } from "@/components/home/MacroTicker";
 import { UseDemoProfileButton } from "@/components/profile/UseDemoProfileButton";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { FACTS } from "@/content/facts";
 
 const STEPS = [
-  { icon: UserRound, title: "Profil financiar minim", text: "Câteva cifre aproximative despre economiile tale. Fără CNP, IBAN sau date de card." },
-  { icon: Target, title: "Reality Check", text: "Vezi diferența dintre suma din cont și ce vei putea cumpăra cu ea, sub ipoteze clare." },
-  { icon: ChartLine, title: "Simulator", text: "Schimbă ipotezele și compară valoarea nominală cu puterea de cumpărare." },
-  { icon: ShieldAlert, title: "Scenarii de fraudă", text: "Exersează pe mesaje fictive, inspirate din tentative reale." },
-  { icon: BookOpen, title: "Învață și verifică", text: "Module scurte, quiz-uri cu explicații și progres salvat." },
+  { icon: Briefcase, title: "Domeniul tău", text: "Un click și vezi o cifră reală despre sectorul în care lucrezi." },
+  { icon: Target, title: "Reality Check", text: "Cât a mâncat inflația oficială (INS, BNR) din economiile tale — în lei, în salarii și în shaorme." },
+  { icon: ShieldAlert, title: "Scenarii de fraudă", text: "Exersează pe mesaje fictive, inspirate din tentative reale: phishing, broker fals, crypto." },
+  { icon: BookOpen, title: "Învață și verifică", text: "Module scurte, quiz-uri cu explicații pe fiecare răspuns." },
+  { icon: Users, title: "Compară cu prietenii", text: "Opțional, sub un alias: doar progresul educațional, niciodată sume." },
 ];
 
 export default function Home() {
   return (
-    <div className="space-y-16">
-      <section className="grid items-center gap-10 lg:grid-cols-[1.25fr_1fr]">
-        <div className="space-y-6">
-          <div className="flex flex-wrap gap-2">
-            <Badge kind="fictional">Demo educațional</Badge>
-          </div>
-          <h1 className="text-4xl font-semibold text-primary sm:text-5xl">Protejează ce ai construit</h1>
-          <p className="max-w-[60ch] text-lg text-ink-muted">
-            Învață să-ți protejezi banii, să recunoști fraudele și să înțelegi riscurile înainte să iei o decizie
-            financiară.
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/profil">Începe demo-ul</ButtonLink>
-            <UseDemoProfileButton />
-          </div>
-          <p className="text-sm text-ink-muted">
-            Durează aproximativ 15 minute. Datele rămân doar în browserul tău și pot fi șterse oricând din pagina
-            Progres.
-          </p>
+    <div className="space-y-12">
+      <section className="space-y-5">
+        <div className="flex flex-wrap gap-2">
+          <Badge kind="fictional">Demo educațional</Badge>
         </div>
-
-        <Card className="space-y-4">
-          <p className="font-heading text-lg font-semibold">Un exemplu ilustrativ</p>
-          <p className="text-ink-muted">
-            10.000 lei ținuți 10 ani fără dobândă rămân <strong className="text-ink">10.000 lei</strong> în cont.
-          </p>
-          <p className="text-ink-muted">
-            Dacă presupunem o inflație de 5% pe an, ar avea puterea de cumpărare a aproximativ{" "}
-            <strong className="text-accent">6.139 lei de azi</strong>.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Badge kind="assumption">Ipoteză: inflație 5%/an</Badge>
-            <Badge kind="estimate" />
-          </div>
-          <p className="text-sm text-ink-muted">
-            Nu este o prognoză. În aplicație poți schimba orice ipoteză și vezi exact cum se calculează.
-          </p>
-        </Card>
+        <h1 className="text-4xl font-semibold text-primary sm:text-5xl">Protejează ce ai construit</h1>
+        <p className="max-w-[60ch] text-lg text-ink-muted">
+          Învață să-ți protejezi banii, să recunoști fraudele și să înțelegi riscurile înainte să iei o decizie
+          financiară.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <ButtonLink href="#domeniu">Începe — durează 10 secunde</ButtonLink>
+          <UseDemoProfileButton />
+        </div>
+        <p className="text-sm text-ink-muted">
+          Fără cont, fără CNP. Ce alegi rămâne doar în browserul tău și poate fi șters oricând din pagina Progres.
+        </p>
       </section>
+
+      <MacroTicker facts={FACTS.macroFacts} generatedAt={FACTS.generatedAt} />
+
+      <IndustryFunnel />
 
       <section aria-labelledby="pasi" className="space-y-6">
         <h2 id="pasi" className="text-2xl font-semibold">

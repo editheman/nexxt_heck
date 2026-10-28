@@ -8,8 +8,9 @@ export function SiteFooter() {
           <p className="font-heading font-semibold text-ink">Protejează ce ai construit</p>
           <p>
             Platformă educațională. Nu suntem bancă, broker sau consultant de investiții și nu oferim recomandări
-            personalizate de cumpărare sau vânzare. Calculele sunt estimări bazate pe ipotezele pe care le vezi și le
-            poți modifica — nu sunt prognoze și nu garantează rezultate.
+            personalizate de cumpărare sau vânzare. Reality Check folosește date istorice oficiale (INS, BNR); simulatorul
+            folosește ipoteze pe care le vezi și le poți modifica. Calculele sunt estimări — nu sunt prognoze și nu
+            garantează rezultate.
           </p>
           <p>
             Datele introduse rămân doar în browserul tău (localStorage). Nu cerem CNP, IBAN, date de card sau parole.

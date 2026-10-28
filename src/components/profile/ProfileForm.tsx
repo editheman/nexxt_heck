@@ -10,19 +10,20 @@ import { Card } from "@/components/ui/Card";
 import { NumberField } from "@/components/ui/NumberField";
 import { cn } from "@/components/ui/cn";
 import { GOAL_LABELS, PLACEMENT_LABELS } from "@/content/labels";
-import { validateSimInput } from "@/lib/finance";
+import { LIMITS, validateSimInput } from "@/lib/finance";
 import { GOALS, PLACEMENTS, type Goal, type Placement, type Profile } from "@/lib/storage";
 import { actions } from "@/lib/useDemoState";
 
-type NumKey = "savings" | "nominalPct" | "monthly" | "years";
+type NumKey = "savings" | "income" | "nominalPct" | "monthly" | "years";
 type Draft = { alias: string; placement: Placement; goal: Goal } & Record<NumKey, number | null>;
 type Errors = Partial<Record<NumKey | "alias", string>>;
 
-const FIELD_ORDER: Array<NumKey | "alias"> = ["alias", "savings", "nominalPct", "monthly", "years"];
+const FIELD_ORDER: Array<NumKey | "alias"> = ["alias", "savings", "income", "nominalPct", "monthly", "years"];
 
 const FIELD_LABELS: Record<NumKey | "alias", string> = {
   alias: "Cum să te numim",
   savings: "Economii actuale",
+  income: "Venit net lunar aproximativ",
   nominalPct: "Randament anual estimat",
   monthly: "Cât pui deoparte lunar",
   years: "Orizont de timp",
@@ -33,6 +34,8 @@ function validate(d: Draft): Errors {
   if (d.alias.trim().length > 40) errors.alias = "Folosește cel mult 40 de caractere.";
   if (d.savings === null) errors.savings = "Introdu suma aproximativă a economiilor (poate fi 0).";
   if (d.years === null) errors.years = "Introdu numărul de ani.";
+  if (d.income !== null && (d.income < 0 || d.income > LIMITS.amountMax))
+    errors.income = "Introdu o sumă între 0 și 100.000.000 lei, sau lasă câmpul gol.";
   if (d.nominalPct === null) errors.nominalPct = "Introdu un procent (poate fi 0).";
 
   const sim = validateSimInput({
@@ -57,6 +60,7 @@ export function ProfileForm({ initial }: { initial: Profile | null }) {
   const [draft, setDraft] = useState<Draft>(() => ({
     alias: initial && !initial.isDemo ? initial.alias : "",
     savings: initial?.savings ?? null,
+    income: initial?.income ?? null,
     placement: initial?.placement ?? "cont-curent",
     nominalPct: initial?.nominalPct ?? 0,
     monthly: initial?.monthly ?? 0,
@@ -82,6 +86,7 @@ export function ProfileForm({ initial }: { initial: Profile | null }) {
     actions.saveProfile({
       alias: draft.alias.trim(),
       savings: draft.savings!,
+      income: draft.income,
       placement: draft.placement,
       nominalPct: draft.nominalPct!,
       monthly: draft.monthly ?? 0,
@@ -156,6 +161,18 @@ export function ProfileForm({ initial }: { initial: Profile | null }) {
           onChange={(v) => set("savings", v)}
           onBlur={() => touch("savings")}
           error={visible("savings")}
+          badge={<Badge kind="user" />}
+        />
+
+        <NumberField
+          id="income"
+          label={`${FIELD_LABELS.income} (opțional)`}
+          helper="Ne ajută să traducem pierderea în salarii. Rămâne doar în browserul tău și nu apare niciodată în comparațiile cu prietenii."
+          suffix="lei"
+          value={draft.income}
+          onChange={(v) => set("income", v)}
+          onBlur={() => touch("income")}
+          error={visible("income")}
           badge={<Badge kind="user" />}
         />
 

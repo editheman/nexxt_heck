@@ -9,6 +9,7 @@ import { MODULES } from "@/content/modules";
 import { SCAMS } from "@/content/scams";
 import { computeProgress, isPassed } from "@/lib/progress";
 import { useDemoState } from "@/lib/useDemoState";
+import { FriendsCompare } from "./FriendsCompare";
 import { ResetDemo } from "./ResetDemo";
 
 const catalog = { moduleSlugs: MODULES.map((m) => m.slug), scamIds: SCAMS.map((s) => s.id) };
@@ -118,6 +119,8 @@ export function ProgressView() {
           </table>
         </div>
       </section>
+
+      <FriendsCompare social={state.social} summary={p} />
 
       <section aria-labelledby="date" className="space-y-3">
         <h2 id="date" className="text-xl font-semibold">Datele tale</h2>

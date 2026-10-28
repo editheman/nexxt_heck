@@ -1,12 +1,17 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import type { RealityWindow } from "@/content/macro-ro";
+import type { Industry } from "./schemas/facts";
 import {
+  FRIENDS_MAX,
   STORAGE_KEY,
   defaultState,
   parseState,
+  quickProfile,
   serializeState,
   type DemoState,
+  type Friend,
   type Profile,
 } from "./storage";
 
@@ -67,8 +72,28 @@ export const actions = {
   saveProfile(profile: Profile) {
     updateState((s) => ({ ...s, profile }));
   },
-  setInflation(inflationPct: number) {
-    updateState((s) => ({ ...s, assumptions: { ...s.assumptions, inflationPct } }));
+  setIndustry(industry: Industry) {
+    updateState((s) => ({ ...s, industry }));
+  },
+  /** Home funnel: keep any existing profile, only update savings and income. */
+  saveQuick(savings: number, income: number) {
+    updateState((s) => ({ ...s, profile: quickProfile(s.profile, savings, income) }));
+  },
+  setSocialAlias(alias: string | null) {
+    updateState((s) => ({ ...s, social: { ...s.social, alias } }));
+  },
+  /** Adds or replaces (same alias) a friend's progress. */
+  addFriend(friend: Friend) {
+    updateState((s) => ({
+      ...s,
+      social: { ...s.social, friends: [friend, ...s.social.friends.filter((f) => f.alias !== friend.alias)].slice(0, FRIENDS_MAX) },
+    }));
+  },
+  removeFriend(alias: string) {
+    updateState((s) => ({ ...s, social: { ...s.social, friends: s.social.friends.filter((f) => f.alias !== alias) } }));
+  },
+  setRealityYears(years: RealityWindow) {
+    updateState((s) => ({ ...s, reality: { years } }));
   },
   markVisited(page: "reality" | "simulator") {
     if (read().progress.visited[page]) return;

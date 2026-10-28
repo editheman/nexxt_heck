@@ -1,4 +1,4 @@
-/** Official Romanian institutions referenced for verification. Names and homepages only — no figures are attributed to them. */
+/** Official Romanian institutions referenced for verification. Figures attributed to them live only in `macro-ro.ts` (CPI, EUR/RON) and `sector-sources.ts` (wages). */
 export const OFFICIAL_SOURCES = [
   { name: "INS", url: "https://insse.ro", topic: "date oficiale despre inflație (indicele prețurilor de consum)" },
   { name: "BNR", url: "https://www.bnr.ro", topic: "politică monetară și informații despre sistemul bancar" },

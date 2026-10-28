@@ -1,9 +1,10 @@
 import { cn } from "./cn";
 
-export type BadgeKind = "user" | "assumption" | "estimate" | "fictional";
+export type BadgeKind = "user" | "official" | "assumption" | "estimate" | "fictional";
 
 const styles: Record<BadgeKind, { label: string; className: string }> = {
   user: { label: "Datele tale", className: "bg-surface-muted text-primary border-transparent" },
+  official: { label: "Date oficiale", className: "bg-surface text-primary border-primary/40" },
   assumption: { label: "Ipoteză", className: "bg-assumption-soft text-assumption border-transparent" },
   estimate: { label: "Estimare", className: "bg-accent-soft text-accent border-transparent" },
   fictional: { label: "Exemplu fictiv", className: "bg-surface text-ink-muted border-border-strong border-dashed" },

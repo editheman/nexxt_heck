@@ -26,7 +26,7 @@ Calm, editorial, premium-but-plain. A light, paper-like background, navy ink, on
 | `--success-soft` | `#E8F5EC` | | |
 | `--ring` | `#2563EB` | focus ring (2px + 2px offset) | |
 
-Data-provenance badges (always text + color, never color alone): **Datele tale** (primary), **Ipoteză** (assumption), **Estimare** (accent), **Exemplu fictiv** (ink-muted, dashed border).
+Data-provenance badges (always text + color, never color alone): **Datele tale** (primary on muted), **Date oficiale** (primary text, solid primary/40 border — INS/BNR series only), **Ipoteză** (assumption), **Estimare** (accent), **Exemplu fictiv** (ink-muted, dashed border).
 
 ## Typography
 - Headings: **Lexend** 500/600; body & UI: **Source Sans 3** 400/600. Both loaded via `next/font/google` with `latin-ext` (ă, â, î, ș, ț — comma-below forms).
@@ -48,6 +48,10 @@ Data-provenance badges (always text + color, never color alone): **Datele tale**
 - **Sliders:** always paired with a numeric input; keyboard operable; value announced.
 - **Charts (Recharts):** line chart; nominal = navy solid, putere de cumpărare = teal dashed; direct end labels + legend; tooltip with both values; a "Vezi tabelul" toggle renders the same data as an accessible table; one-sentence text summary above the chart.
 - **Feedback:** inline Alert (info/assumption/success/danger) with icon + title + text; quiz answers show correct/incorrect with icon + word, not color alone.
+- **Window picker (Reality Check):** native radio group inside a `fieldset`/`legend`, rendered as segmented buttons (selected = primary fill); no inflation input on this page.
+- **Equivalents („Ce puteai cumpăra…”):** cards with a big tabular number and the item phrase below, „Preț orientativ” note, section badge „Metaforă · prețuri orientative” (assumption). Tone: dry, self-aware wake-up line — never meme-style, no emoji.
+- **Home funnel (no modals):** hero → „Economia, pe scurt” strip (Zod-validated facts from `dynamic-facts.json`, horizontally scrollable, no auto-motion, each card cites its source) → „În ce domeniu activezi?” chips (native radio group, pill-shaped, selected = primary fill) → sector insight card (badge „Date oficiale INS” or „Calculat din date oficiale”) → disclosure button „Vrei să vezi calculul exact pe buzunarul tău?” (`aria-expanded`) revealing two slider+input pairs (venit net, economii) and an instant accent-soft result panel → CTA „Vezi calculul complet”.
+- **Friends comparison (Progres):** opt-in alias form → read-only share code with Copy → add-code form with inline Alert feedback → table of alias, %, modules, quizzes, scenarios. Never shows amounts.
 - **Empty states:** e.g. Reality Check with no profile → explanation + CTA to `/profil` or "Folosește profilul exemplu".
 
 ## Motion

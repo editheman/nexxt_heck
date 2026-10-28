@@ -10,7 +10,7 @@ export default function Page() {
       <PageHeader
         step="Pasul 2 din 5"
         title="Reality Check"
-        lead="Suma din cont și puterea ei de cumpărare sunt lucruri diferite. Iată cum arată economiile tale în lei de azi, sub ipoteze pe care le poți schimba."
+        lead="Suma din cont și puterea ei de cumpărare sunt lucruri diferite. Iată cât ar fi pierdut economiile tale în ultimii ani, calculat cu inflația oficială din România."
       />
       <RealityCheck />
     </div>
