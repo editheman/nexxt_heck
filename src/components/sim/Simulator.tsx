@@ -121,14 +121,18 @@ function SimulatorInner({ initial, fromProfile, isDemo }: { initial: SimInput; f
                   {showTable ? "Vezi graficul" : "Vezi tabelul"}
                 </Button>
               </div>
-              <div className={cn(showTable && "hidden")}>
-                <ProjectionChart rows={rows} showContributed={input.monthly > 0} />
-                <p className="mt-2 text-sm text-ink-muted">
-                  Linia continuă: valoarea nominală. Linia întreruptă: puterea de cumpărare în lei de azi.
-                  {input.monthly > 0 ? " Linia punctată: totalul depus." : ""}
-                </p>
-              </div>
-              {showTable && <ProjectionTable rows={rows} caption="Evoluția valorii nominale și a puterii de cumpărare, pe ani" />}
+              {/* Unmounted (not hidden) with the table: a display:none ResponsiveContainer measures 0×0 and warns. */}
+              {showTable ? (
+                <ProjectionTable rows={rows} caption="Evoluția valorii nominale și a puterii de cumpărare, pe ani" />
+              ) : (
+                <div>
+                  <ProjectionChart rows={rows} showContributed={input.monthly > 0} />
+                  <p className="mt-2 text-sm text-ink-muted">
+                    Linia continuă: valoarea nominală. Linia întreruptă: puterea de cumpărare în lei de azi.
+                    {input.monthly > 0 ? " Linia punctată: totalul depus." : ""}
+                  </p>
+                </div>
+              )}
             </Card>
           </div>
         </div>
