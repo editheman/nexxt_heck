@@ -1,4 +1,5 @@
 import { Shield } from "lucide-react";
+import Link from "next/link";
 import { OFFICIAL_SOURCES } from "@/content/sources";
 
 export function SiteFooter() {
@@ -14,6 +15,14 @@ export function SiteFooter() {
               Protejează ce ai construit
             </p>
             <p className="text-sm text-ink-muted">Platformă educațională pentru decizii financiare informate.</p>
+            <ul className="flex flex-wrap gap-x-5 gap-y-1 pt-2 text-sm">
+              <li>
+                <Link href="/confidentialitate" className="font-semibold text-ink hover:text-primary">Confidențialitate</Link>
+              </li>
+              <li>
+                <Link href="/dezabonare" className="font-semibold text-ink hover:text-primary">Dezabonare</Link>
+              </li>
+            </ul>
           </div>
           <div className="space-y-3">
             <p className="text-sm font-semibold text-ink">Verifică informațiile la surse oficiale</p>

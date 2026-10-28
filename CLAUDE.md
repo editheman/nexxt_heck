@@ -160,3 +160,4 @@ Prefer a working, coherent end-to-end product over a large collection of incompl
 - Demo state is one versioned object in localStorage (`pcac:v1`, `src/lib/storage.ts`). Bump the version and add parsing for any shape change; parsing must never throw.
 - This is Next.js 16 with Cache Components: read `node_modules/next/dist/docs/` before using unfamiliar APIs (see `AGENTS.md`).
 - Checks: `npm run verify` (lint, typecheck, unit tests, build) and `npm run test:e2e` (Playwright, desktop + mobile).
+- Newsletter/email capture is **demo-only** (no backend, nothing sent): rules in `src/lib/newsletter.ts`, production requirements in `docs/newsletter.md`. Never claim emails were sent; bump `CONSENT_TEXT_VERSION` (`src/content/consent.ts`) on any consent-text change; email, consent log, prompt state and reading events stay in separate storage keys.
