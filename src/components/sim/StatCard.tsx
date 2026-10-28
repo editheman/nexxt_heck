@@ -19,7 +19,7 @@ export function StatCard({
 }) {
   return (
     <Card className="flex h-full flex-col gap-3 p-5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-col items-start gap-2">
         <p className="text-sm font-semibold text-ink-muted">{label}</p>
         <Badge kind={kind} />
       </div>

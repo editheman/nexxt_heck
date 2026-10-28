@@ -1,5 +1,7 @@
 # Protejează ce ai construit — MVP Implementation Plan
 
+> Status 2026-10-28: Tasks 1–9 implemented and verified (lint, tsc, 78 unit tests, build, 11 e2e). Task 10 (friends) not started.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A running Romanian financial-education web app covering the full journey landing → profil → Reality Check → simulator → fraude → modul → quiz → progres, persisted in localStorage.

@@ -51,3 +51,11 @@ export function parseRoNumber(input: string): number | null {
   if (!Number.isFinite(n)) return null;
   return negative ? -n : n;
 }
+
+/** Romanian count agreement: "1 an", "10 ani", "20 de ani" ("de" when the last two digits are 00 or ≥ 20, n ≥ 20). */
+export function formatYears(n: number): string {
+  if (n === 1) return "1 an";
+  const lastTwo = n % 100;
+  const needsDe = n >= 20 && (lastTwo === 0 || lastTwo >= 20);
+  return `${n} ${needsDe ? "de " : ""}ani`;
+}

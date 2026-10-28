@@ -11,7 +11,7 @@ import { PageSkeleton } from "@/components/ui/Skeleton";
 import { cn } from "@/components/ui/cn";
 import { explainOutcome } from "@/lib/explain";
 import { LIMITS, project, summarize, validateSimInput, type SimInput } from "@/lib/finance";
-import { formatLei, formatPct } from "@/lib/format";
+import { formatLei, formatPct, formatYears } from "@/lib/format";
 import type { DemoState } from "@/lib/storage";
 import { actions, useDemoState } from "@/lib/useDemoState";
 import { ProjectionChart } from "./ProjectionChart";
@@ -104,7 +104,7 @@ function SimulatorInner({ initial, fromProfile, isDemo }: { initial: SimInput; f
           )}
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard label="Total depus" value={formatLei(summary.contributed)} kind={fromProfile && !isDemo ? "user" : "fictional"} />
-            <StatCard label={`Nominal după ${input.years} ani`} value={formatLei(summary.nominal)} kind="estimate" testId="sim-nominal" />
+            <StatCard label={`Nominal după ${formatYears(input.years)}`} value={formatLei(summary.nominal)} kind="estimate" testId="sim-nominal" />
             <StatCard label="În lei de azi" value={formatLei(summary.real)} kind="estimate" emphasis="accent" testId="sim-real" />
           </div>
           <p aria-live="polite" className="text-base" data-testid="sim-explanation">
@@ -137,6 +137,21 @@ function SimulatorInner({ initial, fromProfile, isDemo }: { initial: SimInput; f
       </div>
 
       <NextStep href="/fraude" label="Exersează: recunoaște o fraudă" hint="Patru scenarii fictive, inspirate din tentative reale." />
+
+      {/* On small screens the results sit below the controls; keep the key numbers in view while adjusting. */}
+      <div aria-hidden className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 px-4 py-2.5 backdrop-blur lg:hidden">
+        <div className="tabular mx-auto flex max-w-[1120px] items-center justify-between gap-4 text-sm">
+          <span>
+            <span className="block text-ink-muted">Nominal</span>
+            <span className="font-heading font-semibold text-primary">{formatLei(summary.nominal)}</span>
+          </span>
+          <span className="text-right">
+            <span className="block text-ink-muted">În lei de azi · estimare</span>
+            <span className="font-heading font-semibold text-accent">{formatLei(summary.real)}</span>
+          </span>
+        </div>
+      </div>
+      <div aria-hidden className="h-12 lg:hidden" />
     </div>
   );
 }

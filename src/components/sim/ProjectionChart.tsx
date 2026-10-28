@@ -1,7 +1,7 @@
 "use client";
 
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { formatLei } from "@/lib/format";
+import { formatLei, formatYears } from "@/lib/format";
 import type { ProjectionRow } from "@/lib/finance";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
@@ -25,7 +25,7 @@ export function ProjectionChart({ rows, showContributed }: { rows: ProjectionRow
             tickLine={false}
             axisLine={{ stroke: "var(--color-border)" }}
             tick={{ fill: "var(--color-ink-muted)", fontSize: 13 }}
-            tickFormatter={(y: number) => `${y} ani`}
+            tickFormatter={(y: number) => formatYears(y)}
             interval="preserveStartEnd"
           />
           <YAxis

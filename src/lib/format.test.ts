@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatLei, formatPct, parseRoNumber } from "./format";
+import { formatLei, formatPct, formatYears, parseRoNumber } from "./format";
 
 // Intl uses narrow no-break spaces in some locales; normalise for assertions.
 const norm = (s: string) => s.replace(/[  ]/g, " ");
@@ -39,5 +39,21 @@ describe("parseRoNumber", () => {
 
   it.each(["", "   ", "abc", "1,2,3", "--1", "1.2.3,4,5"])("rejects %j", (input) => {
     expect(parseRoNumber(input)).toBeNull();
+  });
+});
+
+describe("formatYears", () => {
+  it.each([
+    [0, "0 ani"],
+    [1, "1 an"],
+    [2, "2 ani"],
+    [10, "10 ani"],
+    [19, "19 ani"],
+    [20, "20 de ani"],
+    [25, "25 de ani"],
+    [50, "50 de ani"],
+    [101, "101 ani"],
+  ])("%d → %s", (n, expected) => {
+    expect(formatYears(n)).toBe(expected);
   });
 });

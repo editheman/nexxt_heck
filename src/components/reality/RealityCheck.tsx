@@ -11,7 +11,7 @@ import { PageSkeleton } from "@/components/ui/Skeleton";
 import { PLACEMENT_LABELS } from "@/content/labels";
 import { explainOutcome } from "@/lib/explain";
 import { summarize, type SimInput } from "@/lib/finance";
-import { formatLei, formatPct } from "@/lib/format";
+import { formatLei, formatPct, formatYears } from "@/lib/format";
 import { actions, useDemoState } from "@/lib/useDemoState";
 import { InflationAssumption } from "./InflationAssumption";
 
@@ -49,7 +49,7 @@ export function RealityCheck() {
     years: p.years,
   };
   const s = summarize(input);
-  const horizon = p.years === 1 ? "1 an" : `${p.years} ani`;
+  const horizon = formatYears(p.years);
 
   return (
     <div className="space-y-8">

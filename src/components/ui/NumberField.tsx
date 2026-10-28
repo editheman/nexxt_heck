@@ -79,7 +79,7 @@ export function NumberField({ id, label, value, onChange, onBlur, suffix, helper
           className="tabular w-full min-w-0 bg-transparent px-3 py-2 text-base text-ink outline-none"
         />
         {suffix && (
-          <span aria-hidden className="pr-3 text-ink-muted">
+          <span aria-hidden className="pr-3 whitespace-nowrap text-ink-muted">
             {suffix}
           </span>
         )}

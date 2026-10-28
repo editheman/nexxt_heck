@@ -17,7 +17,7 @@ export function InflationAssumption({ value, onCommit }: { value: number; onComm
         label="Inflație anuală presupusă"
         badge={<Badge kind="assumption">Ipoteză ilustrativă</Badge>}
         helper="Aceeași rată pentru fiecare an. Nu este o prognoză și nici rata oficială actuală."
-        suffix="% / an"
+        suffix="%/an"
         value={value}
         error={error}
         onChange={(v) => {

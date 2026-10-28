@@ -151,3 +151,12 @@ For substantial work, create a written implementation plan with small, ordered t
 After implementation, summarize what changed, which tests were run, their results, and any remaining limitations.
 
 Prefer a working, coherent end-to-end product over a large collection of incomplete features.
+## 11. Project Map
+
+- Design system (tokens, components, anti-patterns): `docs/design-system.md`. Tokens live in `src/app/globals.css`; never use raw hex in components.
+- Product/technical spec: `docs/superpowers/specs/2026-10-28-protejeaza-design.md`. Implementation plan: `docs/superpowers/plans/`.
+- Financial math lives only in `src/lib/finance.ts` (annual effective rates, end-of-month contributions at `(1+r)^(1/12)−1`). Change conventions there and in the spec together.
+- Romanian content (modules, quizzes, scam scenarios) is typed data in `src/content/`. Use comma-below ș/ț; a unit test rejects cedilla ş/ţ.
+- Demo state is one versioned object in localStorage (`pcac:v1`, `src/lib/storage.ts`). Bump the version and add parsing for any shape change; parsing must never throw.
+- This is Next.js 16 with Cache Components: read `node_modules/next/dist/docs/` before using unfamiliar APIs (see `AGENTS.md`).
+- Checks: `npm run verify` (lint, typecheck, unit tests, build) and `npm run test:e2e` (Playwright, desktop + mobile).

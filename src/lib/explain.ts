@@ -1,4 +1,4 @@
-import { formatLei } from "./format";
+import { formatLei, formatYears } from "./format";
 import type { SimInput, SimSummary } from "./finance";
 
 /** One plain-language sentence describing a projection. Always conditional ("ar"), never a forecast. */
@@ -6,7 +6,7 @@ export function explainOutcome(input: SimInput, s: SimSummary): string {
   if (input.years === 0) {
     return "Cu un orizont de 0 ani nu există încă niciun efect al randamentului sau al inflației: valoarea rămâne cea de azi.";
   }
-  const horizon = input.years === 1 ? "un an" : `${input.years} de ani`;
+  const horizon = formatYears(input.years);
   const head = `Sub aceste ipoteze, peste ${horizon} ai avea nominal ${formatLei(s.nominal)}, cu puterea de cumpărare a aproximativ ${formatLei(s.real)} de azi`;
   const diff = s.real - s.contributed;
   // Treat differences under 0,05% of the total as "the same" to avoid rounding noise.
