@@ -1,11 +1,12 @@
 "use client";
 
-import { Menu, Shield, UserRound, X } from "lucide-react";
+import { Menu, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { buttonClass } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
+import { Logo } from "./Logo";
 import { NAV_ITEMS } from "./nav";
 
 function isActive(pathname: string, href: string) {
@@ -26,9 +27,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-[1120px] items-center gap-8 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex min-h-11 items-center gap-2.5 font-bold text-ink">
-          <span className="flex size-8 items-center justify-center rounded-[9px] bg-primary text-on-primary">
-            <Shield aria-hidden className="size-[18px]" />
-          </span>
+          <Logo size={36} />
           <span className="text-[1.05rem] leading-tight tracking-tight">Protejează ce ai construit</span>
         </Link>
 

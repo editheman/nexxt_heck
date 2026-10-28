@@ -1,6 +1,6 @@
-import { Shield } from "lucide-react";
 import Link from "next/link";
 import { OFFICIAL_SOURCES } from "@/content/sources";
+import { Logo } from "./Logo";
 
 export function SiteFooter() {
   return (
@@ -9,9 +9,7 @@ export function SiteFooter() {
         <div className="grid gap-8 md:grid-cols-[1.2fr_1fr]">
           <div className="space-y-2">
             <p className="flex items-center gap-2 font-bold text-ink">
-              <span className="flex size-6 items-center justify-center rounded-[7px] bg-primary text-on-primary">
-                <Shield aria-hidden className="size-3.5" />
-              </span>
+              <Logo size={28} />
               Protejează ce ai construit
             </p>
             <p className="text-sm text-ink-muted">Platformă educațională pentru decizii financiare informate.</p>
