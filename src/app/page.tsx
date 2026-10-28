@@ -41,23 +41,23 @@ export default function Home() {
           </ul>
         </div>
 
-        <nav aria-label="Teme principale" className="mx-auto w-full max-w-[1040px]">
-          <ul className="grid gap-3 rounded-[var(--radius-card)] border border-white/50 bg-surface/35 p-3 shadow-[var(--shadow-card)] backdrop-blur-sm md:grid-cols-3">
+        <nav aria-label="Teme principale" className="mx-auto w-full max-w-[960px]">
+          <ul className="grid gap-2 rounded-[var(--radius-card)] border border-white/50 bg-surface/35 p-2 shadow-[var(--shadow-card)] backdrop-blur-sm md:grid-cols-3">
             {PILLARS.map((p) => (
               <li key={p.n}>
                 <Link
                   href={p.href}
-                  className="group flex h-full min-h-16 items-center gap-4 rounded-[var(--radius-control)] border border-white/60 bg-surface/55 px-4 py-3 transition-colors hover:border-primary hover:bg-primary-soft"
+                  className="group flex h-full min-h-14 items-center gap-3 rounded-[var(--radius-control)] border border-white/60 bg-surface/55 px-3 py-2 transition-colors hover:border-primary hover:bg-primary-soft"
                 >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-border bg-surface text-primary">
-                    <p.icon aria-hidden className="size-5" />
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-border bg-surface text-primary">
+                    <p.icon aria-hidden className="size-4" />
                   </span>
                   <span className="min-w-0 text-left">
-                    <span className="flex flex-wrap items-baseline gap-x-2 text-sm">
-                      <span className="font-mono text-xs text-ink-muted">PILON {p.n}</span>
+                    <span className="flex flex-wrap items-baseline gap-x-1.5 text-[0.8125rem]">
+                      <span className="font-mono text-[0.6875rem] text-ink-muted">PILON {p.n}</span>
                       <span className="font-semibold text-primary">{p.title}</span>
                     </span>
-                    <span className="block text-sm text-ink-muted">{p.text}</span>
+                    <span className="block text-xs text-ink-muted">{p.text}</span>
                   </span>
                   <ArrowRight aria-hidden className="ml-auto size-4 shrink-0 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                 </Link>
