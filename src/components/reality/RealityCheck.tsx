@@ -124,7 +124,7 @@ export function RealityCheck() {
             <a href={ins.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2">
               INS
             </a>{" "}
-            (indicele prețurilor de consum, an precedent = 100), pentru {h.baseYear + 1}–{h.endYear}.
+            (indicele prețurilor de consum, an precedent = 100). Pentru perioada {h.baseYear}–{h.endYear} aplicăm ratele anilor {h.baseYear + 1}–{h.endYear}, care duc prețurile de la nivelul din {h.baseYear} la cel din {h.endYear}.
           </p>
           <p>
             <strong className="text-ink">Putere de cumpărare:</strong> P<sub>real</sub> = P / ∏(1 + i<sub>t</sub>) ={" "}

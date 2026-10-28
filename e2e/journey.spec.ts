@@ -31,6 +31,9 @@ test("full journey persists across reloads", async ({ page }) => {
   await expect(page).toHaveURL(/\/reality-check$/);
   await expect(page.getByTestId("stat-nominal")).toHaveText("20.000 lei");
   await expect(page.getByTestId("stat-inflation")).toHaveText("+49,6%");
+  // The window picker and the result cards describe the same period (base year → latest year).
+  await expect(page.getByLabel("Ultimii 5 ani (2020–2025)")).toBeChecked();
+  await expect(page.getByText("Cât au crescut prețurile, 2020–2025")).toBeVisible();
   await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
   await expect(page.getByTestId("reality-loss")).toHaveText("6.627 lei");
   await expect(page.getByTestId("equivalents")).toContainText("1 iPhone de ultimă generație");
@@ -40,11 +43,11 @@ test("full journey persists across reloads", async ({ page }) => {
   await expect(page.getByLabel(/Inflație/)).toHaveCount(0);
 
   // Changing the window updates the loss and the comparisons.
-  await page.locator("label", { hasText: "Ultimii 3 ani (2023–2025)" }).click();
+  await page.locator("label", { hasText: "Ultimii 3 ani (2022–2025)" }).click();
   await expect(page.getByTestId("stat-real")).toHaveText("15.987 lei");
   await expect(page.getByTestId("reality-loss")).toHaveText("4.013 lei");
   await expect(page.getByTestId("equivalents")).toContainText("10 plinuri de benzină");
-  await page.locator("label", { hasText: "Ultimii 10 ani (2016–2025)" }).click();
+  await page.locator("label", { hasText: "Ultimii 10 ani (2015–2025)" }).click();
   await expect(page.getByTestId("stat-real")).toHaveText("12.022 lei");
   await expect(page.getByTestId("reality-explanation")).toContainText("din 2015 până în 2025");
   await expect(page.getByTestId("equivalents")).toContainText("3 luni de chirie");
@@ -103,7 +106,7 @@ test("full journey persists across reloads", async ({ page }) => {
 
   await page.goto("/reality-check");
   await page.reload();
-  await expect(page.getByLabel("Ultimii 10 ani (2016–2025)")).toBeChecked();
+  await expect(page.getByLabel("Ultimii 10 ani (2015–2025)")).toBeChecked();
   await expect(page.getByTestId("stat-real")).toHaveText("12.022 lei");
 
   expect(errors).toEqual([]);
@@ -152,7 +155,7 @@ test("schema-v1 saved data is migrated in place under pcac:v1", async ({ page })
     );
   });
   await page.goto("/reality-check");
-  await expect(page.getByLabel("Ultimii 5 ani (2021–2025)")).toBeChecked();
+  await expect(page.getByLabel("Ultimii 5 ani (2020–2025)")).toBeChecked();
   await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
   await page.getByRole("radio", { name: /Ultimii 3 ani/ }).check({ force: true });
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("pcac:v1")!));

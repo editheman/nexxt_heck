@@ -31,7 +31,7 @@ export const MARKET_FACTS: MarketFact[] = [
     headline: `Între ${five.baseYear} și ${Y}, prețurile au crescut cumulat cu ${formatPct(five.cumulativeInflationPct)}.`,
     detail: `100 de lei ținuți fără dobândă din ${five.baseYear} cumpără azi cât cumpărau atunci aproximativ ${formatLei(five.real)}.`,
     source: "INS",
-    period: `${five.baseYear + 1}–${Y}`,
+    period: `${five.baseYear}–${Y}`,
   },
   {
     id: "curs-eur",

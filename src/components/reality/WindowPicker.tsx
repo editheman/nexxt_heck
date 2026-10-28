@@ -2,7 +2,11 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { LATEST_DATA_YEAR, REALITY_WINDOWS, type RealityWindow } from "@/content/macro-ro";
 
-/** Choice of official history window. Inflation itself is fixed (read-only) data. */
+/**
+ * Choice of official history window. Inflation itself is fixed (read-only) data.
+ * Labels show base year → latest year (e.g. 2020–2025 for 5 years), the same period the
+ * result cards use; the yearly rates applied are those of the years after the base year.
+ */
 export function WindowPicker({ value, onChange }: { value: RealityWindow; onChange: (v: RealityWindow) => void }) {
   return (
     <Card className="p-5 sm:p-6">
@@ -24,7 +28,7 @@ export function WindowPicker({ value, onChange }: { value: RealityWindow; onChan
                 onChange={() => onChange(n)}
                 className="sr-only"
               />
-              Ultimii {n} ani ({LATEST_DATA_YEAR - n + 1}–{LATEST_DATA_YEAR})
+              Ultimii {n} ani ({LATEST_DATA_YEAR - n}–{LATEST_DATA_YEAR})
             </label>
           ))}
         </div>
