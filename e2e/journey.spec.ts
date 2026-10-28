@@ -183,12 +183,17 @@ test("mobile menu navigates", async ({ page, isMobile }) => {
   expect(overflow).toBe(false);
 });
 
-test("home calculator recomputes purchasing power", async ({ page }) => {
+test("home is a single screen with working pillar links", async ({ page, isMobile }) => {
   await page.goto("/");
-  await expect(page.getByTestId("home-real")).toHaveText("7.835 lei"); // 10.000 / 1,05^5
-  await page.getByRole("button", { name: "10 ani", exact: true }).click();
-  await expect(page.getByTestId("home-real")).toHaveText("6.139 lei"); // 10.000 / 1,05^10
-  await page.getByRole("button", { name: "50.000 lei" }).click();
-  await expect(page.getByTestId("home-nominal")).toHaveText("50.000 lei");
-  await expect(page.getByTestId("home-real")).toHaveText("30.696 lei");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Învață azi. Decide informat.");
+  await expect(page.locator("footer")).toHaveCount(0);
+  if (!isMobile) {
+    const scrolls = await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight + 1);
+    expect(scrolls).toBe(false);
+  }
+  const pillars = page.getByRole("navigation", { name: "Teme principale" });
+  await expect(pillars.getByRole("link")).toHaveCount(3);
+  await pillars.getByRole("link", { name: /Protecție anti-fraudă/ }).click();
+  await expect(page).toHaveURL(/\/fraude$/);
+  await expect(page.locator("footer")).toHaveCount(1);
 });

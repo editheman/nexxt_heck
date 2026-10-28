@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { FooterGate } from "@/components/layout/FooterGate";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import "./globals.css";
@@ -29,7 +30,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main id="continut" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>
-        <SiteFooter />
+        <FooterGate>
+          <SiteFooter />
+        </FooterGate>
       </body>
     </html>
   );

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Short laptop screens (e.g. 1366×768): tighter vertical rhythm so single-screen layouts still fit. */
+@custom-variant short (@media (max-height: 820px));
+
 /* Design tokens — see docs/design-system.md. Components use these, never raw hex. */
 @theme {
   --color-bg: #f5f6fc;
