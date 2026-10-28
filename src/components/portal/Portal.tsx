@@ -2,17 +2,18 @@
 
 import { ArrowRight, BookOpen, ChartLine, CheckCircle2, Pencil, ShieldAlert, Target, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { Badge, Tag } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 import { formatLei } from "@/lib/format";
-import { MODULES, getModule } from "@/content/modules";
+import { MODULES } from "@/content/modules";
 import { SCAMS } from "@/content/scams";
-import { TOPICS } from "@/content/topics";
+import { GOAL_PATHS } from "@/content/goalPaths";
+import { GOAL_LABELS } from "@/content/labels";
 import { computeProgress, isPassed } from "@/lib/progress";
-import { recommendedModules } from "@/lib/topics";
+import { modulesForGoal } from "@/lib/goals";
 import type { DemoState } from "@/lib/storage";
 import { useDemoState } from "@/lib/useDemoState";
 
@@ -23,7 +24,6 @@ const AGE: Record<string, string> = { "20-25": "20–25 ani", "26-30": "26–30 
 function resumeHref(s: DemoState) {
   if (!s.profile) return "/profil";
   if (!s.progress.visited.reality) return "/reality-check";
-  if (s.interests.length === 0) return "/interese";
   return "/simulator";
 }
 
@@ -43,7 +43,7 @@ export function Portal() {
   }
 
   const progress = computeProgress(state, catalog);
-  const recommended = recommendedModules(state.interests).map((slug) => getModule(slug)!).filter(Boolean);
+  const recommended = modulesForGoal(p.goal);
   const scamsDone = SCAMS.filter((s) => state.progress.scams[s.id]).length;
   const done = state.onboarding.completedAt !== null;
 
@@ -73,55 +73,40 @@ export function Portal() {
       <section aria-labelledby="recomandate" className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1">
-            <h2 id="recomandate" className="text-2xl text-ink">Recomandate pentru tine</h2>
-            <p className="text-ink-muted">Pe baza temelor pe care le-ai ales.</p>
+            <Eyebrow>Pentru obiectivul tău</Eyebrow>
+            <h2 id="recomandate" className="text-2xl text-ink" data-testid="portal-goal">{GOAL_LABELS[p.goal]}</h2>
+            <p className="max-w-[68ch] text-ink-muted">{GOAL_PATHS[p.goal].intro}</p>
           </div>
-          <Link href="/interese" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
-            <Pencil aria-hidden className="size-4" /> Modifică interesele
+          <Link href="/profil" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+            <Pencil aria-hidden className="size-4" /> Schimbă obiectivul
           </Link>
         </div>
-        {state.interests.length > 0 && (
-          <ul className="flex flex-wrap gap-2" aria-label="Interesele tale" data-testid="portal-interests">
-            {state.interests.map((id) => (
-              <li key={id}>
-                <Tag tone="indigo">{TOPICS.find((t) => t.id === id)?.label ?? id}</Tag>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="portal-recommended">
+          {recommended.map((m) => {
+            const read = state.progress.modulesRead[m.slug];
+            const q = state.progress.quizzes[m.slug];
+            return (
+              <li key={m.slug}>
+                <Link href={`/invata/${m.slug}`} className="group block h-full rounded-[var(--radius-card)]">
+                  <Card className="flex h-full flex-col gap-2 p-5 transition-shadow group-hover:shadow-[var(--shadow-raised)]">
+                    <span className="font-mono text-xs text-ink-muted">{m.minutes} min</span>
+                    <h3 className="text-lg leading-snug text-ink">{m.title}</h3>
+                    <p className="flex-1 text-sm text-ink-muted">{m.summary}</p>
+                    <span className="flex items-center gap-2 text-sm font-semibold">
+                      {q && isPassed(q.best, q.total) ? (
+                        <span className="flex items-center gap-1 text-success"><CheckCircle2 aria-hidden className="size-4" /> Quiz trecut</span>
+                      ) : read ? (
+                        <span className="text-accent">Citit · fă quiz-ul</span>
+                      ) : (
+                        <span className="text-primary">Începe modulul →</span>
+                      )}
+                    </span>
+                  </Card>
+                </Link>
               </li>
-            ))}
-          </ul>
-        )}
-        {recommended.length === 0 ? (
-          <Card className="text-ink-muted">
-            Nu ai ales încă nicio temă.{" "}
-            <Link href="/interese" className="font-semibold text-primary underline underline-offset-2">Alege ce vrei să înveți</Link>.
-          </Card>
-        ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="portal-recommended">
-            {recommended.map((m) => {
-              const read = state.progress.modulesRead[m.slug];
-              const q = state.progress.quizzes[m.slug];
-              return (
-                <li key={m.slug}>
-                  <Link href={`/invata/${m.slug}`} className="group block h-full rounded-[var(--radius-card)]">
-                    <Card className="flex h-full flex-col gap-2 p-5 transition-shadow group-hover:shadow-[var(--shadow-raised)]">
-                      <span className="font-mono text-xs text-ink-muted">{m.minutes} min</span>
-                      <h3 className="text-lg leading-snug text-ink">{m.title}</h3>
-                      <p className="flex-1 text-sm text-ink-muted">{m.summary}</p>
-                      <span className="flex items-center gap-2 text-sm font-semibold">
-                        {q && isPassed(q.best, q.total) ? (
-                          <span className="flex items-center gap-1 text-success"><CheckCircle2 aria-hidden className="size-4" /> Quiz trecut</span>
-                        ) : read ? (
-                          <span className="text-accent">Citit · fă quiz-ul</span>
-                        ) : (
-                          <span className="text-primary">Începe modulul →</span>
-                        )}
-                      </span>
-                    </Card>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+            );
+          })}
+        </ul>
       </section>
 
       <section aria-labelledby="continua" className="space-y-4">
@@ -129,7 +114,7 @@ export function Portal() {
         <ul className="grid gap-4 md:grid-cols-2">
           <li>
             <PortalCard href="/invata" icon={BookOpen} bar="primary" title="Învață" testId="portal-learn"
-              text={`${MODULES.length} module scurte, fiecare cu un quiz cu explicații.`}
+              text={`${MODULES.length} module scurte, ordonate după obiectivul tău, fiecare cu un quiz.`}
               meta={`${progress.modulesRead}/${MODULES.length} citite · ${progress.quizzesPassed} quiz-uri trecute`} />
           </li>
           <li>
@@ -167,7 +152,7 @@ export function Portal() {
           </ButtonLink>
         </Card>
         <p className="flex items-center gap-2 text-xs text-ink-muted">
-          <TrendingUp aria-hidden className="size-3.5" /> Profilul și interesele sunt salvate doar în acest browser (demo, fără cont pe server).
+          <TrendingUp aria-hidden className="size-3.5" /> Profilul este salvat doar în acest browser (demo, fără cont pe server).
         </p>
       </section>
     </div>

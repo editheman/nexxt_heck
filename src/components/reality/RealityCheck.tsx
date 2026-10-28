@@ -171,7 +171,7 @@ export function RealityCheck() {
         </div>
       </details>
 
-      <OnboardingNext href="/interese" label="Alege ce vrei să înveți" hint="Câteva teme care te interesează — le folosim ca să-ți recomandăm module." />
+      <OnboardingNext href="/simulator" label="Proiectează viitorul în simulator" hint="Acolo alegi tu ipotezele de randament și inflație — sunt ipoteze, nu date oficiale." />
     </div>
   );
 }

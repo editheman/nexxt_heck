@@ -2,7 +2,6 @@
 
 import { useSyncExternalStore } from "react";
 import type { RealityWindow } from "@/content/macro-ro";
-import type { TopicId } from "@/content/topics";
 import {
   STORAGE_KEY,
   defaultState,
@@ -68,9 +67,6 @@ export function updateState(fn: (s: DemoState) => DemoState) {
 export const actions = {
   saveProfile(profile: Profile) {
     updateState((s) => ({ ...s, profile }));
-  },
-  setInterests(interests: TopicId[]) {
-    updateState((s) => ({ ...s, interests }));
   },
   completeOnboarding() {
     if (read().onboarding.completedAt) return;

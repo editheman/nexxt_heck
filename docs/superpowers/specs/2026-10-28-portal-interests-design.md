@@ -1,5 +1,7 @@
 # Interests, guided profiling and user portal — Design
 
+> **Superseded (2026-10-28, same day):** the owner dropped the interests page. Learning is now personalised by the savings goal chosen in profile step 2 (`src/content/goalPaths.ts`); profiling is profil → Reality Check → simulator → portal (3 steps). `DemoState` v5 drops `interests`. The portal and onboarding-chain parts below still apply.
+
 Date: 2026-10-28 · Requested by the owner. Decisions marked **[call]** were made by Claude.
 
 ## Flow

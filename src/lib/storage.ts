@@ -1,5 +1,4 @@
 import { DEFAULT_REALITY_WINDOW, REALITY_WINDOWS, type RealityWindow } from "@/content/macro-ro";
-import { TOPIC_IDS, type TopicId } from "@/content/topics";
 import { LIMITS } from "./finance";
 
 /** Schema changes bump `DemoState.version`, not the key. */
@@ -36,11 +35,9 @@ export type QuizResult = { best: number; total: number; lastWrong: string[] };
 export type ScamResult = { completed: true; correct: number; total: number };
 
 export type DemoState = {
-  version: 4;
+  version: 5;
   profile: Profile | null;
-  /** Topics the user wants to learn about (chosen after the Reality Check). */
-  interests: TopicId[];
-  /** Guided profiling (profil → Reality Check → interese → simulator) finished. */
+  /** Guided profiling (profil → Reality Check → simulator) finished. Learning is personalised by `profile.goal`. */
   onboarding: { completedAt: string | null };
   /** Simulator only: illustrative, user-editable future inflation. */
   assumptions: { inflationPct: number };
@@ -56,9 +53,8 @@ export type DemoState = {
 
 export function defaultState(): DemoState {
   return {
-    version: 4,
+    version: 5,
     profile: null,
-    interests: [],
     onboarding: { completedAt: null },
     assumptions: { inflationPct: DEFAULT_INFLATION_PCT },
     reality: { years: DEFAULT_REALITY_WINDOW },
@@ -128,8 +124,8 @@ function parseScam(v: unknown): ScamResult | null {
 
 /**
  * Never throws: anything unreadable falls back to defaults, field by field.
- * Accepts schema v1 (no `reality`), v2 (no `profile.ageRange`) and v3 (no `interests`, `onboarding`)
- * and migrates them to v4.
+ * Accepts schema v1 (no `reality`), v2 (no `profile.ageRange`), v3 (no `onboarding`) and v4 (with the
+ * retired `interests` list, which is dropped) and migrates them to v5.
  */
 export function parseState(raw: string | null): DemoState {
   const fallback = defaultState();
@@ -140,7 +136,7 @@ export function parseState(raw: string | null): DemoState {
   } catch {
     return fallback;
   }
-  if (!isObj(data) || ![1, 2, 3, 4].includes(data.version as number)) return fallback;
+  if (!isObj(data) || ![1, 2, 3, 4, 5].includes(data.version as number)) return fallback;
 
   const assumptions = isObj(data.assumptions) ? data.assumptions : {};
   const reality = isObj(data.reality) ? data.reality : {};
@@ -151,11 +147,8 @@ export function parseState(raw: string | null): DemoState {
   const completedAt = onboarding.completedAt;
 
   return {
-    version: 4,
+    version: 5,
     profile: parseProfile(data.profile),
-    interests: Array.isArray(data.interests)
-      ? [...new Set(data.interests.filter((x): x is TopicId => TOPIC_IDS.includes(x as TopicId)))]
-      : [],
     onboarding: {
       completedAt: typeof completedAt === "string" && !Number.isNaN(Date.parse(completedAt)) ? completedAt : null,
     },

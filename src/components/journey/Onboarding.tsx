@@ -8,9 +8,9 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { actions, useDemoState } from "@/lib/useDemoState";
 import { NextStep } from "./NextStep";
 
-export const ONBOARDING_STEPS = 4;
+export const ONBOARDING_STEPS = 3;
 
-/** True once the guided profiling (profil → Reality Check → interese → simulator) is finished. */
+/** True once the guided profiling (profil → Reality Check → simulator) is finished. */
 export function useOnboardingDone() {
   const { state, hydrated } = useDemoState();
   return { done: state.onboarding.completedAt !== null, hydrated };

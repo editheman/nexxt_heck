@@ -16,7 +16,6 @@ const valid: DemoState = {
   },
   assumptions: { inflationPct: 6.5 },
   reality: { years: 10 },
-  interests: ["etf", "fraude"],
   onboarding: { completedAt: "2026-10-28T10:00:00.000Z" },
   progress: {
     visited: { reality: true },
@@ -65,13 +64,11 @@ describe("parseState", () => {
     delete profile.ageRange;
     const v1: Record<string, unknown> = { ...valid, version: 1, profile };
     delete v1.reality;
-    delete v1.interests;
     delete v1.onboarding;
     expect(parseState(JSON.stringify(v1))).toEqual({
       ...valid,
       profile: { ...valid.profile, ageRange: null },
       reality: defaultState().reality,
-      interests: [],
       onboarding: { completedAt: null },
     });
   });
@@ -80,7 +77,7 @@ describe("parseState", () => {
     const profile: Record<string, unknown> = { ...valid.profile };
     delete profile.ageRange;
     const parsed = parseState(JSON.stringify({ ...valid, version: 2, profile }));
-    expect(parsed.version).toBe(4);
+    expect(parsed.version).toBe(5);
     expect(parsed.profile?.ageRange).toBeNull();
   });
 
@@ -94,19 +91,21 @@ describe("parseState", () => {
     }
   });
 
-  it("migrates a schema-v3 state without interests or onboarding", () => {
+  it("migrates a schema-v3 state without onboarding", () => {
     const v3: Record<string, unknown> = { ...valid, version: 3 };
-    delete v3.interests;
     delete v3.onboarding;
     const parsed = parseState(JSON.stringify(v3));
-    expect(parsed.version).toBe(4);
-    expect(parsed.interests).toEqual([]);
+    expect(parsed.version).toBe(5);
     expect(parsed.onboarding.completedAt).toBeNull();
   });
 
-  it("drops unknown or duplicate interests and an invalid completion date", () => {
-    const parsed = parseState(JSON.stringify({ ...valid, interests: ["etf", "crypto", "etf", 3], onboarding: { completedAt: "ieri" } }));
-    expect(parsed.interests).toEqual(["etf"]);
-    expect(parsed.onboarding.completedAt).toBeNull();
+  it("migrates a schema-v4 state and drops the retired interests list", () => {
+    const parsed = parseState(JSON.stringify({ ...valid, version: 4, interests: ["etf"] }));
+    expect(parsed).toEqual(valid);
+    expect("interests" in parsed).toBe(false);
+  });
+
+  it("drops an invalid completion date", () => {
+    expect(parseState(JSON.stringify({ ...valid, onboarding: { completedAt: "ieri" } })).onboarding.completedAt).toBeNull();
   });
 });
