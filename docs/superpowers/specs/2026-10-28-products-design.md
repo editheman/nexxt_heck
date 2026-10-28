@@ -7,7 +7,12 @@ Date: 2026-10-28 · Requested by the owner: use the user's data to decide which 
 - `produse-recomandari` (variant A): ranked recommendations of **categories** (never a specific fund/issuer) from a prompt to an OpenAI-compatible model (Featherless), validated by the fit engine's guardrails; deterministic ranking when no API key. On this branch only, the CLAUDE.md rule „Do not provide personalized buy/sell recommendations” is replaced by the owner's narrower rule (category-level guidance, no specific product, no guaranteed returns).
 - `produse-harta` (variant B): educational map — relevant categories with reasons, comparison of all six, per-category simulator with the user's own rate assumptions, verification checklist. No ranking. CLAUDE.md unchanged.
 
-## Categories (fixed by the owner)
+## Categories
+Extended 2026-10-28 at the owner's request to 17, each with a **kind**: `consider` (can be suggested), `caution` (explained with warnings, never suggested: aur, acțiuni individuale, unit-linked, criptomonede), `check` (verify / decision of another scale: Pilonul II, imobiliare). New `consider` categories: rambursarea anticipată a unui credit scump, fonduri deschise (monetare/obligațiuni/mixte), economii în euro, obligațiuni corporative și municipale. New risk question: costly debt (da/nu, no amounts) — `DemoState` v7.
+
+Additional facts (verified 2026-10-28): OUG 50/2010 — no early-repayment compensation on variable-rate consumer loans, capped compensation on fixed-rate ones; MiCA — from 1 July 2026 only authorised crypto-asset service providers may operate in the EU (check the ESMA register; Romanian competent-authority designation was pending in July 2026); Pilon II mandatory for insured persons under 35, fund checked on data.asfromania.ro; investment gold VAT-exempt in the EU; open-ended fund gains taxed with rules changed from 2026 (no rate shown); unit-linked products require a KID and may have very low surrender value in early years.
+
+### Original seven (fixed by the owner)
 Cont de economii · Depozit la termen · Titluri de stat Tezaur · Titluri de stat Fidelis · ETF pe indicele BET · ETF global cu acumulare · Fond de pensii facultative (Pilonul III).
 
 ## Verified facts used (2026-10-28) — no live rates

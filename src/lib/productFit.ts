@@ -3,12 +3,13 @@
  * Used as the guardrail and fallback for variant A and as the filter for variant B.
  * Rules are documented in docs/superpowers/specs/2026-10-28-products-design.md.
  */
-import { PRODUCT_IDS, type ProductId } from "@/content/products";
+import { PRODUCT_IDS, productById, type ProductId } from "@/content/products";
 import type { DemoState, Goal } from "./storage";
 
 export type EmergencyFund = "da" | "partial" | "nu";
 export type RiskTolerance = "scazuta" | "medie" | "ridicata";
 export type Experience = "deloc" | "putina" | "multa";
+export type CostlyDebt = "da" | "nu";
 
 export type FitInput = {
   horizonYears: number;
@@ -16,6 +17,8 @@ export type FitInput = {
   emergencyFund: EmergencyFund | null;
   riskTolerance: RiskTolerance | null;
   experience: Experience | null;
+  /** Has a loan with a high interest rate (credit card, personal loan). */
+  costlyDebt: CostlyDebt | null;
 };
 
 export type ProductFit = {
@@ -63,7 +66,70 @@ function assess(id: ProductId, i: FitInput): ProductFit {
     if (i.riskTolerance === null) cautions.push("Gândește-te dacă accepți riscul ca valoarea să scadă temporar cu mult.");
   };
 
+  // "caution" and "check" categories are explained, never suggested.
+  const kind = productById(id).kind;
+  if (kind !== "consider") {
+    const why: Partial<Record<ProductId, string>> = {
+      aur: "Nu aduce dobândă și prețul e volatil — cel mult o parte mică din economii, după ce ai acoperit restul.",
+      actiuni: "O singură companie poate pierde mult; pentru majoritatea oamenilor un ETF diversificat e mai potrivit.",
+      "unit-linked": "Costurile sunt adesea mari, iar retragerea în primii ani poate aduce pierderi — citește KID-ul înainte de semnare.",
+      cripto: "Volatilitate extremă și cea mai frecventă momeală în fraude; folosește doar platforme autorizate MiCA și doar bani pe care îți permiți să-i pierzi.",
+      pilon2: "Nu se alege ca produs: dacă ești salariat, verifică la ce fond ești înscris și cum a evoluat.",
+      imobiliare: "O decizie de alt calibru (avans, credit, lichiditate foarte mică) — nu o alternativă la economii sau la fondul de urgență.",
+    };
+    return { id, eligible: false, score: 0, reasons: [], cautions: [why[id] ?? "De înțeles înainte, nu de ales acum."] };
+  }
+
   switch (id) {
+    case "rambursare-credit":
+      if (i.costlyDebt === "nu") {
+        eligible = false;
+        cautions.push("Ai spus că nu ai credite scumpe — nu e cazul acum.");
+        break;
+      }
+      if (i.costlyDebt === "da") {
+        // Second only to a missing emergency fund: a small reserve first, then the expensive debt.
+        score = i.emergencyFund === "nu" ? 99 : 100;
+        reasons.push("Ai un credit cu dobândă mare: fiecare leu rambursat mai devreme îți „aduce” sigur dobânda pe care n-o mai plătești.");
+      } else {
+        reasons.push("Dacă ai un credit cu dobândă mare, rambursarea lui anticipată e adesea primul pas.");
+      }
+      cautions.push("Păstrează separat fondul de urgență; verifică în contract compensația la dobânda fixă.");
+      break;
+
+    case "fonduri-deschise":
+      score = 45;
+      if (h < 3) plus(20, "Fondurile monetare sunt o alternativă la depozit, cu acces mai rapid la bani.");
+      else plus(10, "Fondurile de obligațiuni sau mixte se potrivesc unui orizont de câțiva ani.");
+      if (i.riskTolerance === "scazuta") plus(5);
+      if (i.experience === "deloc") minus(5, "Începe cu un fond monetar și citește KID-ul înainte.");
+      cautions.push("Nu sunt garantate de FGDB; valoarea unității poate scădea.");
+      break;
+
+    case "economii-euro":
+      score = 40;
+      if (i.goal === "locuinta") plus(15, "Prețurile locuințelor sunt adesea în euro: o parte din economii în euro reduce riscul de curs.");
+      if (h >= 3) plus(5, "Pe câțiva ani, diversificarea monedei contează mai mult.");
+      if (reasons.length === 0) reasons.push("Nu depinzi doar de evoluția leului.");
+      cautions.push("Riscul valutar merge în ambele sensuri; atenție la cursul de schimb al băncii.");
+      break;
+
+    case "obligatiuni-corporative":
+      score = 40;
+      if (h < 2) {
+        eligible = false;
+        cautions.push("Orizontul tău e prea scurt; emisiunile au de regulă scadențe de câțiva ani.");
+      }
+      if (i.riskTolerance === "scazuta") {
+        eligible = false;
+        cautions.push("Au risc de emitent: preferi siguranța, iar titlurile de stat sunt mai potrivite.");
+      }
+      if (h >= 2 && h <= 7) plus(15, "Scadențele de câțiva ani se potrivesc orizontului tău.");
+      if (i.experience && i.experience !== "deloc") plus(10, "Ai deja experiență cu bursa sau titlurile de stat.");
+      else cautions.push("Fără experiență, începe cu titlurile de stat.");
+      cautions.push("Dacă emitentul are probleme, poți pierde din bani.");
+      break;
+
     case "cont-economii":
       if (i.emergencyFund === "nu") {
         score = 100;
@@ -74,7 +140,8 @@ function assess(id: ProductId, i: FitInput): ProductFit {
       }
       if (h < 1) plus(30, "Ai nevoie de bani în mai puțin de un an: lichiditatea contează cel mai mult.");
       if (i.goal === "fond-urgenta") plus(15, "Obiectivul tău este chiar fondul de urgență.");
-      if (h >= 5) minus(20, "Pe termen lung, dobânda unui cont de economii poate rămâne sub inflație.");
+      // Without an emergency fund the account stays first whatever the horizon.
+      if (h >= 5 && i.emergencyFund !== "nu") minus(20, "Pe termen lung, dobânda unui cont de economii poate rămâne sub inflație.");
       if (reasons.length === 0) reasons.push("Util pentru banii pe care vrei să-i ai la îndemână.");
       break;
 
