@@ -74,3 +74,9 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Revision links from quiz results land on a section; highlight it. */
+.module-section:target {
+  background: var(--color-assumption-soft);
+  outline: 8px solid var(--color-assumption-soft);
+}
