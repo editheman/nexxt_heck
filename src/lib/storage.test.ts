@@ -1,0 +1,58 @@
+import { describe, expect, it } from "vitest";
+import { defaultState, parseState, serializeState, type DemoState } from "./storage";
+
+const valid: DemoState = {
+  ...defaultState(),
+  profile: {
+    alias: "Ana",
+    savings: 20000,
+    placement: "cont-curent",
+    nominalPct: 0,
+    monthly: 500,
+    years: 10,
+    goal: "fond-urgenta",
+    isDemo: false,
+  },
+  assumptions: { inflationPct: 6.5 },
+  progress: {
+    visited: { reality: true },
+    scams: { curier: { completed: true, correct: 2, total: 3 } },
+    modulesRead: { inflatia: true },
+    quizzes: { inflatia: { best: 3, total: 4, lastWrong: ["q2"] } },
+  },
+};
+
+describe("parseState", () => {
+  it("returns defaults for null, garbage and wrong versions", () => {
+    expect(parseState(null)).toEqual(defaultState());
+    expect(parseState("{bad")).toEqual(defaultState());
+    expect(parseState(JSON.stringify({ version: 0 }))).toEqual(defaultState());
+    expect(parseState("42")).toEqual(defaultState());
+  });
+
+  it("round-trips a valid state", () => {
+    expect(parseState(serializeState(valid))).toEqual(valid);
+  });
+
+  it("drops an invalid profile but keeps valid progress", () => {
+    const broken = { ...valid, profile: { ...valid.profile, savings: "mult" } };
+    const parsed = parseState(JSON.stringify(broken));
+    expect(parsed.profile).toBeNull();
+    expect(parsed.progress.modulesRead).toEqual({ inflatia: true });
+  });
+
+  it("falls back to the default inflation when out of range", () => {
+    const parsed = parseState(JSON.stringify({ ...valid, assumptions: { inflationPct: 999 } }));
+    expect(parsed.assumptions.inflationPct).toBe(defaultState().assumptions.inflationPct);
+  });
+
+  it("ignores malformed progress entries", () => {
+    const parsed = parseState(
+      JSON.stringify({
+        ...valid,
+        progress: { ...valid.progress, quizzes: { a: { best: "x" }, b: { best: 1, total: 2, lastWrong: [] } } },
+      }),
+    );
+    expect(parsed.progress.quizzes).toEqual({ b: { best: 1, total: 2, lastWrong: [] } });
+  });
+});
