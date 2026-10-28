@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatLei, formatPct, formatYears, parseRoNumber } from "./format";
+import { formatCount, formatEur, formatLei, formatPct, formatYears, parseRoNumber } from "./format";
 
 // Intl uses narrow no-break spaces in some locales; normalise for assertions.
 const norm = (s: string) => s.replace(/[  ]/g, " ");
@@ -55,5 +55,28 @@ describe("formatYears", () => {
     [101, "101 ani"],
   ])("%d → %s", (n, expected) => {
     expect(formatYears(n)).toBe(expected);
+  });
+});
+
+describe("formatCount", () => {
+  it.each([
+    [1, "1 pachet"],
+    [2, "2 pachete"],
+    [4, "4 pachete"],
+    [15, "15 pachete"],
+    [19, "19 pachete"],
+    [20, "20 de pachete"],
+    [101, "101 pachete"],
+    [119, "119 pachete"],
+    [120, "120 de pachete"],
+    [1234, "1.234 de pachete"],
+  ])("%i → %s", (n, expected) => {
+    expect(formatCount(n, "pachet", "pachete")).toBe(expected);
+  });
+});
+
+describe("formatEur", () => {
+  it("rounds and groups like lei", () => {
+    expect(formatEur(4012.4)).toBe("4.012 €");
   });
 });

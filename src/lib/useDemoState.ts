@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import type { RealityWindow } from "@/content/macro-ro";
 import {
   STORAGE_KEY,
   defaultState,
@@ -67,8 +68,8 @@ export const actions = {
   saveProfile(profile: Profile) {
     updateState((s) => ({ ...s, profile }));
   },
-  setInflation(inflationPct: number) {
-    updateState((s) => ({ ...s, assumptions: { ...s.assumptions, inflationPct } }));
+  setRealityYears(years: RealityWindow) {
+    updateState((s) => ({ ...s, reality: { years } }));
   },
   markVisited(page: "reality" | "simulator") {
     if (read().progress.visited[page]) return;

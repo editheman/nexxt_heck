@@ -9,11 +9,14 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 import { PLACEMENT_LABELS } from "@/content/labels";
-import { explainOutcome } from "@/lib/explain";
-import { summarize, type SimInput } from "@/lib/finance";
-import { formatLei, formatPct, formatYears } from "@/lib/format";
+import { CPI_ANNUAL_INDEX, EUR_RON_ANNUAL_AVG, LATEST_DATA_YEAR } from "@/content/macro-ro";
+import { sourceByName } from "@/content/sources";
+import { pickEquivalents } from "@/lib/equivalents";
+import { eurConversion, historicalInflation } from "@/lib/finance";
+import { formatEur, formatLei, formatPct } from "@/lib/format";
 import { actions, useDemoState } from "@/lib/useDemoState";
-import { InflationAssumption } from "./InflationAssumption";
+import { EquivalentsList } from "./EquivalentsList";
+import { WindowPicker } from "./WindowPicker";
 
 export function RealityCheck() {
   const { state, hydrated } = useDemoState();
@@ -28,10 +31,10 @@ export function RealityCheck() {
   if (!p) {
     return (
       <Card className="space-y-4">
-        <h2 className="text-xl font-semibold">Mai întâi, un profil minim</h2>
+        <h2 className="text-xl text-ink">Mai întâi, un profil minim</h2>
         <p className="text-ink-muted">
-          Reality Check folosește câteva cifre aproximative despre economiile tale. Poți completa profilul sau poți
-          explora cu un profil exemplu, cu date fictive.
+          Reality Check folosește suma aproximativă a economiilor tale. Poți completa profilul sau poți explora cu un
+          profil exemplu, cu date fictive.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <ButtonLink href="/profil">Completează profilul</ButtonLink>
@@ -41,15 +44,13 @@ export function RealityCheck() {
     );
   }
 
-  const input: SimInput = {
-    principal: p.savings,
-    monthly: p.monthly,
-    nominalPct: p.nominalPct,
-    inflationPct: state.assumptions.inflationPct,
-    years: p.years,
-  };
-  const s = summarize(input);
-  const horizon = formatYears(p.years);
+  const years = state.reality.years;
+  const h = historicalInflation(p.savings, years, LATEST_DATA_YEAR, CPI_ANNUAL_INDEX);
+  const eur = eurConversion(p.savings, EUR_RON_ANNUAL_AVG[h.baseYear], EUR_RON_ANNUAL_AVG[h.endYear]);
+  const picked = pickEquivalents(h.loss);
+  const ins = sourceByName("INS");
+  const bnr = sourceByName("BNR");
+  const rows = Array.from({ length: years }, (_, k) => h.baseYear + 1 + k);
 
   return (
     <div className="space-y-8">
@@ -58,14 +59,13 @@ export function RealityCheck() {
         <span>
           {p.alias ? `${p.alias} · ` : ""}
           {formatLei(p.savings)} în {PLACEMENT_LABELS[p.placement].toLowerCase()}
-          {p.monthly > 0 ? ` · +${formatLei(p.monthly)}/lună` : ""} · randament estimat {formatPct(p.nominalPct)} · {horizon}
         </span>
         <ButtonLink href="/profil" variant="ghost" className="min-h-9 px-2 py-1 text-sm">
           Modifică profilul
         </ButtonLink>
       </div>
 
-      <InflationAssumption value={state.assumptions.inflationPct} onCommit={actions.setInflation} />
+      <WindowPicker value={years} onChange={actions.setRealityYears} />
 
       <section aria-labelledby="rezultat" className="space-y-4">
         <h2 id="rezultat" className="sr-only">
@@ -73,64 +73,113 @@ export function RealityCheck() {
         </h2>
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard
-            label={p.monthly > 0 ? "Total pus deoparte" : "Economiile tale azi"}
-            value={formatLei(s.contributed)}
+            label="Economiile tale"
+            value={formatLei(h.nominal)}
             kind={p.isDemo ? "fictional" : "user"}
-            note={p.monthly > 0 ? `${formatLei(p.savings)} azi + ${formatLei(p.monthly)} pe lună, ${horizon}` : "Suma introdusă de tine"}
-            testId="stat-contributed"
-          />
-          <StatCard
-            label={`Valoare nominală peste ${horizon}`}
-            value={formatLei(s.nominal)}
-            kind="estimate"
-            note={`Cu randament presupus de ${formatPct(p.nominalPct)} pe an`}
+            note="Presupunem că au stat fără dobândă (numerar sau cont curent)."
             testId="stat-nominal"
           />
           <StatCard
-            label="Putere de cumpărare, în lei de azi"
-            value={formatLei(s.real)}
+            label={`Cât au crescut prețurile, ${h.baseYear}–${h.endYear}`}
+            value={`+${formatPct(h.cumulativeInflationPct)}`}
+            kind="official"
+            note={`IPC INS: prețurile medii din ${h.endYear} față de ${h.baseYear}.`}
+            testId="stat-inflation"
+          />
+          <StatCard
+            label={`Ce cumpără azi, în lei din ${h.baseYear}`}
+            value={formatLei(h.real)}
             kind="estimate"
             emphasis="accent"
-            note={`Cu inflație presupusă de ${formatPct(state.assumptions.inflationPct)} pe an`}
+            note="Calculat din ratele oficiale ale inflației, an cu an."
             testId="stat-real"
           />
         </div>
         <p aria-live="polite" className="max-w-[68ch] text-lg" data-testid="reality-explanation">
-          {explainOutcome(input, s)}
+          Dacă ai fi ținut {formatLei(h.nominal)} fără dobândă din {h.baseYear} până în {h.endYear}, azi ar cumpăra cât
+          cumpărau {formatLei(h.real)} în {h.baseYear}. Inflația a „mâncat”{" "}
+          <strong className="tabular" data-testid="reality-loss">
+            {formatLei(h.loss)}
+          </strong>{" "}
+          din puterea lor de cumpărare.
         </p>
-        <p className="text-ink-muted">
-          Randamentul real anual estimat: <strong className="tabular text-ink">{formatPct(s.realRatePct, 2)}</strong>{" "}
-          {s.realRatePct < -0.005
-            ? "— randamentul presupus este sub inflația presupusă."
-            : s.realRatePct > 0.005
-              ? "— randamentul presupus este peste inflația presupusă."
-              : "— randamentul presupus este egal cu inflația presupusă."}
+        <p className="flex flex-wrap items-center gap-2 text-ink-muted" data-testid="reality-eur">
+          <Badge kind="official">Curs BNR</Badge>
+          <span>
+            În euro, aceeași sumă valora {formatEur(eur.eurFrom)} în {h.baseYear} și {formatEur(eur.eurTo)} în{" "}
+            {h.endYear} (curs mediu anual {formatRate(EUR_RON_ANNUAL_AVG[h.baseYear])} → {formatRate(EUR_RON_ANNUAL_AVG[h.endYear])} lei/€),
+            adică leul s-a {eur.leuChangePct < 0 ? "depreciat" : "apreciat"} cu {formatPct(Math.abs(eur.leuChangePct))} față de euro.
+          </span>
         </p>
       </section>
 
+      <EquivalentsList picked={picked} loss={h.loss} baseYear={h.baseYear} endYear={h.endYear} />
+
       <details className="rounded-[var(--radius-card)] border border-border bg-surface p-5">
-        <summary className="font-semibold text-primary">Cum am calculat</summary>
+        <summary className="min-h-11 font-semibold text-primary">Cum am calculat și de unde sunt datele</summary>
         <div className="mt-4 max-w-[68ch] space-y-3 text-ink-muted">
           <p>
-            <strong className="text-ink">Valoare nominală:</strong> economiile cresc anual cu randamentul presupus: P ×
-            (1 + r)ⁿ. Depunerile lunare se fac la sfârșitul fiecărei luni și cresc cu rata lunară echivalentă (1 + r)^(1/12) − 1.
+            <strong className="text-ink">Inflația este fixă, nu o ipoteză:</strong> folosim rata medie anuală a inflației
+            publicată de{" "}
+            <a href={ins.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2">
+              INS
+            </a>{" "}
+            (indicele prețurilor de consum, an precedent = 100), pentru {h.baseYear + 1}–{h.endYear}.
           </p>
           <p>
-            <strong className="text-ink">Putere de cumpărare:</strong> valoarea nominală / (1 + i)ⁿ, unde i este inflația
-            presupusă. Rezultatul arată ce ai putea cumpăra cu acei bani la prețurile de azi.
+            <strong className="text-ink">Putere de cumpărare:</strong> P<sub>real</sub> = P / ∏(1 + i<sub>t</sub>) ={" "}
+            {formatLei(h.nominal)} / {h.priceFactor.toLocaleString("ro-RO", { maximumFractionDigits: 4 })} ≈ {formatLei(h.real)}.
+            Produsul indicilor medii anuali compară nivelul mediu al prețurilor din {h.endYear} cu cel din {h.baseYear}.
           </p>
           <p>
-            <strong className="text-ink">Randament real:</strong> (1 + r) / (1 + i) − 1 = (1 + {formatPct(p.nominalPct)}) /
-            (1 + {formatPct(state.assumptions.inflationPct)}) − 1 ≈ {formatPct(s.realRatePct, 2)}.
+            <strong className="text-ink">Pierdere:</strong> P − P<sub>real</sub> ≈ {formatLei(h.loss)}, exprimată în lei din{" "}
+            {h.baseYear}.
           </p>
           <p>
-            Limitări: ratele sunt constante în fiecare an, nu includem costuri, comisioane sau impozite, iar rezultatul
-            este o estimare, nu o prognoză sau o garanție.
+            <strong className="text-ink">Euro:</strong> cursul mediu anual EUR/RON calculat de{" "}
+            <a href={bnr.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2">
+              BNR
+            </a>{" "}
+            (media celor 12 medii lunare ale cursului oficial).
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full max-w-md text-sm">
+              <caption className="pb-2 text-left font-semibold text-ink">Rata medie anuală a inflației (INS)</caption>
+              <thead>
+                <tr className="border-b border-border text-left">
+                  <th scope="col" className="py-1.5 pr-4 font-semibold">An</th>
+                  <th scope="col" className="py-1.5 pr-4 font-semibold">Indice (an precedent = 100)</th>
+                  <th scope="col" className="py-1.5 font-semibold">Inflație</th>
+                </tr>
+              </thead>
+              <tbody className="tabular">
+                {rows.map((y) => (
+                  <tr key={y} className="border-b border-border/60">
+                    <th scope="row" className="py-1.5 pr-4 font-normal">{y}</th>
+                    <td className="py-1.5 pr-4">{CPI_ANNUAL_INDEX[y].toLocaleString("ro-RO", { minimumFractionDigits: 2 })}</td>
+                    <td className="py-1.5">{formatPct(CPI_ANNUAL_INDEX[y] - 100)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Limitări: presupunem că suma nu a primit dobândă; o dobândă sau un randament ar fi redus pierderea. IPC
+            măsoară un coș mediu de consum — inflația ta personală poate fi diferită. Echivalențele folosesc prețuri
+            orientative de azi și sunt o metaforă educațională, nu o sumă exactă. Nu este o recomandare financiară.
           </p>
         </div>
       </details>
 
-      <NextStep href="/simulator" label="Explorează scenarii în simulator" hint="Schimbă randamentul, inflația și orizontul și vezi graficul." />
+      <NextStep
+        href="/simulator"
+        label="Proiectează viitorul în simulator"
+        hint="Acolo alegi tu ipotezele de randament și inflație — sunt ipoteze, nu date oficiale."
+      />
     </div>
   );
+}
+
+function formatRate(v: number) {
+  return v.toLocaleString("ro-RO", { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 }

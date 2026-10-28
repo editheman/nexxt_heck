@@ -1,5 +1,7 @@
+import { DEFAULT_REALITY_WINDOW, REALITY_WINDOWS, type RealityWindow } from "@/content/macro-ro";
 import { LIMITS } from "./finance";
 
+/** Schema changes bump `DemoState.version`, not the key. */
 export const STORAGE_KEY = "pcac:v1";
 export const DEFAULT_INFLATION_PCT = 5;
 
@@ -28,9 +30,12 @@ export type QuizResult = { best: number; total: number; lastWrong: string[] };
 export type ScamResult = { completed: true; correct: number; total: number };
 
 export type DemoState = {
-  version: 1;
+  version: 2;
   profile: Profile | null;
+  /** Simulator only: illustrative, user-editable future inflation. */
   assumptions: { inflationPct: number };
+  /** Reality Check: which official history window is shown. */
+  reality: { years: RealityWindow };
   progress: {
     visited: Partial<Record<"reality" | "simulator", true>>;
     scams: Record<string, ScamResult>;
@@ -41,9 +46,10 @@ export type DemoState = {
 
 export function defaultState(): DemoState {
   return {
-    version: 1,
+    version: 2,
     profile: null,
     assumptions: { inflationPct: DEFAULT_INFLATION_PCT },
+    reality: { years: DEFAULT_REALITY_WINDOW },
     progress: { visited: {}, scams: {}, modulesRead: {}, quizzes: {} },
   };
 }
@@ -95,7 +101,10 @@ function parseScam(v: unknown): ScamResult | null {
   return { completed: true, correct: v.correct, total: v.total };
 }
 
-/** Never throws: anything unreadable falls back to defaults, field by field. */
+/**
+ * Never throws: anything unreadable falls back to defaults, field by field.
+ * Accepts schema v1 (no `reality`) and migrates it to v2.
+ */
 export function parseState(raw: string | null): DemoState {
   const fallback = defaultState();
   if (raw === null) return fallback;
@@ -105,19 +114,23 @@ export function parseState(raw: string | null): DemoState {
   } catch {
     return fallback;
   }
-  if (!isObj(data) || data.version !== 1) return fallback;
+  if (!isObj(data) || (data.version !== 1 && data.version !== 2)) return fallback;
 
   const assumptions = isObj(data.assumptions) ? data.assumptions : {};
+  const reality = isObj(data.reality) ? data.reality : {};
   const progress = isObj(data.progress) ? data.progress : {};
   const visited = isObj(progress.visited) ? progress.visited : {};
 
   return {
-    version: 1,
+    version: 2,
     profile: parseProfile(data.profile),
     assumptions: {
       inflationPct: inRange(assumptions.inflationPct, LIMITS.ratePctMin, LIMITS.ratePctMax)
         ? assumptions.inflationPct
         : DEFAULT_INFLATION_PCT,
+    },
+    reality: {
+      years: REALITY_WINDOWS.includes(reality.years as RealityWindow) ? (reality.years as RealityWindow) : DEFAULT_REALITY_WINDOW,
     },
     progress: {
       visited: {

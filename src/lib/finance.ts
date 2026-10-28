@@ -8,6 +8,8 @@
  *   equivalent monthly rate rm = (1 + r)^(1/12) − 1, so 12 months of
  *   compounding equal exactly one year at r.
  * - Purchasing power in today's RON = nominal / (1 + i)^t, t in years.
+ * - Historical Reality Check: real = P / ∏(1 + i_t) over official INS annual
+ *   average CPI indices (design spec §3b); no interest on P.
  */
 
 export type SimInput = {
@@ -110,6 +112,75 @@ export function project(input: SimInput): ProjectionRow[] {
     });
   }
   return rows;
+}
+
+/* ------------------------------------------------------------------ */
+/* Historical Reality Check (design spec §3b)                          */
+/* ------------------------------------------------------------------ */
+
+export type HistoricalResult = {
+  /** Year whose average price level is the starting point (first year of the window − 1). */
+  baseYear: number;
+  endYear: number;
+  /** ∏(1 + i_t) over the window. */
+  priceFactor: number;
+  /** Cumulative price increase, %: (priceFactor − 1) × 100. */
+  cumulativeInflationPct: number;
+  /** The amount, unchanged in lei. */
+  nominal: number;
+  /** nominal / priceFactor: what the amount buys, expressed in base-year lei. */
+  real: number;
+  /** nominal − real. */
+  loss: number;
+};
+
+/**
+ * Purchasing power of `amount` lei kept without interest over the `years`
+ * complete years ending at `endYear`, using official annual average CPI indices
+ * (previous year = 100). Throws on invalid input or missing data.
+ */
+export function historicalInflation(
+  amount: number,
+  years: number,
+  endYear: number,
+  cpiIndex: Record<number, number>,
+): HistoricalResult {
+  if (!Number.isFinite(amount) || amount < 0 || amount > LIMITS.amountMax) throw new RangeError("Invalid amount");
+  if (!Number.isInteger(years) || years < 1) throw new RangeError("Invalid window");
+  let priceFactor = 1;
+  for (let y = endYear - years + 1; y <= endYear; y++) {
+    const idx = cpiIndex[y];
+    if (!Number.isFinite(idx) || idx <= 0) throw new RangeError(`Missing CPI index for ${y}`);
+    priceFactor *= idx / 100;
+  }
+  const real = amount / priceFactor;
+  return {
+    baseYear: endYear - years,
+    endYear,
+    priceFactor,
+    cumulativeInflationPct: (priceFactor - 1) * 100,
+    nominal: amount,
+    real,
+    loss: amount - real,
+  };
+}
+
+/** The same lei amount in euro at two annual average EUR/RON rates. */
+export function eurConversion(amount: number, rateFrom: number, rateTo: number) {
+  if (!(rateFrom > 0) || !(rateTo > 0)) throw new RangeError("Invalid exchange rate");
+  return {
+    eurFrom: amount / rateFrom,
+    eurTo: amount / rateTo,
+    /** % change of the leu against the euro; negative = depreciation. */
+    leuChangePct: (rateFrom / rateTo - 1) * 100,
+  };
+}
+
+/** How many whole items of `price` fit into `amount`. Non-positive amounts give 0. */
+export function wholeUnits(amount: number, price: number): number {
+  if (!(price > 0)) throw new RangeError("Price must be positive");
+  if (!Number.isFinite(amount) || amount <= 0) return 0;
+  return Math.floor(amount / price);
 }
 
 export function summarize(input: SimInput): SimSummary {

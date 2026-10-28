@@ -14,6 +14,7 @@ const valid: DemoState = {
     isDemo: false,
   },
   assumptions: { inflationPct: 6.5 },
+  reality: { years: 10 },
   progress: {
     visited: { reality: true },
     scams: { curier: { completed: true, correct: 2, total: 3 } },
@@ -54,5 +55,17 @@ describe("parseState", () => {
       }),
     );
     expect(parsed.progress.quizzes).toEqual({ b: { best: 1, total: 2, lastWrong: [] } });
+  });
+
+  it("migrates a schema-v1 state, keeping everything and adding the default Reality Check window", () => {
+    const v1: Record<string, unknown> = { ...valid, version: 1 };
+    delete v1.reality;
+    expect(parseState(JSON.stringify(v1))).toEqual({ ...valid, reality: defaultState().reality });
+  });
+
+  it("falls back to the default window when the saved one is not offered", () => {
+    for (const years of [4, "5", null]) {
+      expect(parseState(JSON.stringify({ ...valid, reality: { years } })).reality.years).toBe(defaultState().reality.years);
+    }
   });
 });

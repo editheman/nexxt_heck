@@ -6,6 +6,7 @@
 - **Type:** Hanken Grotesk 400–700 for everything (tight −0.025em tracking on headings), JetBrains Mono for eyebrow labels, tags, chips and disclaimers (`eyebrow` utility, `font-mono`). Both loaded with `latin-ext`.
 - **Patterns:** mono uppercase eyebrow with dot/icon above every section title; lavender `hero-wash` backgrounds; pastel topic pills (`Tag`); cards with 18px radius, hairline border and a 4px colored top bar for feature/path cards (`Card bar=…`); pill-shaped chips for topics; segmented choice buttons (filled indigo = selected); progress bars green-on-rose for kept vs. eroded value.
 - **Gradients — allowed only here:** one headline line (`text-gradient`) and the top edge of the calculator card (`bar-gradient`). No gradient buttons, surfaces or body text.
+- **Reality Check (ported from `fix_reality_check`, restyled):** badge **Date oficiale** (primary text, primary/40 border, mono) only for INS/BNR series; window picker = native radio group rendered as segmented buttons like the home calculator (selected = primary fill); equivalents = cards with a rose top bar, big tabular number, item phrase and mono „Preț orientativ”, under the assumption badge „Metaforă · prețuri orientative”.
 - **Content rule kept from CLAUDE.md:** the reference mockups' news items, BNR rates, "actualizat în timp real" and "medie istorică" labels were **not** reproduced — the decodificator shows module content and computed, labelled examples only.
 
 ---
