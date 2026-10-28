@@ -45,6 +45,26 @@ async function errorText(res: Response) {
   }
 }
 
+const CAPACITY_RETRY_MS = 3_000;
+
+type Completion = { content: string; error?: undefined } | { content?: undefined; error: { message: string; code?: string } };
+
+async function completion(res: Response): Promise<Completion> {
+  const text = await res.text();
+  try {
+    const j = JSON.parse(text) as { choices?: Array<{ message?: { content?: string } }>; error?: { message?: string; code?: string } | string };
+    if (j.error) {
+      const e = typeof j.error === "string" ? { message: j.error } : { message: j.error.message ?? "eroare necunoscută", code: j.error.code };
+      return { error: { message: e.message.slice(0, 200), code: e.code } };
+    }
+    return { content: j.choices?.[0]?.message?.content ?? "" };
+  } catch {
+    return { error: { message: `răspuns ne-JSON: ${text.trim().slice(0, 120)}` } };
+  }
+}
+
+const isCapacity = (e: { message: string; code?: string }) => e.code === "capacity_exhausted" || /capacity/i.test(e.message);
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
@@ -90,8 +110,26 @@ export async function POST(request: Request) {
       console.warn(`[recomandari] ${reason} Using rules.`);
       return Response.json(rules(reason));
     }
-    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    const content = data.choices?.[0]?.message?.content ?? "";
+    // Featherless can answer HTTP 200 with an error body (e.g. "capacity_exhausted"): read it as JSON first.
+    let data = await completion(res);
+    if (data.error && isCapacity(data.error)) {
+      console.warn(`[recomandari] model ${AI_MODEL}: ${data.error.message}; retrying once in ${CAPACITY_RETRY_MS / 1000} s`);
+      await new Promise((r) => setTimeout(r, CAPACITY_RETRY_MS));
+      res = await send(messages);
+      data = res.ok ? await completion(res) : { error: { message: `HTTP ${res.status} ${await errorText(res)}` } };
+    }
+    if (data.error) {
+      const reason = isCapacity(data.error)
+        ? `Modelul ${AI_MODEL} este ocupat momentan la furnizor (${data.error.message}). Încearcă din nou peste puțin timp.`
+        : `Modelul ${AI_MODEL} a răspuns cu o eroare: ${data.error.message}`;
+      console.warn(`[recomandari] ${reason} Using rules.`);
+      return Response.json(rules(reason));
+    }
+    const content = data.content;
+    if (content.trim() === "") {
+      console.warn(`[recomandari] model ${AI_MODEL}: empty answer; using rules`);
+      return Response.json(rules(`Modelul ${AI_MODEL} a trimis un răspuns gol.`));
+    }
     const items = parseModelOutput(content, eligible);
     if (!items) {
       console.warn(`[recomandari] model ${AI_MODEL}: answer rejected by validation; using rules. Answer: ${content.slice(0, 300)}`);

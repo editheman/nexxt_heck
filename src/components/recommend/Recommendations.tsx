@@ -71,7 +71,7 @@ export function Recommendations() {
         />
         <Button onClick={generate} aria-disabled={status.kind === "loading" || undefined} className="w-full sm:w-auto">
           <Sparkles aria-hidden className="size-4" />
-          {status.kind === "loading" ? "Se pregătesc recomandările…" : status.kind === "done" ? "Generează din nou" : "Generează recomandările"}
+          {status.kind === "loading" ? "Se pregătesc recomandările… (poate dura până la un minut)" : status.kind === "done" ? "Generează din nou" : "Generează recomandările"}
         </Button>
       </Card>
 

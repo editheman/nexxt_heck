@@ -84,6 +84,36 @@ describe("POST /api/recomandari with a model configured", () => {
     expect(sent.messages.map((m: { role: string }) => m.role)).toEqual(["user"]);
   });
 
+  it("treats an error inside an HTTP 200 body as a failure, retries once when the model is at capacity, and explains it", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout"] });
+    const busy = () =>
+      new Response("   " + JSON.stringify({ error: { message: "Model is temporarily at capacity. Please try again shortly.", code: "capacity_exhausted" } }), { status: 200 });
+    const fetchMock = vi.fn(async () => busy());
+    vi.stubGlobal("fetch", fetchMock);
+    const pending = call();
+    await vi.runAllTimersAsync();
+    const data = await (await pending).json();
+    vi.useRealTimers();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(data.source).toBe("reguli");
+    expect(data.fallbackReason).toMatch(/ocupat|capacity/i);
+    expect(data.fallbackReason).not.toMatch(/validarea/);
+  });
+
+  it("succeeds when the model frees up on the retry", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout"] });
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ error: { message: "at capacity", code: "capacity_exhausted" } }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ recomandari: [{ id: "pilon3", motiv: "Pensie.", atentie: "-" }] }) } }] }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const pending = call();
+    await vi.runAllTimersAsync();
+    const data = await (await pending).json();
+    vi.useRealTimers();
+    expect(data.source).toBe("ai");
+  });
+
   it("says when no model is configured", async () => {
     vi.unstubAllEnvs();
     vi.stubEnv("AI_API_KEY", "");
