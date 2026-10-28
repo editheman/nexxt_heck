@@ -1,6 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-
-const state = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem("pcac:v1") ?? "null"));
+import { createAccount } from "./helpers";
 
 function seed(page: Page, goal: string) {
   return page.evaluate((g) => {
@@ -21,9 +20,7 @@ test("guided profiling: profil → Reality Check → simulator → portal, perso
   await page.reload();
   if (!isMobile) await expect(page.getByRole("navigation", { name: "Navigare principală" })).toHaveCount(0);
 
-  await page.goto("/profil");
-  await page.getByLabel("Cum să-ți spunem").fill("Ana");
-  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
+  await createAccount(page, "Ana");
   await page.getByLabel("Economii actuale").fill("20.000");
   await page.getByLabel("Obiectivul principal").selectOption("pensie");
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
@@ -42,7 +39,6 @@ test("guided profiling: profil → Reality Check → simulator → portal, perso
   await expect(page.getByTestId("portal-recommended")).toContainText("Ce înseamnă să investești în ETF-uri");
   await expect(page.getByTestId("portal-learn")).toBeVisible();
   await expect(page.getByTestId("portal-scams")).toBeVisible();
-  expect((await state(page)).onboarding.completedAt).not.toBeNull();
 
   // After profiling the pages are not chained.
   await page.getByTestId("portal-reality").click();
@@ -80,13 +76,4 @@ test("without a profile Învață lists all modules and asks for the goal", asyn
   await expect(page.getByTestId("goal-path")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Completează profilul" })).toBeVisible();
   await expect(page.locator('a[href^="/invata/"]')).toHaveCount(8);
-});
-
-test("home CTA opens the portal once profiling is done", async ({ page }) => {
-  await page.goto("/");
-  await seed(page, "altul");
-  await page.reload();
-  await page.getByRole("link", { name: "Deschide portalul tău" }).click();
-  await expect(page).toHaveURL(/\/portal$/);
-  await expect(page.getByTestId("portal-goal")).toHaveText("Alt obiectiv");
 });

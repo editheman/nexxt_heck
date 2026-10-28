@@ -75,13 +75,11 @@ export function LoginForm() {
   return (
     <form noValidate onSubmit={submit} aria-label="Intră în cont">
       <Card className="space-y-5 p-6 sm:p-8">
-        <div aria-live="assertive">
-          {error && (
-            <p ref={errorRef} tabIndex={-1} role="alert" className="rounded-[var(--radius-control)] bg-danger-soft px-4 py-3 text-sm font-medium text-danger outline-none">
-              {error}
-            </p>
-          )}
-        </div>
+        {error && (
+          <p ref={errorRef} tabIndex={-1} role="alert" className="rounded-[var(--radius-control)] bg-danger-soft px-4 py-3 text-sm font-medium text-danger outline-none">
+            {error}
+          </p>
+        )}
         <div className="space-y-2">
           <label htmlFor="login-username" className="font-semibold text-ink">
             Nume de utilizator

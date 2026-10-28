@@ -15,6 +15,7 @@ import { GOAL_LABELS } from "@/content/labels";
 import { computeProgress, isPassed } from "@/lib/progress";
 import { modulesForGoal } from "@/lib/goals";
 import type { DemoState } from "@/lib/storage";
+import { useAuth } from "@/lib/useAuth";
 import { useDemoState } from "@/lib/useDemoState";
 
 const catalog = { moduleSlugs: MODULES.map((m) => m.slug), scamIds: SCAMS.map((s) => s.id) };
@@ -29,15 +30,31 @@ function resumeHref(s: DemoState) {
 
 export function Portal() {
   const { state, hydrated } = useDemoState();
+  const { account } = useAuth();
   if (!hydrated) return <PageSkeleton />;
+
+  if (!account) {
+    return (
+      <Card className="mx-auto max-w-[640px] space-y-4 text-center" data-testid="portal-login">
+        <h1 className="text-2xl text-ink">Portalul tău e disponibil după autentificare</h1>
+        <p className="text-ink-muted">Intră în cont sau creează unul nou — durează câteva minute.</p>
+        <div className="flex flex-col justify-center gap-3 sm:flex-row">
+          <ButtonLink href="/intra">Intră în cont</ButtonLink>
+          <ButtonLink href="/profil" variant="secondary">
+            Creează cont
+          </ButtonLink>
+        </div>
+      </Card>
+    );
+  }
 
   const p = state.profile;
   if (!p) {
     return (
       <Card className="mx-auto max-w-[640px] space-y-4 text-center">
-        <h1 className="text-2xl text-ink">Portalul tău apare după profilare</h1>
+        <h1 className="text-2xl text-ink">Mai ai de completat profilul</h1>
         <p className="text-ink-muted">Completează profilul în câțiva pași, apoi aici găsești tot ce ai nevoie.</p>
-        <ButtonLink href="/profil">Începe profilarea</ButtonLink>
+        <ButtonLink href="/profil">Completează profilul</ButtonLink>
       </Card>
     );
   }

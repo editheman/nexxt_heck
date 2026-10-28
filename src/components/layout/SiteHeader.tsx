@@ -8,6 +8,9 @@ import { buttonClass } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
 import { Logo } from "./Logo";
 import { useOnboardingDone } from "@/components/journey/Onboarding";
+import { resumeHref } from "@/lib/resume";
+import { useAuth } from "@/lib/useAuth";
+import { useDemoState } from "@/lib/useDemoState";
 import { AccountMenu } from "./AccountMenu";
 import { NAV_ITEMS } from "./nav";
 
@@ -24,6 +27,8 @@ export function SiteHeader() {
     setOpen(false);
   }
   const { done } = useOnboardingDone();
+  const { account } = useAuth();
+  const { state } = useDemoState();
   const primaryNav = NAV_ITEMS;
 
   return (
@@ -58,31 +63,29 @@ export function SiteHeader() {
         </nav>
         )}
 
-        <div className="ml-auto hidden items-center gap-3 md:flex">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {!done && (
-            <Link href="/profil" className={buttonClass("primary", "min-h-10 px-4 py-2 text-sm")}>
-              Începe
+            <Link
+              href={account ? resumeHref(state) : "/profil"}
+              className={buttonClass("primary", "hidden min-h-10 px-4 py-2 text-sm sm:inline-flex")}
+            >
+              {account ? "Continuă profilarea" : "Începe"}
             </Link>
           )}
           <AccountMenu />
+          {done && (
+            <button
+              type="button"
+              className="inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] text-ink hover:bg-surface-muted md:hidden"
+              aria-expanded={open}
+              aria-controls="mobile-nav"
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? <X aria-hidden className="size-6" /> : <Menu aria-hidden className="size-6" />}
+              <span className="sr-only">{open ? "Închide meniul" : "Meniu"}</span>
+            </button>
+          )}
         </div>
-
-        {done ? (
-        <button
-          type="button"
-          className="ml-auto inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] text-ink hover:bg-surface-muted md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X aria-hidden className="size-6" /> : <Menu aria-hidden className="size-6" />}
-          <span className="sr-only">{open ? "Închide meniul" : "Meniu"}</span>
-        </button>
-        ) : (
-          <Link href="/profil" className={buttonClass("primary", "ml-auto min-h-10 px-4 py-2 text-sm md:hidden")}>
-            Începe
-          </Link>
-        )}
       </div>
 
       {open && done && (

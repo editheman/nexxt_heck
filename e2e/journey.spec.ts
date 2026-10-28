@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { PASSWORD } from "./helpers";
 
 async function freshStart(page: Page) {
   await page.goto("/");
@@ -17,9 +18,11 @@ test("full journey persists across reloads", async ({ page }) => {
   await page.getByRole("button", { name: "Sari peste" }).click();
   await expect(page).toHaveURL(/\/profil$/);
 
-  // Profile, step 1 → step 2
-  await page.getByLabel("Cum să-ți spunem").fill("Ana");
-  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
+  // Profile, step 1 (create the account) → step 2
+  await page.getByLabel("Nume de utilizator").fill("ana");
+  await page.getByLabel("Parolă", { exact: true }).fill(PASSWORD);
+  await page.getByLabel("Confirmă parola").fill(PASSWORD);
+  await page.getByRole("button", { name: "Creează contul și continuă" }).click();
   await expect(page.getByTestId("onboarding-step")).toHaveText("Pasul 2 din 2: Banii tăi");
   await page.getByLabel("Economii actuale").fill("20.000");
   await page.getByLabel("Cât pui deoparte lunar").fill("0");
@@ -115,8 +118,10 @@ test("full journey persists across reloads", async ({ page }) => {
 test("profile validation shows an error summary and inline errors", async ({ page }) => {
   await freshStart(page);
   await page.goto("/profil");
-  await page.getByLabel("Cum să-ți spunem").fill("Ana");
-  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
+  await page.getByLabel("Nume de utilizator").fill("ana");
+  await page.getByLabel("Parolă", { exact: true }).fill(PASSWORD);
+  await page.getByLabel("Confirmă parola").fill(PASSWORD);
+  await page.getByRole("button", { name: "Creează contul și continuă" }).click();
   await page.getByLabel("Orizont de timp").fill("2,5");
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   const summary = page.getByRole("alert").filter({ hasText: "Verifică" });
