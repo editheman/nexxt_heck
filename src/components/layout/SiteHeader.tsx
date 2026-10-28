@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, UserRound, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { buttonClass } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
 import { Logo } from "./Logo";
 import { useOnboardingDone } from "@/components/journey/Onboarding";
+import { AccountMenu } from "./AccountMenu";
 import { NAV_ITEMS } from "./nav";
 
 function isActive(pathname: string, href: string) {
@@ -63,14 +64,7 @@ export function SiteHeader() {
               Începe
             </Link>
           )}
-          <Link
-            href={done ? "/portal" : "/progres"}
-            aria-current={isActive(pathname, done ? "/portal" : "/progres") ? "page" : undefined}
-            className="flex size-10 items-center justify-center rounded-full bg-primary text-on-primary transition-colors hover:bg-primary-hover"
-          >
-            <UserRound aria-hidden className="size-[18px]" />
-            <span className="sr-only">{done ? "Portalul tău" : "Progresul tău"}</span>
-          </Link>
+          <AccountMenu />
         </div>
 
         {done ? (

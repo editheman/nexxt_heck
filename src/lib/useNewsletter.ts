@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { MODULE_SLUGS } from "@/content/moduleSlugs";
+import { SESSION_KEY, accountStateKey, parseSession } from "./auth";
 import {
   declinePrompt,
   defaultPrompt,
@@ -22,13 +23,30 @@ import {
   type Subscriber,
 } from "./newsletter";
 
-/** Separate keys on purpose: reading events, prompt state, subscriber (email) and consent log never share a record. */
-export const NEWSLETTER_KEYS = {
-  reading: "pcac:reading:v1",
-  prompt: "pcac:prompt:v1",
-  subscriber: "pcac:subscriber:v1",
-  consent: "pcac:consent:v1",
-} as const;
+/**
+ * Separate keys on purpose: reading events, prompt state, subscriber (email) and consent log never
+ * share a record. Each account has its own set; logged out uses the guest keys (`pcac:reading:v1`, …).
+ */
+const NAMES = { reading: "reading:v1", prompt: "prompt:v1", subscriber: "subscriber:v1", consent: "consent:v1" } as const;
+
+export function newsletterKeys(accountId: string | null) {
+  return {
+    reading: accountStateKey(accountId, NAMES.reading),
+    prompt: accountStateKey(accountId, NAMES.prompt),
+    subscriber: accountStateKey(accountId, NAMES.subscriber),
+    consent: accountStateKey(accountId, NAMES.consent),
+  };
+}
+
+function keys() {
+  let accountId: string | null = null;
+  try {
+    accountId = parseSession(window.localStorage.getItem(SESSION_KEY))?.accountId ?? null;
+  } catch {
+    /* storage blocked: guest */
+  }
+  return newsletterKeys(accountId);
+}
 
 export type NewsletterSnapshot = {
   reading: ReadingState;
@@ -59,27 +77,37 @@ function set(key: string, value: unknown) {
 }
 
 function read(): NewsletterSnapshot {
-  cache ??= {
-    reading: parseReading(get(NEWSLETTER_KEYS.reading)),
-    prompt: parsePrompt(get(NEWSLETTER_KEYS.prompt)),
-    subscriber: parseSubscriber(get(NEWSLETTER_KEYS.subscriber)),
-    consentLog: parseConsentLog(get(NEWSLETTER_KEYS.consent)),
-  };
+  if (cache === null) {
+    const k = keys();
+    cache = {
+      reading: parseReading(get(k.reading)),
+      prompt: parsePrompt(get(k.prompt)),
+      subscriber: parseSubscriber(get(k.subscriber)),
+      consentLog: parseConsentLog(get(k.consent)),
+    };
+  }
   return cache;
+}
+
+/** Re-reads from storage, e.g. after login/logout switched the active account. */
+export function refreshNewsletter() {
+  cache = null;
+  listeners.forEach((l) => l());
 }
 
 function commit(next: Partial<NewsletterSnapshot>) {
   const cur = read();
   cache = { ...cur, ...next };
-  if (next.reading) set(NEWSLETTER_KEYS.reading, next.reading);
-  if (next.prompt) set(NEWSLETTER_KEYS.prompt, next.prompt);
-  if ("subscriber" in next) set(NEWSLETTER_KEYS.subscriber, next.subscriber ?? null);
-  if (next.consentLog) set(NEWSLETTER_KEYS.consent, next.consentLog);
+  const k = keys();
+  if (next.reading) set(k.reading, next.reading);
+  if (next.prompt) set(k.prompt, next.prompt);
+  if ("subscriber" in next) set(k.subscriber, next.subscriber ?? null);
+  if (next.consentLog) set(k.consent, next.consentLog);
   listeners.forEach((l) => l());
 }
 
 function onStorage(e: StorageEvent) {
-  if (e.key === null || Object.values(NEWSLETTER_KEYS).includes(e.key as never)) {
+  if (e.key === null || e.key === SESSION_KEY || Object.values(keys()).includes(e.key)) {
     cache = null;
     listeners.forEach((l) => l());
   }
@@ -126,7 +154,7 @@ export const newsletter = {
   },
   /** Used by "Resetează demo-ul": removes every newsletter-related key, including the consent log. */
   clearAll() {
-    Object.values(NEWSLETTER_KEYS).forEach((k) => set(k, null));
+    Object.values(keys()).forEach((k) => set(k, null));
     cache = null;
     listeners.forEach((l) => l());
   },
