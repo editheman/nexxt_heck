@@ -1,3 +1,5 @@
+> **Status (2026-10-29):** the newsletter UI was removed at the owner's request. This document is kept as the requirements reference if the feature returns.
+
 # Newsletter (digest săptămânal) — demo status and production requirements
 
 ## Current status: demo only

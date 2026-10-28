@@ -17,9 +17,6 @@ export function SiteFooter() {
               <li>
                 <Link href="/confidentialitate" className="font-semibold text-ink hover:text-primary">Confidențialitate</Link>
               </li>
-              <li>
-                <Link href="/dezabonare" className="font-semibold text-ink hover:text-primary">Dezabonare</Link>
-              </li>
             </ul>
           </div>
           <div className="space-y-3">

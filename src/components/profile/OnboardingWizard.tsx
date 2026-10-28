@@ -6,8 +6,6 @@ import { cn } from "@/components/ui/cn";
 import type { Profile } from "@/lib/storage";
 import { useAuth, auth } from "@/lib/useAuth";
 import { actions, useDemoState } from "@/lib/useDemoState";
-import { newsletter } from "@/lib/useNewsletter";
-import type { Subscriber } from "@/lib/newsletter";
 import { FinancialStep, initialFinancial, type FinancialDraft } from "./FinancialStep";
 import { IdentityStep, type Identity, type IdentityErrors } from "./IdentityStep";
 
@@ -16,7 +14,7 @@ const STEPS = [
   { title: "Banii tăi, pe scurt", label: "Banii tăi" },
 ] as const;
 
-export function OnboardingWizard({ initial, subscriber }: { initial: Profile | null; subscriber: Subscriber | null }) {
+export function OnboardingWizard({ initial }: { initial: Profile | null }) {
   const router = useRouter();
   const { state } = useDemoState();
   const { account } = useAuth();
@@ -28,8 +26,6 @@ export function OnboardingWizard({ initial, subscriber }: { initial: Profile | n
     username: account?.username ?? "",
     password: "",
     confirm: "",
-    email: "",
-    consent: false,
     ageRange: initial?.ageRange ?? null,
   }));
   const [financial, setFinancial] = useState<FinancialDraft>(() => initialFinancial(initial));
@@ -46,12 +42,8 @@ export function OnboardingWizard({ initial, subscriber }: { initial: Profile | n
       const r = await auth.signUp({ username: identity.username, password: identity.password, confirm: identity.confirm });
       if (!r.ok) return r.errors;
     }
-    // Email is optional; it is stored only together with explicit marketing consent (under the new account).
-    if (!subscriber && identity.email.trim() !== "" && identity.consent) {
-      newsletter.subscribe(identity.email, true, "onboarding");
-    }
     // Never keep the password in memory longer than needed.
-    setIdentity((v) => ({ ...v, password: "", confirm: "", email: "", consent: false }));
+    setIdentity((v) => ({ ...v, password: "", confirm: "" }));
     go(1);
     return null;
   }
@@ -91,7 +83,7 @@ export function OnboardingWizard({ initial, subscriber }: { initial: Profile | n
       </h1>
 
       {step === 0 ? (
-        <IdentityStep value={identity} onChange={setIdentity} onNext={next} subscriber={subscriber} mode={account ? "edit" : "signup"} />
+        <IdentityStep value={identity} onChange={setIdentity} onNext={next} mode={account ? "edit" : "signup"} />
       ) : (
         <FinancialStep draft={financial} onChange={setFinancial} onBack={() => go(0)} onSave={save} />
       )}

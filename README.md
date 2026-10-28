@@ -69,13 +69,8 @@ Din `/recomandari` poți alege categorii („Aleg această metodă”) — apar 
 - Un quiz este „trecut” la ≥ 75%. La reluarea întrebărilor greșite, cele corecte anterior rămân corecte.
 - Sumele se afișează ca „12.346 lei” (convenția obișnuită în interfețele financiare); anii respectă acordul („10 ani”, „20 de ani”).
 
-## Digest pe e-mail (mod demo)
-
-După ce deschizi două module diferite, la finalul articolului apare o propunere discretă de abonare la un digest săptămânal. Acordul de marketing este o căsuță separată, nebifată implicit; fără el nu se salvează nimic. Închiderea amână propunerea 14, apoi 30 de zile; „Nu, mulțumesc” o oprește definitiv; maximum 3 afișări. Nu există încă un serviciu de e-mail: totul rămâne în browser și interfața spune asta explicit. Cerințele pentru producție sunt în `docs/newsletter.md`; nota de confidențialitate e la `/confidentialitate`, dezabonarea la `/dezabonare`.
-
 ## Limitări cunoscute
 
-- Digestul pe e-mail funcționează doar în mod demo (fără trimitere reală).
 - Funcția opțională „Prieteni” (comparații de progres pe bază de alias) nu este implementată.
 - Fără mod întunecat; fără export de rezultate.
 - Calculele ignoră costurile și impozitele (explicat în aplicație); ratele sunt constante pe toată perioada.
