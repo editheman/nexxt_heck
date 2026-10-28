@@ -34,7 +34,6 @@ export type Profile = {
 };
 
 export type QuizResult = { best: number; total: number; lastWrong: string[] };
-export type ScamResult = { completed: true; correct: number; total: number };
 
 export const EMERGENCY_FUND = ["da", "partial", "nu"] as const;
 export const RISK_TOLERANCE = ["scazuta", "medie", "ridicata"] as const;
@@ -49,7 +48,7 @@ export type RiskProfile = {
 };
 
 export type DemoState = {
-  version: 8;
+  version: 9;
   profile: Profile | null;
   /** Guided profiling (profil → Reality Check → simulator) finished. Learning is personalised by `profile.goal`. */
   onboarding: { completedAt: string | null };
@@ -63,7 +62,6 @@ export type DemoState = {
   reality: { years: RealityWindow };
   progress: {
     visited: Partial<Record<"reality" | "simulator", true>>;
-    scams: Record<string, ScamResult>;
     modulesRead: Record<string, true>;
     quizzes: Record<string, QuizResult>;
   };
@@ -71,14 +69,14 @@ export type DemoState = {
 
 export function defaultState(): DemoState {
   return {
-    version: 8,
+    version: 9,
     profile: null,
     onboarding: { completedAt: null },
     riskProfile: { emergencyFund: null, riskTolerance: null, experience: null, costlyDebt: null },
     plans: emptyPlans(),
     assumptions: { inflationPct: DEFAULT_INFLATION_PCT },
     reality: { years: DEFAULT_REALITY_WINDOW },
-    progress: { visited: {}, scams: {}, modulesRead: {}, quizzes: {} },
+    progress: { visited: {}, modulesRead: {}, quizzes: {} },
   };
 }
 
@@ -137,15 +135,11 @@ function parseQuiz(v: unknown): QuizResult | null {
   return { best: v.best, total: v.total, lastWrong: v.lastWrong as string[] };
 }
 
-function parseScam(v: unknown): ScamResult | null {
-  if (!isObj(v) || v.completed !== true || !isNum(v.correct) || !isNum(v.total)) return null;
-  return { completed: true, correct: v.correct, total: v.total };
-}
-
 /**
  * Never throws: anything unreadable falls back to defaults, field by field.
  * Accepts schema v1 (no `reality`), v2 (no `profile.ageRange`), v3 (no `onboarding`) and v4 (with the
- * retired `interests` list, which is dropped) v5 (no `riskProfile`), v6 (no `riskProfile.costlyDebt`) and v7 (no `plans`) and migrates them to v8.
+ * retired `interests` list, which is dropped) v5 (no `riskProfile`), v6 (no `riskProfile.costlyDebt`), v7 (no `plans`) and v8 (with the retired scam-scenario progress,
+ * which is dropped) and migrates them to v9.
  */
 export function parseState(raw: string | null): DemoState {
   const fallback = defaultState();
@@ -156,7 +150,7 @@ export function parseState(raw: string | null): DemoState {
   } catch {
     return fallback;
   }
-  if (!isObj(data) || ![1, 2, 3, 4, 5, 6, 7, 8].includes(data.version as number)) return fallback;
+  if (!isObj(data) || ![1, 2, 3, 4, 5, 6, 7, 8, 9].includes(data.version as number)) return fallback;
 
   const assumptions = isObj(data.assumptions) ? data.assumptions : {};
   const reality = isObj(data.reality) ? data.reality : {};
@@ -169,7 +163,7 @@ export function parseState(raw: string | null): DemoState {
   const pick = <T extends string>(v: unknown, allowed: readonly T[]): T | null => (allowed.includes(v as T) ? (v as T) : null);
 
   return {
-    version: 8,
+    version: 9,
     profile: parseProfile(data.profile),
     onboarding: {
       completedAt: typeof completedAt === "string" && !Number.isNaN(Date.parse(completedAt)) ? completedAt : null,
@@ -194,7 +188,6 @@ export function parseState(raw: string | null): DemoState {
         ...(visited.reality === true ? { reality: true as const } : {}),
         ...(visited.simulator === true ? { simulator: true as const } : {}),
       },
-      scams: filterRecord(progress.scams, parseScam),
       modulesRead: filterRecord(progress.modulesRead, parseTrue),
       quizzes: filterRecord(progress.quizzes, parseQuiz),
     },

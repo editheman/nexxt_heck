@@ -67,6 +67,6 @@ test("Înapoi keeps the answers without asking for the password again; the profi
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   await expect(page).toHaveURL(/\/reality-check$/);
   const saved = await accountItem(page, "v1");
-  expect(saved.version).toBe(8);
+  expect(saved.version).toBe(9);
   expect(saved.profile).toMatchObject({ alias: "ana", ageRange: "26-30", savings: 10000 });
 });

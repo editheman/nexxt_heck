@@ -60,7 +60,7 @@ export function FinishOnboarding() {
       <div className="space-y-1">
         <Eyebrow dot>Ultimul pas</Eyebrow>
         <p className="text-lg font-semibold text-ink">Profilarea e gata</p>
-        <p className="text-sm text-ink-muted">În portalul tău găsești modulele recomandate, scenariile de fraudă și progresul.</p>
+        <p className="text-sm text-ink-muted">În portalul tău găsești modulele recomandate, recomandările și progresul.</p>
       </div>
       <Button
         onClick={() => {

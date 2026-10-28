@@ -5,6 +5,5 @@ export const NAV_ITEMS = [
   { href: "/reality-check", label: "Reality Check" },
   { href: "/simulator", label: "Simulator" },
   { href: "/invata", label: "Învață" },
-  { href: "/fraude", label: "Fraude" },
   { href: "/progres", label: "Progres" },
 ] as const;

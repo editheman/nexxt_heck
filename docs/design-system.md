@@ -39,7 +39,7 @@ Calm, editorial, premium-but-plain. A light, paper-like background, navy ink, on
 | `--accent-soft` | `#E6F4F2` | accent backgrounds | |
 | `--assumption` | `#B45309` | "Ipoteză" badge, caution | 5.0:1 |
 | `--assumption-soft` | `#FDF3E7` | | |
-| `--danger` | `#B42318` | errors, scam red flags | 6.0:1 |
+| `--danger` | `#B42318` | errors, risk warnings | 6.0:1 |
 | `--danger-soft` | `#FDECEA` | | |
 | `--success` | `#1F7A3D` | correct answers | 5.3:1 |
 | `--success-soft` | `#E8F5EC` | | |

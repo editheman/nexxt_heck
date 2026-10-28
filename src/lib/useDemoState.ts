@@ -124,12 +124,6 @@ export const actions = {
     if (read().progress.visited[page]) return;
     updateState((s) => ({ ...s, progress: { ...s.progress, visited: { ...s.progress.visited, [page]: true } } }));
   },
-  recordScam(id: string, correct: number, total: number) {
-    updateState((s) => ({
-      ...s,
-      progress: { ...s.progress, scams: { ...s.progress.scams, [id]: { completed: true, correct, total } } },
-    }));
-  },
   markModuleRead(slug: string) {
     updateState((s) => ({
       ...s,

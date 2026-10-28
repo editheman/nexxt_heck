@@ -23,7 +23,7 @@ Necesită Node.js 20.9+ (testat cu Node 26). Nu are nevoie de chei API sau servi
 
 ## Parcursul principal
 
-Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` → `/portal`. După profilare, toate secțiunile se deschid din portal (nu mai sunt înlănțuite), iar Fraude și Învață apar ca opțiuni acolo. Învață și portalul recomandă modulele după obiectivul de economisire ales în profil. Profilarea începe cu crearea unui cont (nume de utilizator + parolă); `/intra` este pagina de autentificare, iar iconița din dreapta sus deschide meniul contului. Conturile sunt **locale, de demo**: parola nu se salvează, ci doar un hash PBKDF2-SHA-256 cu sare, iar datele fiecărui cont stau separat în browser. Pentru conturi reale e nevoie de server — vezi `docs/superpowers/specs/2026-10-28-accounts-design.md`.
+Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` → `/portal`. După profilare, toate secțiunile se deschid din portal (nu mai sunt înlănțuite), iar Învață apare ca opțiune acolo. Învață și portalul recomandă modulele după obiectivul de economisire ales în profil. Profilarea începe cu crearea unui cont (nume de utilizator + parolă); `/intra` este pagina de autentificare, iar iconița din dreapta sus deschide meniul contului. Conturile sunt **locale, de demo**: parola nu se salvează, ci doar un hash PBKDF2-SHA-256 cu sare, iar datele fiecărui cont stau separat în browser. Pentru conturi reale e nevoie de server — vezi `docs/superpowers/specs/2026-10-28-accounts-design.md`.
 
 
 | Pas | Rută | Ce face |
@@ -32,8 +32,7 @@ Profilare ghidată: `/profil` (2 pași) → `/reality-check` → `/simulator` �
 | 1 | `/profil` | Profil minim: economii, unde sunt ținute, randament estimat de tine, depunere lunară, orizont, obiectiv |
 | 2 | `/reality-check` | Valoare nominală vs. putere de cumpărare în lei de azi; inflația este o ipoteză editabilă |
 | 3 | `/simulator` | Glisoare + câmpuri numerice, scenarii rapide, grafic (nominal continuu / real întrerupt) și tabel |
-| 4 | `/fraude` | 4 scenarii fictive (SMS curier, platformă „garantată”, apel „de la bancă”, prieten pe WhatsApp) |
-| 5 | `/invata`, `/invata/[slug]` | 7 module: inflație, randament real, lichiditate, diversificare, comisioane, taxe, fraude |
+| 4 | `/invata`, `/invata/[slug]` | 7 module: inflație, randament real, lichiditate, diversificare, comisioane, taxe, fraude |
 | Quiz | `/invata/[slug]/quiz` | Feedback la fiecare răspuns, link către secțiunea de recitit, reluarea doar a întrebărilor greșite |
 | Progres | `/progres` | Traseu, module, scoruri, resetare cu confirmare; totul persistă la reîncărcare |
 

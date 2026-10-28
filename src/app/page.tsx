@@ -4,7 +4,7 @@ import { StartDemoButton } from "@/components/home/StartDemoDialog";
 
 const PILLARS = [
   { n: "01", icon: Landmark, title: "Fond de urgență", text: "3–6 luni de cheltuieli esențiale", href: "/invata/lichiditate" },
-  { n: "02", icon: ShieldCheck, title: "Protecție anti-fraudă", text: "SMS-uri, apeluri și oferte false", href: "/fraude" },
+  { n: "02", icon: ShieldCheck, title: "Protecție anti-fraudă", text: "SMS-uri, apeluri și oferte false", href: "/invata/fraude" },
   { n: "03", icon: TrendingDown, title: "Inflație & putere de cumpărare", text: "Cât valorează azi economiile tale", href: "/reality-check" },
 ] as const;
 

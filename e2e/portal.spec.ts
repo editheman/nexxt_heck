@@ -38,7 +38,7 @@ test("guided profiling: profil → Reality Check → simulator → portal, perso
   await expect(page.getByTestId("portal-goal")).toHaveText("Pensie / termen lung");
   await expect(page.getByTestId("portal-recommended")).toContainText("Ce înseamnă să investești în ETF-uri");
   await expect(page.getByTestId("portal-learn")).toBeVisible();
-  await expect(page.getByTestId("portal-scams")).toBeVisible();
+  await expect(page.getByTestId("portal-scams")).toHaveCount(0);
 
   // After profiling the pages are not chained.
   await page.getByTestId("portal-reality").click();

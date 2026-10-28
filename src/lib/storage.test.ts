@@ -20,7 +20,6 @@ const valid: DemoState = {
   riskProfile: { emergencyFund: "partial", riskTolerance: "medie", experience: "deloc", costlyDebt: "da" },
   progress: {
     visited: { reality: true },
-    scams: { curier: { completed: true, correct: 2, total: 3 } },
     modulesRead: { inflatia: true },
     quizzes: { inflatia: { best: 3, total: 4, lastWrong: ["q2"] } },
   },
@@ -80,7 +79,7 @@ describe("parseState", () => {
     const profile: Record<string, unknown> = { ...valid.profile };
     delete profile.ageRange;
     const parsed = parseState(JSON.stringify({ ...valid, version: 2, profile }));
-    expect(parsed.version).toBe(8);
+    expect(parsed.version).toBe(9);
     expect(parsed.profile?.ageRange).toBeNull();
   });
 
@@ -98,7 +97,7 @@ describe("parseState", () => {
     const v3: Record<string, unknown> = { ...valid, version: 3 };
     delete v3.onboarding;
     const parsed = parseState(JSON.stringify(v3));
-    expect(parsed.version).toBe(8);
+    expect(parsed.version).toBe(9);
     expect(parsed.onboarding.completedAt).toBeNull();
   });
 
@@ -122,7 +121,7 @@ describe("parseState", () => {
 
   it("migrates a schema-v6 risk profile without the costly-debt answer", () => {
     const parsed = parseState(JSON.stringify({ ...valid, version: 6, riskProfile: { emergencyFund: "da", riskTolerance: "medie", experience: "deloc" } }));
-    expect(parsed.version).toBe(8);
+    expect(parsed.version).toBe(9);
     expect(parsed.riskProfile.costlyDebt).toBeNull();
   });
 
@@ -148,7 +147,13 @@ describe("parseState", () => {
 
   it("migrates a schema-v7 state with empty plans", () => {
     const parsed = parseState(JSON.stringify({ ...valid, version: 7 }));
-    expect(parsed.version).toBe(8);
+    expect(parsed.version).toBe(9);
     expect(parsed.plans).toEqual({ generations: [], methods: [] });
+  });
+
+  it("drops the retired scam-scenario progress from a v8 state", () => {
+    const parsed = parseState(JSON.stringify({ ...valid, version: 8, progress: { ...valid.progress, scams: { curier: { completed: true, correct: 2, total: 3 } } } }));
+    expect(parsed.version).toBe(9);
+    expect(parsed.progress).toEqual(valid.progress);
   });
 });

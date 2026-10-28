@@ -22,18 +22,3 @@ export type LearningModule = {
   tool?: { href: string; label: string };
   quiz: Question[];
 };
-
-export type ScamChoice = { id: string; text: string; correct: boolean; feedback: string };
-
-export type ScamStep = { id: string; prompt: string; choices: ScamChoice[] };
-
-export type ScamScenario = {
-  id: string;
-  title: string;
-  channel: string;
-  sender: string;
-  message: string[];
-  steps: ScamStep[];
-  redFlags: string[];
-  safeSteps: string[];
-};

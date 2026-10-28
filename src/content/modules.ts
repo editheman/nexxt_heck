@@ -371,7 +371,6 @@ export const MODULES: LearningModule[] = [
     title: "Cum recunoști o fraudă financiară",
     summary: "Semnalele de alarmă comune și ce faci concret dacă ceva pare suspect.",
     minutes: 7,
-    tool: { href: "/fraude", label: "Exersează pe scenarii fictive" },
     sections: [
       {
         id: "semnale",

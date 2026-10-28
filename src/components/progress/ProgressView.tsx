@@ -6,12 +6,11 @@ import { Alert } from "@/components/ui/Alert";
 import { Card } from "@/components/ui/Card";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 import { MODULES } from "@/content/modules";
-import { SCAMS } from "@/content/scams";
 import { computeProgress, isPassed } from "@/lib/progress";
 import { useDemoState } from "@/lib/useDemoState";
 import { ResetDemo } from "./ResetDemo";
 
-const catalog = { moduleSlugs: MODULES.map((m) => m.slug), scamIds: SCAMS.map((s) => s.id) };
+const catalog = { moduleSlugs: MODULES.map((m) => m.slug) };
 
 export function ProgressView() {
   const { state, hydrated, storageAvailable } = useDemoState();
@@ -43,10 +42,6 @@ export function ProgressView() {
             <div>
               <dt className="text-ink-muted">Quiz-uri trecute</dt>
               <dd className="text-xl font-semibold">{p.quizzesPassed}/{MODULES.length}</dd>
-            </div>
-            <div>
-              <dt className="text-ink-muted">Scenarii fraudă</dt>
-              <dd className="text-xl font-semibold">{p.scamsDone}/{SCAMS.length}</dd>
             </div>
           </dl>
         </div>

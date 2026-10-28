@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, BookOpen, ChartLine, CheckCircle2, Pencil, ShieldAlert, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, BookOpen, ChartLine, CheckCircle2, Pencil, Target, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
@@ -9,7 +9,6 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 import { formatLei } from "@/lib/format";
 import { MODULES } from "@/content/modules";
-import { SCAMS } from "@/content/scams";
 import { GOAL_PATHS } from "@/content/goalPaths";
 import { GOAL_LABELS } from "@/content/labels";
 import { computeProgress, isPassed } from "@/lib/progress";
@@ -19,7 +18,7 @@ import { currentGeneration, history, methodsOf, type Plans } from "@/lib/plans";
 import { useAuth } from "@/lib/useAuth";
 import { useDemoState } from "@/lib/useDemoState";
 
-const catalog = { moduleSlugs: MODULES.map((m) => m.slug), scamIds: SCAMS.map((s) => s.id) };
+const catalog = { moduleSlugs: MODULES.map((m) => m.slug) };
 const AGE: Record<string, string> = { "20-25": "20–25 ani", "26-30": "26–30 ani", "31-35": "31–35 ani" };
 
 /** Where an unfinished profiling should continue. */
@@ -62,7 +61,6 @@ export function Portal() {
 
   const progress = computeProgress(state, catalog);
   const recommended = modulesForGoal(p.goal);
-  const scamsDone = SCAMS.filter((s) => state.progress.scams[s.id]).length;
   const done = state.onboarding.completedAt !== null;
 
   return (
@@ -144,16 +142,11 @@ export function Portal() {
 
       <section aria-labelledby="continua" className="space-y-4">
         <h2 id="continua" className="text-2xl text-ink">Continuă să înveți</h2>
-        <ul className="grid gap-4 md:grid-cols-2">
+        <ul className="grid gap-4">
           <li>
             <PortalCard href="/invata" icon={BookOpen} bar="primary" title="Învață" testId="portal-learn"
               text={`${MODULES.length} module scurte, ordonate după obiectivul tău, fiecare cu un quiz.`}
               meta={`${progress.modulesRead}/${MODULES.length} citite · ${progress.quizzesPassed} quiz-uri trecute`} />
-          </li>
-          <li>
-            <PortalCard href="/fraude" icon={ShieldAlert} bar="danger" title="Recunoaște fraudele" testId="portal-scams"
-              text="Scenarii fictive cu SMS-uri, apeluri „de la bancă” și oferte „garantate”."
-              meta={`${scamsDone}/${SCAMS.length} scenarii parcurse`} />
           </li>
         </ul>
       </section>
