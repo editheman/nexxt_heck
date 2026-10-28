@@ -12,7 +12,9 @@ test("full journey persists across reloads", async ({ page }) => {
 
   await freshStart(page);
   await page.goto("/");
-  await page.getByRole("link", { name: "Începe demo-ul" }).click();
+  await page.getByRole("button", { name: "Începe demo-ul" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "Sari peste" }).click();
   await expect(page).toHaveURL(/\/profil$/);
 
   // Profile

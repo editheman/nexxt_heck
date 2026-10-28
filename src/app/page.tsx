@@ -1,6 +1,6 @@
 import { ArrowRight, CircleCheck, Clock, Landmark, Lock, ShieldCheck, TrendingDown } from "lucide-react";
 import Link from "next/link";
-import { ButtonLink } from "@/components/ui/Button";
+import { StartDemoButton } from "@/components/home/StartDemoDialog";
 
 const PILLARS = [
   { n: "01", icon: Landmark, title: "Fond de urgență", text: "3–6 luni de cheltuieli esențiale", href: "/invata/lichiditate" },
@@ -28,9 +28,7 @@ export default function Home() {
             financiară importantă.
           </p>
           <div className="mt-8 short:mt-5 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-            <ButtonLink href="/profil" className="min-h-12 px-7 text-base">
-              Începe demo-ul <ArrowRight aria-hidden className="size-4" />
-            </ButtonLink>
+            <StartDemoButton />
           </div>
           <ul className="mt-6 short:mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-ink-muted">
             {TRUST.map((t, i) => (
