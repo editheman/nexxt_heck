@@ -102,10 +102,11 @@
   background: linear-gradient(90deg, #4f46e5 0%, #7dd3c0 50%, #b4322a 100%);
 }
 
-@utility hero-wash {
+/* Home background: watercolour hills with llamas, under a soft light veil so the centred text stays readable. */
+@utility hero-photo {
   background:
-    radial-gradient(60% 70% at 70% 30%, rgb(124 58 237 / 0.1), transparent 70%),
-    radial-gradient(50% 60% at 20% 20%, rgb(79 70 229 / 0.08), transparent 70%),
+    radial-gradient(55% 60% at 50% 45%, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.35) 75%, rgb(255 255 255 / 0.15)),
+    url("/hero-lame.jpg") center / cover no-repeat,
     var(--color-bg);
 }
 

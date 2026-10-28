@@ -17,7 +17,7 @@ const TRUST = [
 export default function Home() {
   return (
     // One screen on laptop/desktop; on very short or narrow screens it may scroll rather than clip content.
-    <section className="hero-wash flex min-h-[calc(100dvh-4rem-1px)] flex-col" data-testid="home">
+    <section className="hero-photo flex min-h-[calc(100dvh-4rem-1px)] flex-col" data-testid="home">
       <div className="mx-auto flex w-full max-w-[1240px] flex-1 flex-col px-4 py-5 short:py-3 sm:px-6 lg:px-8">
         <div className="flex flex-1 flex-col items-center justify-center py-8 text-center short:py-4">
           <h1 className="max-w-[20ch] text-[2.4rem] leading-[1.08] text-ink sm:text-6xl sm:short:text-5xl">
