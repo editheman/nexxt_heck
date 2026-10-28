@@ -1,6 +1,5 @@
 import { ArrowRight, CircleCheck, Clock, Landmark, Lock, ShieldCheck, TrendingDown } from "lucide-react";
 import Link from "next/link";
-import { UseDemoProfileButton } from "@/components/profile/UseDemoProfileButton";
 import { ButtonLink } from "@/components/ui/Button";
 
 const PILLARS = [
@@ -32,7 +31,6 @@ export default function Home() {
             <ButtonLink href="/profil" className="min-h-12 px-7 text-base">
               Începe demo-ul <ArrowRight aria-hidden className="size-4" />
             </ButtonLink>
-            <UseDemoProfileButton />
           </div>
           <ul className="mt-6 short:mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-ink-muted">
             {TRUST.map((t, i) => (
