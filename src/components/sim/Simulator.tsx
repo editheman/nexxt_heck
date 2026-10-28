@@ -97,44 +97,47 @@ function SimulatorInner({ initial, fromProfile, isDemo }: { initial: SimInput; f
         </Card>
 
         <div className="min-w-0 space-y-6">
-          {!valid && (
-            <Alert tone="danger" role="status" title="Corectează valorile marcate">
-              Graficul arată ultimul scenariu valid până atunci.
-            </Alert>
-          )}
-          <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="Total depus" value={formatLei(summary.contributed)} kind={fromProfile && !isDemo ? "user" : "fictional"} />
-            <StatCard label={`Nominal după ${formatYears(input.years)}`} value={formatLei(summary.nominal)} kind="estimate" testId="sim-nominal" />
-            <StatCard label="În lei de azi" value={formatLei(summary.real)} kind="estimate" emphasis="accent" testId="sim-real" />
+          {/* Desktop: results stay in view while the (long) controls column scrolls; not with the tall table. */}
+          <div className={cn("space-y-6", !showTable && "lg:sticky lg:top-20 lg:z-10")} data-testid="sim-results">
+            {!valid && (
+              <Alert tone="danger" role="status" title="Corectează valorile marcate">
+                Graficul arată ultimul scenariu valid până atunci.
+              </Alert>
+            )}
+            <div className="grid gap-4 sm:grid-cols-3">
+              <StatCard label="Total depus" value={formatLei(summary.contributed)} kind={fromProfile && !isDemo ? "user" : "fictional"} />
+              <StatCard label={`Nominal după ${formatYears(input.years)}`} value={formatLei(summary.nominal)} kind="estimate" testId="sim-nominal" />
+              <StatCard label="În lei de azi" value={formatLei(summary.real)} kind="estimate" emphasis="accent" testId="sim-real" />
+            </div>
+            <p aria-live="polite" className="text-base" data-testid="sim-explanation">
+              {explainOutcome(input, summary)} Randament real anual: {formatPct(summary.realRatePct, 2)}.
+            </p>
+
+            <Card className="space-y-4 p-4 sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold">Evoluție an cu an</h2>
+                <Button variant="secondary" className="min-h-9 py-1 text-sm" aria-pressed={showTable} onClick={() => setShowTable((v) => !v)}>
+                  <Table2 aria-hidden className="size-4" />
+                  {showTable ? "Vezi graficul" : "Vezi tabelul"}
+                </Button>
+              </div>
+              <div className={cn(showTable && "hidden")}>
+                <ProjectionChart rows={rows} showContributed={input.monthly > 0} />
+                <p className="mt-2 text-sm text-ink-muted">
+                  Linia continuă: valoarea nominală. Linia întreruptă: puterea de cumpărare în lei de azi.
+                  {input.monthly > 0 ? " Linia punctată: totalul depus." : ""}
+                </p>
+              </div>
+              {showTable && <ProjectionTable rows={rows} caption="Evoluția valorii nominale și a puterii de cumpărare, pe ani" />}
+            </Card>
           </div>
-          <p aria-live="polite" className="text-base" data-testid="sim-explanation">
-            {explainOutcome(input, summary)} Randament real anual: {formatPct(summary.realRatePct, 2)}.
-          </p>
-
-          <Card className="space-y-4 p-4 sm:p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold">Evoluție an cu an</h2>
-              <Button variant="secondary" className="min-h-9 py-1 text-sm" aria-pressed={showTable} onClick={() => setShowTable((v) => !v)}>
-                <Table2 aria-hidden className="size-4" />
-                {showTable ? "Vezi graficul" : "Vezi tabelul"}
-              </Button>
-            </div>
-            <div className={cn(showTable && "hidden")}>
-              <ProjectionChart rows={rows} showContributed={input.monthly > 0} />
-              <p className="mt-2 text-sm text-ink-muted">
-                Linia continuă: valoarea nominală. Linia întreruptă: puterea de cumpărare în lei de azi.
-                {input.monthly > 0 ? " Linia punctată: totalul depus." : ""}
-              </p>
-            </div>
-            {showTable && <ProjectionTable rows={rows} caption="Evoluția valorii nominale și a puterii de cumpărare, pe ani" />}
-          </Card>
-
-          <Alert tone="assumption" title="Ipoteze, nu prognoze">
-            Randamentul și inflația sunt constante în fiecare an și nu includ costuri sau impozite. Randamentele reale
-            variază și pot fi negative; nimic de aici nu este o recomandare sau o garanție.
-          </Alert>
         </div>
       </div>
+
+      <Alert tone="assumption" title="Ipoteze, nu prognoze">
+        Randamentul și inflația sunt constante în fiecare an și nu includ costuri sau impozite. Randamentele reale
+        variază și pot fi negative; nimic de aici nu este o recomandare sau o garanție.
+      </Alert>
 
       <FinishOnboarding />
 
