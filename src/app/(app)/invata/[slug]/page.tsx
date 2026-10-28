@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { MarkReadButton } from "@/components/learn/MarkReadButton";
+import { ArticleEngagement } from "@/components/newsletter/ArticleEngagement";
 import { ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageSkeleton } from "@/components/ui/Skeleton";
@@ -90,6 +91,8 @@ async function ModuleView({ params }: { params: Promise<{ slug: string }> }) {
           </ButtonLink>
         )}
       </div>
+
+      <ArticleEngagement slug={m.slug} />
     </article>
   );
 }

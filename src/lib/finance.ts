@@ -9,7 +9,7 @@
  *   compounding equal exactly one year at r.
  * - Purchasing power in today's RON = nominal / (1 + i)^t, t in years.
  * - Historical Reality Check: real = P / ∏(1 + i_t) over official INS annual
- *   average CPI indices (spec §3b); no interest on P.
+ *   average CPI indices (design spec §3b); no interest on P.
  */
 
 export type SimInput = {
@@ -115,7 +115,7 @@ export function project(input: SimInput): ProjectionRow[] {
 }
 
 /* ------------------------------------------------------------------ */
-/* Historical Reality Check (CLAUDE.md §7.B)                           */
+/* Historical Reality Check (design spec §3b)                          */
 /* ------------------------------------------------------------------ */
 
 export type HistoricalResult = {

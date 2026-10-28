@@ -76,20 +76,3 @@ export function formatCount(n: number, one: string, many: string): string {
 export function formatYears(n: number): string {
   return formatCount(n, "an", "ani");
 }
-
-/**
- * A loss as a share of monthly net income: "40% dintr-un venit net lunar",
- * "2,4 venituri nete lunare", "21 de venituri nete lunare". Empty for income ≤ 0.
- */
-export function formatIncomeShare(loss: number, income: number): string {
-  if (!(income > 0) || !Number.isFinite(loss) || loss <= 0) return "";
-  const ratio = loss / income;
-  if (ratio < 0.995) return `${formatPct(Math.max(1, ratio * 100), 0)} dintr-un venit net lunar`;
-  const one = "venit net lunar";
-  const many = "venituri nete lunare";
-  if (ratio >= 9.95) return formatCount(Math.round(ratio), one, many);
-  const rounded = Math.round(ratio * 10) / 10;
-  return Number.isInteger(rounded)
-    ? formatCount(rounded, one, many)
-    : `${rounded.toLocaleString("ro-RO", { minimumFractionDigits: 1 })} ${many}`;
-}

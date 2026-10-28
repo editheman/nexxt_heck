@@ -1,6 +1,6 @@
 /**
  * "What inflation ate" catalog. Prices are rough, illustrative 2025 RON prices
- * (CLAUDE.md §7.B), not offers or official statistics — the UI labels them so.
+ * (see docs/superpowers/specs/2026-10-28-protejeaza-design.md §3b), not offers or official statistics — the UI labels them so.
  * Tiers are by the purchasing-power loss in lei.
  */
 

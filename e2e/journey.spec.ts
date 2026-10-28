@@ -11,12 +11,17 @@ test("full journey persists across reloads", async ({ page }) => {
   page.on("pageerror", (e) => errors.push(e.message));
 
   await freshStart(page);
-  // The home funnel has its own test below; this journey uses the detailed profile.
-  await page.goto("/profil");
+  await page.goto("/");
+  await page.getByRole("button", { name: "Începe demo-ul" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "Sari peste" }).click();
+  await expect(page).toHaveURL(/\/profil$/);
 
-  // Profile
+  // Profile, step 1 → step 2
+  await page.getByLabel("Cum să-ți spunem").fill("Ana");
+  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
+  await expect(page.getByTestId("onboarding-step")).toHaveText("Pasul 2 din 2: Banii tăi");
   await page.getByLabel("Economii actuale").fill("20.000");
-  await page.getByLabel("Venit net lunar aproximativ (opțional)").fill("5.000");
   await page.getByLabel("Cât pui deoparte lunar").fill("0");
   await page.getByLabel("Orizont de timp").fill("10");
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
@@ -31,8 +36,6 @@ test("full journey persists across reloads", async ({ page }) => {
   await expect(page.getByTestId("equivalents")).toContainText("1 iPhone de ultimă generație");
   await expect(page.getByTestId("equivalents")).toContainText("2 luni de chirie");
   await expect(page.getByTestId("reality-eur")).toContainText("4.135 €");
-  // 6.627 / 5.000 ≈ 1,3
-  await expect(page.getByTestId("reality-income")).toContainText("1,3 venituri nete lunare");
   // No editable inflation on this page.
   await expect(page.getByLabel(/Inflație/)).toHaveCount(0);
 
@@ -109,6 +112,8 @@ test("full journey persists across reloads", async ({ page }) => {
 test("profile validation shows an error summary and inline errors", async ({ page }) => {
   await freshStart(page);
   await page.goto("/profil");
+  await page.getByLabel("Cum să-ți spunem").fill("Ana");
+  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
   await page.getByLabel("Orizont de timp").fill("2,5");
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   const summary = page.getByRole("alert").filter({ hasText: "Verifică" });
@@ -151,9 +156,9 @@ test("schema-v1 saved data is migrated in place under pcac:v1", async ({ page })
   await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
   await page.getByRole("radio", { name: /Ultimii 3 ani/ }).check({ force: true });
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("pcac:v1")!));
-  expect(saved.version).toBe(2);
+  expect(saved.version).toBe(3);
+  expect(saved.profile.ageRange).toBeNull();
   expect(saved.reality.years).toBe(3);
-  expect(saved.profile.income).toBeNull();
   await page.goto("/progres");
   await expect(page.getByTestId("modules-read")).toHaveText("1/7");
 });
@@ -186,87 +191,17 @@ test("mobile menu navigates", async ({ page, isMobile }) => {
   expect(overflow).toBe(false);
 });
 
-test("home funnel: industry chip → insight → inline sliders → Reality Check, no modals", async ({ page }) => {
-  const errors: string[] = [];
-  page.on("pageerror", (e) => errors.push(e.message));
-  await freshStart(page);
+test("home is a single screen with working pillar links", async ({ page, isMobile }) => {
   await page.goto("/");
-
-  await expect(page.getByTestId("macro-ticker").getByRole("listitem")).toHaveCount(5);
-  await expect(page.getByTestId("macro-ticker")).toContainText("7,32%");
-  await expect(page.getByTestId("sector-insight")).toHaveCount(0);
-
-  await page.getByText("HoReCa", { exact: true }).click();
-  await expect(page.getByTestId("sector-stat")).toHaveText("3.396 lei");
-  await expect(page.getByTestId("sector-insight")).toContainText("12 cafele de specialitate");
-
-  await page.getByText("IT & Tech", { exact: true }).click();
-  await expect(page.getByTestId("sector-stat")).toHaveText("11.810 lei");
-
-  const reveal = page.getByRole("button", { name: "Vrei să vezi calculul exact pe buzunarul tău?" });
-  await expect(reveal).toHaveAttribute("aria-expanded", "false");
-  await reveal.click();
-  await expect(reveal).toHaveAttribute("aria-expanded", "true");
-  await expect(page.getByTestId("quick-calc")).toBeVisible();
-
-  await page.getByLabel("Venit net lunar", { exact: true }).fill("4.000");
-  await page.getByLabel("Economii în numerar sau cont curent", { exact: true }).fill("10.000");
-  // 10.000 − 10.000 / 1,49558 ≈ 3.314; / 4.000 ≈ 83%
-  await expect(page.getByTestId("quick-loss")).toHaveText("3.314 lei");
-  await expect(page.getByTestId("quick-result")).toContainText("83% dintr-un venit net lunar");
-  await expect(page.getByTestId("quick-result")).toContainText("8 plinuri de benzină");
-
-  // Clearing a field hides the result and disables the CTA instead of using a stale value.
-  await page.getByLabel("Economii în numerar sau cont curent", { exact: true }).fill("");
-  await expect(page.getByTestId("quick-result")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Vezi calculul complet" })).toBeDisabled();
-  await page.getByLabel("Economii în numerar sau cont curent", { exact: true }).fill("10.000");
-
-  await expect(page.locator("dialog[open], [role=dialog]")).toHaveCount(0);
-
-  await page.getByRole("button", { name: "Vezi calculul complet" }).click();
-  await expect(page).toHaveURL(/\/reality-check$/);
-  await expect(page.getByTestId("stat-nominal")).toHaveText("10.000 lei");
-  await expect(page.getByTestId("reality-loss")).toHaveText("3.314 lei");
-  await expect(page.getByTestId("reality-income")).toContainText("83% dintr-un venit net lunar");
-
-  // Industry choice persists.
-  await page.goto("/");
-  await expect(page.getByRole("radio", { name: "IT & Tech" })).toBeChecked();
-  await expect(page.getByTestId("sector-stat")).toHaveText("11.810 lei");
-  expect(errors).toEqual([]);
-
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
-  expect(overflow).toBe(false);
-});
-
-test("friends comparison shares only educational progress", async ({ page }) => {
-  await freshStart(page);
-  await page.goto("/progres");
-
-  await page.getByRole("button", { name: "Activează comparația" }).click();
-  await expect(page.getByText("Alege un alias de 2–24 caractere.")).toBeVisible();
-  await page.getByLabel("Aliasul tău").fill("Ana");
-  await page.getByRole("button", { name: "Activează comparația" }).click();
-
-  const code = await page.getByTestId("my-friend-code").inputValue();
-  const payload = JSON.parse(Buffer.from(code.replace("PCAC1.", ""), "base64url").toString("utf8"));
-  expect(Object.keys(payload).sort()).toEqual(["a", "m", "p", "q", "s"]);
-  expect(payload.a).toBe("Ana");
-
-  await page.getByLabel("Adaugă codul unui prieten").fill("ceva greșit");
-  await page.getByRole("button", { name: "Adaugă", exact: true }).click();
-  await expect(page.getByText("Codul nu este valid.", { exact: false })).toBeVisible();
-
-  const friend = "PCAC1." + Buffer.from(JSON.stringify({ a: "Mihai", p: 60, m: 3, q: 2, s: 1 })).toString("base64url");
-  await page.getByLabel("Adaugă codul unui prieten").fill(friend);
-  await page.getByRole("button", { name: "Adaugă", exact: true }).click();
-  const table = page.getByTestId("friends-table");
-  await expect(table.getByRole("row", { name: /Mihai/ })).toContainText("60%");
-  await expect(table.getByRole("row", { name: /Ana \(tu\)/ })).toContainText("0%");
-
-  await page.reload();
-  await expect(page.getByTestId("friends-table").getByRole("row", { name: /Mihai/ })).toBeVisible();
-  await page.getByRole("button", { name: "Elimină Mihai" }).click();
-  await expect(page.getByTestId("friends-table").getByRole("row", { name: /Mihai/ })).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Învață azi. Decide informat.");
+  await expect(page.locator("footer")).toHaveCount(0);
+  if (!isMobile) {
+    const scrolls = await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight + 1);
+    expect(scrolls).toBe(false);
+  }
+  const pillars = page.getByRole("navigation", { name: "Teme principale" });
+  await expect(pillars.getByRole("link")).toHaveCount(3);
+  await pillars.getByRole("link", { name: /Protecție anti-fraudă/ }).click();
+  await expect(page).toHaveURL(/\/fraude$/);
+  await expect(page.locator("footer")).toHaveCount(1);
 });

@@ -25,129 +25,140 @@ This is an educational product, not a bank, broker, investment advisor, or tradi
 - Explain important architectural decisions and trade-offs.
 - Never claim a feature works without testing it.
 
-## 3. Product Priorities & Progressive Profiling Flow
+## 3. Product Priorities
 
-No forced login or heavy onboarding up-front. The primary journey uses a "Give-to-Get" progressive profiling funnel:
+Prioritize the following end-to-end user journey:
 
-1. **Top of Funnel — Zero-Friction Hook (Public Home)**:
-   - Live macro fun-facts banner/ticker based on pre-processed Romanian economic indicators and verified news.
-   - Micro-interaction: "În ce domeniu activezi?" with 1-click industry chips (e.g., IT & Tech, HoReCa, Sănătate, Corporate & Servicii, Construcții, Freelancer / Student).
-2. **Instant Reward (Dynamic Sector Insight)**:
-   - Selecting an industry instantly renders a tailored financial fun-fact / benchmark for that Romanian sector (e.g., real salary growth vs. inflation impact on local dining/rent).
-3. **Organic Inline Profile Expansion (No intrusive pop-ups)**:
-   - An inline contextual reveal transitions the user into the Reality Check: *"Vrei să vezi calculul exact pe buzunarul tău?"*
-   - Requests minimal non-identifying inputs via sliders/steppers: approximate net monthly income and cash/current-account savings.
-4. **Reality Check & Tangible Loss Shock**:
-   - Calculates real purchasing power loss using read-only historical inflation and RON depreciation data (INS/BNR).
-   - Translates lost purchasing power into funny, tangible opportunity costs (e.g., cartons of cigarettes, specialty coffees, Cluj/Bucharest rent, clean BMWs, villas in Pipera).
-5. **Interactive Scam Awareness Scenario**:
-   - Complete an engaging, realistic fictional Romanian fraud case (phishing, fake broker, crypto scheme).
-6. **Learning Roadmap & Adaptive Quiz**:
-   - Short module on inflation, compounding, diversification, and fraud markers with answer-level feedback.
-7. **Session Persistence & Educational Identity**:
-   - LocalStorage saves the generated profile and progress anonymously (`pcac:v1`).
-   - Opt-in creation of a privacy-safe alias for comparing educational completion with friends.
+1. Enter the demo.
+2. Complete a minimal financial profile.
+3. View the Reality Check.
+4. Change assumptions and explore purchasing power.
+5. Complete an interactive financial scam scenario.
+6. Study a learning module.
+7. Complete a quiz and receive useful feedback.
+8. Refresh the page and confirm progress persists.
+9. Explore privacy-safe educational progress comparisons.
 
-Build this end-to-end journey before secondary features.
+Core modules:
 
-## 4. Financial Accuracy, AI Ingestion & Safety
+- Reality Check: financial profile and purchasing-power analysis.
+- Scenario Simulator: nominal balances versus real purchasing power.
+- Learning Roadmap: inflation, returns, liquidity, diversification, fees, taxes and fraud awareness.
+- Scam Awareness: realistic fictional scenarios and explanations.
+- Adaptive Quiz: answer-level feedback and concept-specific revision.
+- Progress: persistent learning progress and completed modules.
+- Friends: opt-in, alias-based educational comparisons.
 
-- **Real Macro Data (INS & BNR)**:
-  - Historical inflation (IPC) and FX series are strictly read-only and loaded from verified datasets (`src/content/macro-ro.ts`).
-  - Users cannot arbitrarily override historical inflation rates in the Reality Check module.
-- **AI-Curated News & Fun Facts Pipeline**:
-  - Do NOT invoke live LLM calls on every client page visit (avoids latency, operational costs, and runtime hallucinations).
-  - Use a batch/build-time ingestion workflow (or cache script) that processes vetted economic news and indicators into typed, validated JSON structures (`src/content/dynamic-facts.json`) validated with Zod schemas.
-  - Fallbacks must always exist in static data if dynamic updates are unavailable.
-- **Clear Separation of Math and Metaphors**:
-  - Formulas for purchasing power loss must be 100% mathematically accurate.
-  - Tangible comparisons (cigarettes, BMWs, Pipera villas) must be clearly labeled as educational opportunity-cost metaphors.
-- **Zero Sensitive Data**:
-  - Never ask for CNPs, bank logins, card details, or exact employer names.
-  - Never broadcast or display personal financial figures in social or comparison views.
-  - No personalized buy/sell trading advice.
+Build a complete core journey before adding secondary features.
+
+## 4. Financial Accuracy and Safety
+
+- Clearly distinguish user-provided data, illustrative examples, assumptions and calculated estimates.
+- Never invent live market data, interest rates, fees, taxes or regulatory verification.
+- Never present hypothetical returns as forecasts or guarantees.
+- Never claim that inflation caused an exact personal financial loss unless the calculation and its assumptions support that claim.
+- Show nominal amounts and purchasing power in today's RON separately.
+- Explain the assumptions used in all financial calculations.
+- Do not provide personalized buy/sell recommendations or execute financial transactions.
+- Do not request CNPs, bank credentials, account numbers or unnecessary sensitive information.
+- Never expose a user's income, savings, debt or financial profile through social features.
+- Clearly label demo and fictional data.
+- Use verified official sources when making specific claims about Romanian financial regulation or fraud warnings.
 
 ## 5. UX and Visual Design
 
-- All user-facing product content must be in Romanian with proper comma-below diacritics (ș, ț).
-- Calm, trustworthy, premium fintech visual style; avoid generic startup templates or crypto-casino aesthetics.
-- **No Intrusive Modals for Onboarding**:
-  - Never display blocking modals like *"Hello stranger..."*.
-  - Use inline step expansions, progressive reveals, or subtle slide-overs that maintain context.
-- Keep the tone witty and self-aware for Romanians aged 20–35 (relatable cultural references: shaorma, festival tickets, Cluj rent, German sedans), while retaining absolute rigor in financial numbers.
-- Ensure full keyboard accessibility and mobile responsiveness (test on mobile viewports).
-- Zero broken buttons; every control must perform an observable action.
+- All user-facing product content must be in Romanian, with correct diacritics.
+- Use a calm, premium, trustworthy fintech aesthetic.
+- Prioritize clarity, confidence, accessibility and financial comprehension over visual novelty.
+- Avoid generic dashboard templates, trading-terminal aesthetics and unnecessary gradients.
+- Use consistent typography, spacing, colors, component states and interaction patterns.
+- Make the interface responsive and keyboard accessible.
+- Include useful loading, empty, error, success and validation states.
+- Use clear language for financial concepts and explain technical terms.
+- Every visible interactive control must perform its advertised action.
+- Do not use fake testimonials, fabricated statistics or unsupported trust badges.
+
+Use UI UX Pro Max to research and establish a coherent design system before implementing the main interface. Record the resulting decisions in project documentation or design tokens so they remain consistent.
 
 ## 6. Technical Principles
 
-Stack:
-- Next.js 16 (App Router) with TypeScript strict mode
-- Tailwind CSS
-- shadcn/ui components
-- Recharts for financial visualisations
-- Zod for contract and dynamic content validation
-- LocalStorage for client-side persistence
+Preferred stack, unless repository constraints justify another choice:
 
-Architecture:
-- Keep financial logic testable and separated in `src/lib/finance.ts`.
-- Store macroeconomic series in `src/content/macro-ro.ts`.
-- Store tangible equivalent benchmarks and pluralization rules in `src/content/equivalents.ts`.
-- Store dynamic facts and industry insights in `src/content/dynamic-facts.json` validated by `src/lib/schemas/facts.ts`.
-- Persist state safely under the `pcac:v1` key in `src/lib/storage.ts` without throwing on parse errors.
+- Next.js App Router
+- TypeScript with strict type checking
+- Tailwind CSS
+- shadcn/ui where appropriate
+- Recharts for meaningful financial visualizations
+- LocalStorage for the initial demo's profile and progress persistence
+
+Inspect the repository before selecting or changing dependencies.
+
+- Keep financial calculations in testable, separate functions.
+- Validate user inputs and handle edge cases.
+- Keep components focused and reusable.
+- Avoid unnecessary dependencies and premature abstractions.
+- Do not require external API keys or paid services for the core demo.
+- Never expose secrets in client-side code.
+- Keep business logic separate from presentation.
+- Use semantic HTML and accessible form controls.
 
 ## 7. Financial Calculation Requirements
 
-### A. Real Purchasing Power Loss (Reality Check)
-Using the official historical consumer price index (IPC) series:
-$$P_{\text{real}} = \frac{P_{\text{nominal}}}{\prod_{t=1}^n (1 + i_t)}$$
-Where $i_t$ represents the annual Romanian inflation rates for the selected window.
+For a starting amount P, annual nominal return r, annual inflation i, and n years:
 
-Absolute lost purchasing power:
-$$\Delta_{\text{pierdere}} = P_{\text{nominal}} - P_{\text{real}}$$
-
-### B. Tangible Cost Equivalents (Lost Opportunity Index)
-- Calculate equivalent units: $\text{Cantitate} = \lfloor \Delta_{\text{pierdere}} / \text{Preț Bun} \rfloor$.
-- Select 2–3 proportional comparisons from `src/content/equivalents.ts` based on loss brackets:
-  - `< 500 RON`: Pachete de țigări (~28 RON), cafele de specialitate (~18 RON), shaorme mari (~35 RON).
-  - `500 – 5.000 RON`: Plinuri de benzină (~400 RON), abonamente anuale de sală (~2.000 RON), bilete VIP festival (~1.200 RON).
-  - `5.000 – 30.000 RON`: iPhone-uri noi (~6.500 RON), luni de chirie 2 camere Cluj/București (~2.500 RON/lună).
-  - `30.000 – 100.000 RON`: Un BMW E46 / Golf îngrijit (~25.000 RON), avans credit garsonieră (~60.000 RON).
-  - `> 100.000 RON`: Mașină electrică nouă (~180.000 RON), avans penthouse sau fracțiuni dintr-o vilă în Pipera (~1.500.000 RON).
-- Format strings using proper Romanian grammar and plural forms (e.g., "1 pachet", "4 pachete", "21 de pachete").
-
-### C. General Future Projections (Scenario Simulator)
 Nominal future value:
-$$P \times (1 + r)^n$$
-Real future value:
-$$\frac{P \times (1 + r)^n}{(1 + i)^n}$$
-Document compounding rules and monthly contribution conventions explicitly.
+P × (1 + r)^n
+
+Real future value in today's purchasing power:
+Nominal future value / (1 + i)^n
+
+Document the compounding convention and assumptions.
+
+If monthly contributions are implemented, document their timing and calculate them consistently. Test zero rates, zero years, invalid inputs, and boundary cases.
+
+Do not silently treat nominal returns as real returns.
 
 ## 8. Testing and Quality
 
-- Run `npm run verify` (lint, typecheck, unit tests, build).
-- Run `npm run test:e2e` for end-to-end user journeys (desktop and mobile).
-- Unit tests must cover:
-  - Financial calculations (zero rates, negative rates, boundary values).
-  - Tangible item selection logic and pluralization algorithms.
-  - Zod schema validation for dynamic facts and news.
-  - Content diacritics check (rejection of cedilla ş/ţ in favor of comma-below ș/ț).
-- Verify progressive profiling steps update state dynamically without layout shifts or intrusive pop-ups.
+- Run available linting, type checking, tests and production builds.
+- Add unit tests for financial formulas and important edge cases.
+- Test the primary journey from onboarding to persistent progress.
+- Verify that changing an assumption updates the relevant calculations and visualizations.
+- Verify quiz feedback and concept-specific revision.
+- Verify that refreshing the page preserves the expected demo state.
+- Verify responsive behavior and important accessibility requirements.
+- Check for broken navigation, inert controls, console errors and misleading financial labels.
+- Report any tests that could not be run and why.
 
 ## 9. Definition of Done
 
 A feature is complete only when:
-1. It fulfills the progressive profiling flow without requiring authentication.
-2. Macro data and inflation losses strictly match official Romanian records.
-3. Opportunity cost items render with correct Romanian plurals and contextual relevance.
-4. UI matches the calm fintech design system with zero intrusive pop-ups.
-5. All automated checks (`npm run verify` and `npm run test:e2e`) pass cleanly.
 
-## 10. Project Map
+1. Its behavior matches the agreed requirements.
+2. Its UI follows the established design system.
+3. Inputs and edge cases are handled.
+4. The feature works on relevant screen sizes.
+5. Relevant tests and verification have been performed.
+6. Its financial meaning and limitations are communicated clearly where applicable.
+7. It does not break the existing primary journey.
 
-- Design system tokens & guide: `docs/design-system.md` & `src/app/globals.css`.
-- Mathematical logic: `src/lib/finance.ts`.
-- Macroeconomic datasets (INS/BNR): `src/content/macro-ro.ts`.
-- Tangible item catalog & pluralizers: `src/content/equivalents.ts`.
-- Industry facts & dynamic news: `src/content/dynamic-facts.json`.
-- Fact schema definitions: `src/lib/schemas/facts.ts`.
-- Local persistence: `src/lib/storage.ts` (`pcac:v1`).
+## 10. Communication
+
+Before implementation, explain the proposed approach and important assumptions.
+
+For substantial work, create a written implementation plan with small, ordered tasks and explicit verification steps.
+
+After implementation, summarize what changed, which tests were run, their results, and any remaining limitations.
+
+Prefer a working, coherent end-to-end product over a large collection of incomplete features.
+## 11. Project Map
+
+- Design system (tokens, components, anti-patterns): `docs/design-system.md`. Tokens live in `src/app/globals.css`; never use raw hex in components.
+- Product/technical spec: `docs/superpowers/specs/2026-10-28-protejeaza-design.md`. Implementation plan: `docs/superpowers/plans/`.
+- Financial math lives only in `src/lib/finance.ts` (annual effective rates, end-of-month contributions at `(1+r)^(1/12)−1`). Change conventions there and in the spec together.
+- Romanian content (modules, quizzes, scam scenarios) is typed data in `src/content/`. Use comma-below ș/ț; a unit test rejects cedilla ş/ţ.
+- Demo state is one versioned object in localStorage (`pcac:v1`, `src/lib/storage.ts`). Bump the version and add parsing for any shape change; parsing must never throw.
+- This is Next.js 16 with Cache Components: read `node_modules/next/dist/docs/` before using unfamiliar APIs (see `AGENTS.md`).
+- Checks: `npm run verify` (lint, typecheck, unit tests, build) and `npm run test:e2e` (Playwright, desktop + mobile).
+- Newsletter/email capture is **demo-only** (no backend, nothing sent): rules in `src/lib/newsletter.ts`, production requirements in `docs/newsletter.md`. Never claim emails were sent; bump `CONSENT_TEXT_VERSION` (`src/content/consent.ts`) on any consent-text change; email, consent log, prompt state and reading events stay in separate storage keys.
+- Reality Check is historical and read-only: official INS CPI and BNR EUR/RON series live only in `src/content/macro-ro.ts` (cite source and period in the UI; update `LATEST_DATA_YEAR` and tests together). Future-inflation assumptions belong only in the simulator.

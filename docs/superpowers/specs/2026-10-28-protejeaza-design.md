@@ -45,8 +45,8 @@ Persistent top nav (desktop) / compact menu (mobile): Reality Check · Simulator
 - Yearly series for charts: year 0…n with nominal, real, total contributed.
 - "Pierdere de putere de cumpărare" is shown only as `nominal − real` *under the stated assumptions*, worded as an estimate.
 
-### 3b. Historical Reality Check (CLAUDE.md §7.B)
-- Data: INS „IPC – serie de date anuală”, average annual index (previous year = 100), 2015–2025; BNR annual EUR/RON average (mean of the 12 monthly averages) for base years 2015, 2016, 2020–2025. Stored locally; no live data.
+### 3b. Historical Reality Check
+- Data (2025 values cross-checked 2026-10-28: BNR monthly averages give 5,0415; INS 2025 average inflation 7,3% per INS release coverage): INS „IPC – serie de date anuală”, average annual index (previous year = 100), 2015–2025; BNR annual EUR/RON average (mean of the 12 monthly averages) for base years 2015, 2016, 2020–2025. Stored locally; no live data.
 - Window n ∈ {3, 5, 10} complete years ending 2025. `priceFactor = ∏(1 + i_t)` for t = 2025−n+1 … 2025, which compares the 2025 average price level to the base year 2025−n.
 - `P_real = P / priceFactor` (base-year lei), `Δ = P − P_real`. P = profile savings, assumed held with no interest (no historical deposit rates are invented).
 - EUR view: `P / rate(base)` vs `P / rate(2025)`; leu change = `rate(base)/rate(2025) − 1`.
@@ -56,7 +56,7 @@ Persistent top nav (desktop) / compact menu (mobile): Reality Check · Simulator
 
 - Next.js 16 App Router, TypeScript strict, Tailwind v4, Recharts, lucide-react icons. No shadcn CLI scaffolding **[call]**: a small set of hand-written accessible primitives (Button, Card, Field, Slider, Alert) is less dependency surface for this size; patterns follow shadcn/Radix conventions.
 - All pages are client-interactive; content (modules, quizzes, scam scenarios) lives as typed data in `src/content/*` — no CMS.
-- State: one versioned `DemoState` object in localStorage (`pcac:v2`; `pcac:v1` is read once and migrated), read via a `useSyncExternalStore`-based store; parsing validates shape and falls back to defaults on corrupt data. Pages render a skeleton until hydrated to avoid SSR mismatch.
+- State: one versioned `DemoState` object in localStorage under the key `pcac:v1` (schema `version: 2`; version-1 data is migrated on read), read via a `useSyncExternalStore`-based store; parsing validates shape and falls back to defaults on corrupt data. Pages render a skeleton until hydrated to avoid SSR mismatch.
 - Structure: `src/lib` (finance, format, storage, quiz logic — no React), `src/content` (Romanian content), `src/components` (UI primitives + feature components), `src/app` (routes).
 
 ```ts

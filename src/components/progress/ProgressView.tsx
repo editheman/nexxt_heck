@@ -9,7 +9,7 @@ import { MODULES } from "@/content/modules";
 import { SCAMS } from "@/content/scams";
 import { computeProgress, isPassed } from "@/lib/progress";
 import { useDemoState } from "@/lib/useDemoState";
-import { FriendsCompare } from "./FriendsCompare";
+import { NewsletterSettings } from "@/components/newsletter/NewsletterSettings";
 import { ResetDemo } from "./ResetDemo";
 
 const catalog = { moduleSlugs: MODULES.map((m) => m.slug), scamIds: SCAMS.map((s) => s.id) };
@@ -120,14 +120,13 @@ export function ProgressView() {
         </div>
       </section>
 
-      <FriendsCompare social={state.social} summary={p} />
-
       <section aria-labelledby="date" className="space-y-3">
         <h2 id="date" className="text-xl font-semibold">Datele tale</h2>
         <p className="max-w-[68ch] text-ink-muted">
           Tot ce ai introdus este salvat doar în acest browser (localStorage) și rămâne după reîncărcarea paginii. Nu
           trimitem nimic către un server.
         </p>
+        <NewsletterSettings />
         <ResetDemo />
       </section>
     </div>

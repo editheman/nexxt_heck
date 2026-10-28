@@ -1,10 +1,12 @@
 "use client";
 
-import { Menu, ShieldCheck, X } from "lucide-react";
+import { Menu, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { buttonClass } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
+import { Logo } from "./Logo";
 import { NAV_ITEMS } from "./nav";
 
 function isActive(pathname: string, href: string) {
@@ -19,18 +21,19 @@ export function SiteHeader() {
     setLastPath(pathname);
     setOpen(false);
   }
+  const primaryNav = NAV_ITEMS.filter((i) => i.href !== "/progres");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex min-h-11 items-center gap-2 font-heading font-semibold text-primary">
-          <ShieldCheck aria-hidden className="size-6 text-accent" />
-          <span className="leading-tight">Protejează ce ai construit</span>
+    <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/90 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-[1120px] items-center gap-8 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex min-h-11 items-center gap-2.5 font-bold text-ink">
+          <Logo size={36} />
+          <span className="text-[1.05rem] leading-tight tracking-tight">Protejează ce ai construit</span>
         </Link>
 
         <nav aria-label="Navigare principală" className="hidden md:block">
           <ul className="flex items-center gap-1">
-            {NAV_ITEMS.map((item) => {
+            {primaryNav.map((item) => {
               const active = isActive(pathname, item.href);
               return (
                 <li key={item.href}>
@@ -38,8 +41,8 @@ export function SiteHeader() {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[0.95rem] font-semibold transition-colors",
-                      active ? "bg-surface-muted text-primary" : "text-ink-muted hover:text-ink",
+                      "inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-sm font-semibold transition-colors",
+                      active ? "text-primary" : "text-ink-muted hover:text-ink",
                     )}
                   >
                     {item.label}
@@ -50,9 +53,23 @@ export function SiteHeader() {
           </ul>
         </nav>
 
+        <div className="ml-auto hidden items-center gap-3 md:flex">
+          <Link href="/profil" className={buttonClass("primary", "min-h-10 px-4 py-2 text-sm")}>
+            Începe
+          </Link>
+          <Link
+            href="/progres"
+            aria-current={isActive(pathname, "/progres") ? "page" : undefined}
+            className="flex size-10 items-center justify-center rounded-full bg-primary text-on-primary transition-colors hover:bg-primary-hover"
+          >
+            <UserRound aria-hidden className="size-[18px]" />
+            <span className="sr-only">Progresul tău</span>
+          </Link>
+        </div>
+
         <button
           type="button"
-          className="inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] text-ink hover:bg-surface-muted md:hidden"
+          className="ml-auto inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] text-ink hover:bg-surface-muted md:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           onClick={() => setOpen((v) => !v)}
@@ -74,7 +91,7 @@ export function SiteHeader() {
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "flex min-h-12 items-center rounded-[var(--radius-control)] px-3 font-semibold",
-                      active ? "bg-surface-muted text-primary" : "text-ink",
+                      active ? "bg-primary-soft text-primary" : "text-ink",
                     )}
                   >
                     {item.label}

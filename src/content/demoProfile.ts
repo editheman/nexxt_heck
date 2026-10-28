@@ -4,11 +4,11 @@ import type { Profile } from "@/lib/storage";
 export const DEMO_PROFILE: Profile = {
   alias: "Andrei (exemplu)",
   savings: 25000,
-  income: 6000,
   placement: "cont-curent",
   nominalPct: 0,
   monthly: 500,
   years: 10,
   goal: "fond-urgenta",
+  ageRange: null,
   isDemo: true,
 };

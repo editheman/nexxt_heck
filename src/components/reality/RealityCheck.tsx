@@ -13,7 +13,7 @@ import { CPI_ANNUAL_INDEX, EUR_RON_ANNUAL_AVG, LATEST_DATA_YEAR } from "@/conten
 import { sourceByName } from "@/content/sources";
 import { pickEquivalents } from "@/lib/equivalents";
 import { eurConversion, historicalInflation } from "@/lib/finance";
-import { formatEur, formatIncomeShare, formatLei, formatPct } from "@/lib/format";
+import { formatEur, formatLei, formatPct } from "@/lib/format";
 import { actions, useDemoState } from "@/lib/useDemoState";
 import { EquivalentsList } from "./EquivalentsList";
 import { WindowPicker } from "./WindowPicker";
@@ -31,7 +31,7 @@ export function RealityCheck() {
   if (!p) {
     return (
       <Card className="space-y-4">
-        <h2 className="text-xl font-semibold">Mai întâi, un profil minim</h2>
+        <h2 className="text-xl text-ink">Mai întâi, un profil minim</h2>
         <p className="text-ink-muted">
           Reality Check folosește suma aproximativă a economiilor tale. Poți completa profilul sau poți explora cu un
           profil exemplu, cu date fictive.
@@ -103,12 +103,6 @@ export function RealityCheck() {
           </strong>{" "}
           din puterea lor de cumpărare.
         </p>
-        {p.income !== null && formatIncomeShare(h.loss, p.income) && (
-          <p className="text-ink-muted" data-testid="reality-income">
-            Raportat la venitul tău net de azi ({formatLei(p.income)} pe lună), asta înseamnă cam{" "}
-            <strong className="text-ink">{formatIncomeShare(h.loss, p.income)}</strong>.
-          </p>
-        )}
         <p className="flex flex-wrap items-center gap-2 text-ink-muted" data-testid="reality-eur">
           <Badge kind="official">Curs BNR</Badge>
           <span>
@@ -122,7 +116,7 @@ export function RealityCheck() {
       <EquivalentsList picked={picked} loss={h.loss} baseYear={h.baseYear} endYear={h.endYear} />
 
       <details className="rounded-[var(--radius-card)] border border-border bg-surface p-5">
-        <summary className="font-semibold text-primary">Cum am calculat și de unde sunt datele</summary>
+        <summary className="min-h-11 font-semibold text-primary">Cum am calculat și de unde sunt datele</summary>
         <div className="mt-4 max-w-[68ch] space-y-3 text-ink-muted">
           <p>
             <strong className="text-ink">Inflația este fixă, nu o ipoteză:</strong> folosim rata medie anuală a inflației
