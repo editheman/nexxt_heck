@@ -39,8 +39,9 @@ export function SiteHeader() {
           <span className="text-[1.05rem] leading-tight tracking-tight">Protejează ce ai construit</span>
         </Link>
 
+        {/* Fills the space between logo and account button, links centred in it. */}
         {done && (
-        <nav aria-label="Navigare principală" className="hidden lg:block">
+        <nav aria-label="Navigare principală" className="hidden flex-1 justify-center lg:flex">
           <ul className="flex items-center">
             {primaryNav.map((item) => {
               const active = isActive(pathname, item.href);
