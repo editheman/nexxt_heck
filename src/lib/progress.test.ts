@@ -25,7 +25,7 @@ describe("computeProgress", () => {
 
   it("reaches 100% when everything is done", () => {
     const s = defaultState();
-    s.profile = { alias: "", savings: 1, placement: "numerar", nominalPct: 0, monthly: 0, years: 1, goal: "altul", isDemo: false };
+    s.profile = { alias: "", savings: 1, placement: "numerar", nominalPct: 0, monthly: 0, years: 1, goal: "altul", ageRange: null, isDemo: false };
     s.progress = {
       visited: { reality: true, simulator: true },
       scams: { x: { completed: true, correct: 2, total: 2 } },

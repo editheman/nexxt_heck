@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { project, realRatePct, summarize, validateSimInput, type SimInput } from "./finance";
+import { CPI_ANNUAL_INDEX, EUR_RON_ANNUAL_AVG, LATEST_DATA_YEAR, REALITY_WINDOWS } from "@/content/macro-ro";
+import {
+  eurConversion,
+  historicalInflation,
+  project,
+  realRatePct,
+  summarize,
+  validateSimInput,
+  wholeUnits,
+  type SimInput,
+} from "./finance";
 
 const base: SimInput = { principal: 1000, monthly: 0, nominalPct: 0, inflationPct: 0, years: 0 };
 
@@ -91,5 +101,75 @@ describe("validateSimInput", () => {
 
   it("makes project throw on invalid input instead of returning NaN", () => {
     expect(() => project({ ...base, years: Number.NaN })).toThrow();
+  });
+});
+
+describe("historicalInflation", () => {
+  const cpi = { 2023: 110, 2024: 105, 2025: 100 };
+
+  it("divides by the product of the yearly indices", () => {
+    const h = historicalInflation(11_550, 3, 2025, cpi);
+    expect(h.baseYear).toBe(2022);
+    expect(h.priceFactor).toBeCloseTo(1.1 * 1.05 * 1.0, 12);
+    expect(h.real).toBeCloseTo(10_000, 8);
+    expect(h.loss).toBeCloseTo(1_550, 8);
+    expect(h.cumulativeInflationPct).toBeCloseTo(15.5, 10);
+  });
+
+  it("a neutral index (100) changes nothing; deflation gives a negative loss", () => {
+    expect(historicalInflation(5000, 1, 2025, cpi).loss).toBe(0);
+    expect(historicalInflation(1000, 1, 2016, { 2016: 98.45 }).loss).toBeLessThan(0);
+  });
+
+  it("zero savings lose nothing", () => {
+    const h = historicalInflation(0, 3, 2025, cpi);
+    expect(h.real).toBe(0);
+    expect(h.loss).toBe(0);
+  });
+
+  it("rejects invalid input and missing years", () => {
+    expect(() => historicalInflation(-1, 3, 2025, cpi)).toThrow();
+    expect(() => historicalInflation(Number.NaN, 3, 2025, cpi)).toThrow();
+    expect(() => historicalInflation(1000, 0, 2025, cpi)).toThrow();
+    expect(() => historicalInflation(1000, 2.5, 2025, cpi)).toThrow();
+    expect(() => historicalInflation(1000, 4, 2025, cpi)).toThrow(/2022/);
+  });
+
+  it("uses official INS data for every offered window", () => {
+    for (const n of REALITY_WINDOWS) {
+      const h = historicalInflation(10_000, n, LATEST_DATA_YEAR, CPI_ANNUAL_INDEX);
+      expect(h.priceFactor).toBeGreaterThan(1);
+      expect(EUR_RON_ANNUAL_AVG[h.baseYear]).toBeGreaterThan(0);
+    }
+    // 2016–2025: 0,9845 · 1,0134 · 1,0463 · 1,0383 · 1,0263 · 1,0505 · 1,138 · 1,104 · 1,0559 · 1,0732
+    expect(historicalInflation(10_000, 10, 2025, CPI_ANNUAL_INDEX).priceFactor).toBeCloseTo(1.6636, 4);
+    expect(historicalInflation(10_000, 5, 2025, CPI_ANNUAL_INDEX).priceFactor).toBeCloseTo(1.4956, 4);
+    expect(historicalInflation(10_000, 3, 2025, CPI_ANNUAL_INDEX).priceFactor).toBeCloseTo(1.251, 4);
+  });
+});
+
+describe("eurConversion", () => {
+  it("converts at both rates and reports the leu change", () => {
+    const e = eurConversion(10_000, 4, 5);
+    expect(e.eurFrom).toBe(2500);
+    expect(e.eurTo).toBe(2000);
+    expect(e.leuChangePct).toBeCloseTo(-20, 10);
+  });
+
+  it("rejects zero or invalid rates", () => {
+    expect(() => eurConversion(100, 0, 5)).toThrow();
+    expect(() => eurConversion(100, 5, Number.NaN)).toThrow();
+  });
+});
+
+describe("wholeUnits", () => {
+  it("floors and never divides by zero", () => {
+    expect(wholeUnits(99, 28)).toBe(3);
+    expect(wholeUnits(28, 28)).toBe(1);
+    expect(wholeUnits(27.99, 28)).toBe(0);
+    expect(wholeUnits(-50, 28)).toBe(0);
+    expect(wholeUnits(Number.NaN, 28)).toBe(0);
+    expect(() => wholeUnits(100, 0)).toThrow();
+    expect(() => wholeUnits(100, -5)).toThrow();
   });
 });

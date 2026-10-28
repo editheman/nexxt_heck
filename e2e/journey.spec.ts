@@ -12,29 +12,46 @@ test("full journey persists across reloads", async ({ page }) => {
 
   await freshStart(page);
   await page.goto("/");
-  await page.getByRole("link", { name: "Începe demo-ul" }).click();
+  await page.getByRole("button", { name: "Începe demo-ul" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "Sari peste" }).click();
   await expect(page).toHaveURL(/\/profil$/);
 
-  // Profile
+  // Profile, step 1 → step 2
+  await page.getByLabel("Cum să-ți spunem").fill("Ana");
+  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
+  await expect(page.getByTestId("onboarding-step")).toHaveText("Pasul 2 din 2: Banii tăi");
   await page.getByLabel("Economii actuale").fill("20.000");
   await page.getByLabel("Cât pui deoparte lunar").fill("0");
   await page.getByLabel("Orizont de timp").fill("10");
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
 
-  // Reality Check: 20.000 / 1,05^10 ≈ 12.278
+  // Reality Check on official INS data, default window: last 5 years (2021–2025, base 2020).
+  // 20.000 / (1,0505 · 1,138 · 1,104 · 1,0559 · 1,0732) ≈ 13.373
   await expect(page).toHaveURL(/\/reality-check$/);
-  await expect(page.getByTestId("stat-real")).toHaveText("12.278 lei");
   await expect(page.getByTestId("stat-nominal")).toHaveText("20.000 lei");
+  await expect(page.getByTestId("stat-inflation")).toHaveText("+49,6%");
+  await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
+  await expect(page.getByTestId("reality-loss")).toHaveText("6.627 lei");
+  await expect(page.getByTestId("equivalents")).toContainText("1 iPhone de ultimă generație");
+  await expect(page.getByTestId("equivalents")).toContainText("2 luni de chirie");
+  await expect(page.getByTestId("reality-eur")).toContainText("4.135 €");
+  // No editable inflation on this page.
+  await expect(page.getByLabel(/Inflație/)).toHaveCount(0);
 
-  // Changing the assumption updates the estimate: 20.000 / 1,03^10 ≈ 14.882
-  const inflation = page.getByLabel("Inflație anuală presupusă");
-  await inflation.fill("3");
-  await expect(page.getByTestId("stat-real")).toHaveText("14.882 lei");
-  await expect(page.getByTestId("reality-explanation")).toContainText("mai puțin");
+  // Changing the window updates the loss and the comparisons.
+  await page.locator("label", { hasText: "Ultimii 3 ani (2023–2025)" }).click();
+  await expect(page.getByTestId("stat-real")).toHaveText("15.987 lei");
+  await expect(page.getByTestId("reality-loss")).toHaveText("4.013 lei");
+  await expect(page.getByTestId("equivalents")).toContainText("10 plinuri de benzină");
+  await page.locator("label", { hasText: "Ultimii 10 ani (2016–2025)" }).click();
+  await expect(page.getByTestId("stat-real")).toHaveText("12.022 lei");
+  await expect(page.getByTestId("reality-explanation")).toContainText("din 2015 până în 2025");
+  await expect(page.getByTestId("equivalents")).toContainText("3 luni de chirie");
 
-  // Simulator seeds from profile + assumption, presets change the result
+  // Simulator seeds from profile + illustrative 5% assumption: 20.000 / 1,05^10 ≈ 12.278
   await page.goto("/simulator");
-  await expect(page.getByTestId("sim-real")).toHaveText("14.882 lei");
+  await expect(page.getByTestId("sim-real")).toHaveText("12.278 lei");
   await page.getByRole("button", { name: "Randament egal cu inflația" }).click();
   await expect(page.getByTestId("sim-real")).toHaveText("20.000 lei");
   await expect(page.getByTestId("sim-explanation")).toContainText("aproximativ aceeași putere de cumpărare");
@@ -86,8 +103,8 @@ test("full journey persists across reloads", async ({ page }) => {
 
   await page.goto("/reality-check");
   await page.reload();
-  await expect(page.getByLabel("Inflație anuală presupusă")).toHaveValue("3");
-  await expect(page.getByTestId("stat-real")).toHaveText("14.882 lei");
+  await expect(page.getByLabel("Ultimii 10 ani (2016–2025)")).toBeChecked();
+  await expect(page.getByTestId("stat-real")).toHaveText("12.022 lei");
 
   expect(errors).toEqual([]);
 });
@@ -95,6 +112,8 @@ test("full journey persists across reloads", async ({ page }) => {
 test("profile validation shows an error summary and inline errors", async ({ page }) => {
   await freshStart(page);
   await page.goto("/profil");
+  await page.getByLabel("Cum să-ți spunem").fill("Ana");
+  await page.getByRole("button", { name: "Continuă spre datele financiare" }).click();
   await page.getByLabel("Orizont de timp").fill("2,5");
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   const summary = page.getByRole("alert").filter({ hasText: "Verifică" });
@@ -116,6 +135,32 @@ test("deep links without a profile and unknown modules are handled", async ({ pa
   const res = await page.goto("/invata/nu-exista");
   expect(res?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "Pagina nu există" })).toBeVisible();
+});
+
+test("schema-v1 saved data is migrated in place under pcac:v1", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem(
+      "pcac:v1",
+      JSON.stringify({
+        version: 1,
+        profile: { alias: "", savings: 20000, placement: "numerar", nominalPct: 0, monthly: 0, years: 10, goal: "altul", isDemo: false },
+        assumptions: { inflationPct: 5 },
+        progress: { visited: {}, scams: {}, modulesRead: { inflatia: true }, quizzes: {} },
+      }),
+    );
+  });
+  await page.goto("/reality-check");
+  await expect(page.getByLabel("Ultimii 5 ani (2021–2025)")).toBeChecked();
+  await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
+  await page.getByRole("radio", { name: /Ultimii 3 ani/ }).check({ force: true });
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("pcac:v1")!));
+  expect(saved.version).toBe(3);
+  expect(saved.profile.ageRange).toBeNull();
+  expect(saved.reality.years).toBe(3);
+  await page.goto("/progres");
+  await expect(page.getByTestId("modules-read")).toHaveText("1/7");
 });
 
 test("corrupt saved data falls back to defaults", async ({ page }) => {
@@ -144,4 +189,19 @@ test("mobile menu navigates", async ({ page, isMobile }) => {
   await expect(page).toHaveURL(/\/progres$/);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
+});
+
+test("home is a single screen with working pillar links", async ({ page, isMobile }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Învață azi. Decide informat.");
+  await expect(page.locator("footer")).toHaveCount(0);
+  if (!isMobile) {
+    const scrolls = await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight + 1);
+    expect(scrolls).toBe(false);
+  }
+  const pillars = page.getByRole("navigation", { name: "Teme principale" });
+  await expect(pillars.getByRole("link")).toHaveCount(3);
+  await pillars.getByRole("link", { name: /Protecție anti-fraudă/ }).click();
+  await expect(page).toHaveURL(/\/fraude$/);
+  await expect(page.locator("footer")).toHaveCount(1);
 });

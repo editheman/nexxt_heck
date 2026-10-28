@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { actions } from "@/lib/useDemoState";
+import { newsletter } from "@/lib/useNewsletter";
 
 export function ResetDemo() {
   const ref = useRef<HTMLDialogElement>(null);
@@ -16,7 +17,7 @@ export function ResetDemo() {
       </Button>
       {done && (
         <Alert tone="success" role="status" title="Demo resetat">
-          Profilul și progresul au fost șterse din acest browser.
+          Profilul, progresul și datele de abonare au fost șterse din acest browser.
         </Alert>
       )}
       <dialog
@@ -28,7 +29,7 @@ export function ResetDemo() {
           Ștergi tot progresul?
         </h2>
         <p className="mt-2 text-ink-muted">
-          Se vor șterge profilul, ipotezele și progresul salvate în acest browser. Acțiunea nu poate fi anulată.
+          Se vor șterge profilul, ipotezele, progresul, articolele citite și, dacă există, adresa de e-mail și istoricul acordului salvate în acest browser. Acțiunea nu poate fi anulată.
         </p>
         <form method="dialog" className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button type="submit" variant="secondary" autoFocus>
@@ -38,6 +39,7 @@ export function ResetDemo() {
             variant="danger"
             onClick={() => {
               actions.reset();
+              newsletter.clearAll();
               ref.current?.close();
               setDone(true);
             }}

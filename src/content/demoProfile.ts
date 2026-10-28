@@ -9,5 +9,6 @@ export const DEMO_PROFILE: Profile = {
   monthly: 500,
   years: 10,
   goal: "fond-urgenta",
+  ageRange: null,
   isDemo: true,
 };
