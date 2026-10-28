@@ -164,7 +164,7 @@ test("schema-v1 saved data is migrated in place under pcac:v1", async ({ page })
   await expect(page.getByTestId("stat-real")).toHaveText("13.373 lei");
   await page.getByRole("radio", { name: /Ultimii 3 ani/ }).check({ force: true });
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("pcac:v1")!));
-  expect(saved.version).toBe(5);
+  expect(saved.version).toBe(6);
   expect(saved.profile.ageRange).toBeNull();
   expect(saved.reality.years).toBe(3);
   await page.goto("/progres");

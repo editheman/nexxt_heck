@@ -91,6 +91,9 @@ export const actions = {
   saveProfile(profile: Profile) {
     updateState((s) => ({ ...s, profile }));
   },
+  setRiskProfile(riskProfile: DemoState["riskProfile"]) {
+    updateState((s) => ({ ...s, riskProfile }));
+  },
   completeOnboarding() {
     if (read().onboarding.completedAt) return;
     updateState((s) => ({ ...s, onboarding: { completedAt: new Date().toISOString() } }));

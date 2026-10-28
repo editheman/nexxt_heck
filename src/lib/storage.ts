@@ -1,5 +1,6 @@
 import { DEFAULT_REALITY_WINDOW, REALITY_WINDOWS, type RealityWindow } from "@/content/macro-ro";
 import { LIMITS } from "./finance";
+import type { EmergencyFund, Experience, RiskTolerance } from "./productFit";
 
 /** Schema changes bump `DemoState.version`, not the key. */
 export const STORAGE_KEY = "pcac:v1";
@@ -34,11 +35,23 @@ export type Profile = {
 export type QuizResult = { best: number; total: number; lastWrong: string[] };
 export type ScamResult = { completed: true; correct: number; total: number };
 
+export const EMERGENCY_FUND = ["da", "partial", "nu"] as const;
+export const RISK_TOLERANCE = ["scazuta", "medie", "ridicata"] as const;
+export const EXPERIENCE = ["deloc", "putina", "multa"] as const;
+
+export type RiskProfile = {
+  emergencyFund: EmergencyFund | null;
+  riskTolerance: RiskTolerance | null;
+  experience: Experience | null;
+};
+
 export type DemoState = {
-  version: 5;
+  version: 6;
   profile: Profile | null;
   /** Guided profiling (profil → Reality Check → simulator) finished. Learning is personalised by `profile.goal`. */
   onboarding: { completedAt: string | null };
+  /** Answers used to match product categories; null = not answered. */
+  riskProfile: RiskProfile;
   /** Simulator only: illustrative, user-editable future inflation. */
   assumptions: { inflationPct: number };
   /** Reality Check: which official history window is shown. */
@@ -53,9 +66,10 @@ export type DemoState = {
 
 export function defaultState(): DemoState {
   return {
-    version: 5,
+    version: 6,
     profile: null,
     onboarding: { completedAt: null },
+    riskProfile: { emergencyFund: null, riskTolerance: null, experience: null },
     assumptions: { inflationPct: DEFAULT_INFLATION_PCT },
     reality: { years: DEFAULT_REALITY_WINDOW },
     progress: { visited: {}, scams: {}, modulesRead: {}, quizzes: {} },
@@ -125,7 +139,7 @@ function parseScam(v: unknown): ScamResult | null {
 /**
  * Never throws: anything unreadable falls back to defaults, field by field.
  * Accepts schema v1 (no `reality`), v2 (no `profile.ageRange`), v3 (no `onboarding`) and v4 (with the
- * retired `interests` list, which is dropped) and migrates them to v5.
+ * retired `interests` list, which is dropped) and v5 (no `riskProfile`) and migrates them to v6.
  */
 export function parseState(raw: string | null): DemoState {
   const fallback = defaultState();
@@ -136,7 +150,7 @@ export function parseState(raw: string | null): DemoState {
   } catch {
     return fallback;
   }
-  if (!isObj(data) || ![1, 2, 3, 4, 5].includes(data.version as number)) return fallback;
+  if (!isObj(data) || ![1, 2, 3, 4, 5, 6].includes(data.version as number)) return fallback;
 
   const assumptions = isObj(data.assumptions) ? data.assumptions : {};
   const reality = isObj(data.reality) ? data.reality : {};
@@ -145,12 +159,19 @@ export function parseState(raw: string | null): DemoState {
 
   const onboarding = isObj(data.onboarding) ? data.onboarding : {};
   const completedAt = onboarding.completedAt;
+  const risk = isObj(data.riskProfile) ? data.riskProfile : {};
+  const pick = <T extends string>(v: unknown, allowed: readonly T[]): T | null => (allowed.includes(v as T) ? (v as T) : null);
 
   return {
-    version: 5,
+    version: 6,
     profile: parseProfile(data.profile),
     onboarding: {
       completedAt: typeof completedAt === "string" && !Number.isNaN(Date.parse(completedAt)) ? completedAt : null,
+    },
+    riskProfile: {
+      emergencyFund: pick(risk.emergencyFund, EMERGENCY_FUND),
+      riskTolerance: pick(risk.riskTolerance, RISK_TOLERANCE),
+      experience: pick(risk.experience, EXPERIENCE),
     },
     assumptions: {
       inflationPct: inRange(assumptions.inflationPct, LIMITS.ratePctMin, LIMITS.ratePctMax)
