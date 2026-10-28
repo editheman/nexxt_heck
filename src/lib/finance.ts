@@ -8,6 +8,9 @@
  *   equivalent monthly rate rm = (1 + r)^(1/12) − 1, so 12 months of
  *   compounding equal exactly one year at r.
  * - Purchasing power in today's RON = nominal / (1 + i)^t, t in years.
+ * - Contributions in today's RON deflate each payment at the moment it is made,
+ *   with the equivalent monthly inflation im = (1 + i)^(1/12) − 1. When r = i the
+ *   purchasing power of the balance equals exactly this amount (real return 0).
  * - Historical Reality Check: real = P / ∏(1 + i_t) over official INS annual
  *   average CPI indices (design spec §3b); no interest on P.
  */
@@ -31,14 +34,17 @@ export type ProjectionRow = {
   nominal: number;
   /** Same balance expressed in today's lei. */
   real: number;
-  /** Principal + contributions paid so far (no growth). */
+  /** Principal + contributions paid so far (no growth), nominal lei. */
   contributed: number;
+  /** The same payments, each expressed in today's lei at the time it was made. */
+  contributedReal: number;
 };
 
 export type SimSummary = {
   nominal: number;
   real: number;
   contributed: number;
+  contributedReal: number;
   /** nominal − real: how many future lei are "missing" in today's money, under the assumptions. */
   purchasingPowerGap: number;
   realRatePct: number;
@@ -96,6 +102,7 @@ export function project(input: SimInput): ProjectionRow[] {
   const r = input.nominalPct / 100;
   const i = input.inflationPct / 100;
   const rm = Math.pow(1 + r, 1 / 12) - 1;
+  const im = Math.pow(1 + i, 1 / 12) - 1;
 
   const rows: ProjectionRow[] = [];
   for (let year = 0; year <= input.years; year++) {
@@ -109,6 +116,8 @@ export function project(input: SimInput): ProjectionRow[] {
       nominal,
       real: nominal / Math.pow(1 + i, year),
       contributed: input.principal + input.monthly * months,
+      contributedReal:
+        input.principal + (im === 0 ? input.monthly * months : (input.monthly * (1 - Math.pow(1 + im, -months))) / im),
     });
   }
   return rows;
@@ -189,6 +198,7 @@ export function summarize(input: SimInput): SimSummary {
     nominal: last.nominal,
     real: last.real,
     contributed: last.contributed,
+    contributedReal: last.contributedReal,
     purchasingPowerGap: last.nominal - last.real,
     realRatePct: realRatePct(input.nominalPct, input.inflationPct),
   };

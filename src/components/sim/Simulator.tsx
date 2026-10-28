@@ -11,7 +11,7 @@ import { PageSkeleton } from "@/components/ui/Skeleton";
 import { cn } from "@/components/ui/cn";
 import { explainOutcome } from "@/lib/explain";
 import { LIMITS, project, summarize, validateSimInput, type SimInput } from "@/lib/finance";
-import { formatLei, formatPct, formatYears } from "@/lib/format";
+import { formatLei, formatYears } from "@/lib/format";
 import type { DemoState } from "@/lib/storage";
 import { actions, useDemoState } from "@/lib/useDemoState";
 import { ProjectionChart } from "./ProjectionChart";
@@ -110,7 +110,7 @@ function SimulatorInner({ initial, fromProfile, isDemo }: { initial: SimInput; f
               <StatCard label="În lei de azi" value={formatLei(summary.real)} kind="estimate" emphasis="accent" testId="sim-real" />
             </div>
             <p aria-live="polite" className="text-base" data-testid="sim-explanation">
-              {explainOutcome(input, summary)} Randament real anual: {formatPct(summary.realRatePct, 2)}.
+              {explainOutcome(input, summary)}
             </p>
 
             <Card className="space-y-4 p-4 sm:p-6">

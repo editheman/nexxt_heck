@@ -60,7 +60,7 @@ test("full journey persists across reloads", async ({ page }) => {
   await expect(page.getByTestId("sim-real")).toHaveText("12.278 lei");
   await page.getByRole("button", { name: "Randament egal cu inflația" }).click();
   await expect(page.getByTestId("sim-real")).toHaveText("20.000 lei");
-  await expect(page.getByTestId("sim-explanation")).toContainText("aproximativ aceeași putere de cumpărare");
+  await expect(page.getByTestId("sim-explanation")).toContainText("Randamentul real anual este de 0%");
   await page.getByRole("button", { name: "Vezi tabelul" }).click();
   await expect(page.getByRole("table")).toContainText("Putere de cumpărare (lei de azi)");
 

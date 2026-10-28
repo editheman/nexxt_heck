@@ -17,7 +17,7 @@ describe("project", () => {
   it("returns only year 0 when years is 0", () => {
     const rows = project(base);
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toEqual({ year: 0, nominal: 1000, real: 1000, contributed: 1000 });
+    expect(rows[0]).toEqual({ year: 0, nominal: 1000, real: 1000, contributed: 1000, contributedReal: 1000 });
   });
 
   it("compounds the lump sum annually: P(1+r)^n", () => {
@@ -60,6 +60,45 @@ describe("project", () => {
   it("handles a negative nominal return", () => {
     const last = project({ ...base, nominalPct: -10, years: 1 }).at(-1)!;
     expect(last.nominal).toBeCloseTo(900, 9);
+  });
+});
+
+describe("baseline scenario: 39.000 lei + 800 lei/lună, 5% randament, 5% inflație, 15 ani", () => {
+  // Independently computed (40-digit decimals): end-of-month payments, rm = 1,05^(1/12) − 1.
+  const input = { principal: 39000, monthly: 800, nominalPct: 5, inflationPct: 5, years: 15 };
+  const s = summarize(input);
+  const rows = project(input);
+
+  it("total contributions: P + 12·n·PMT", () => expect(s.contributed).toBe(183000));
+  it("nominal future value", () => expect(s.nominal).toBeCloseTo(292937.8747, 3));
+  it("inflation-adjusted value in today's lei", () => expect(s.real).toBeCloseTo(140908.1264, 3));
+  it("real annual return (Fisher) is 0", () => expect(s.realRatePct).toBeCloseTo(0, 12));
+  it("with r = i the real balance equals the contributions in today's lei", () => {
+    expect(s.contributedReal).toBeCloseTo(140908.1264, 3);
+    expect(s.real).toBeCloseTo(s.contributedReal, 6);
+  });
+  it("the table/chart rows end at the same values as the cards", () => {
+    expect(rows).toHaveLength(16);
+    expect(rows.at(-1)).toMatchObject({ nominal: s.nominal, real: s.real, contributed: s.contributed, contributedReal: s.contributedReal });
+    for (const row of rows) expect(row.real).toBeCloseTo(row.nominal / Math.pow(1.05, row.year), 6);
+  });
+});
+
+describe("contributedReal", () => {
+  it("equals contributed without inflation", () => {
+    const last = project({ ...base, monthly: 100, inflationPct: 0, nominalPct: 4, years: 3 }).at(-1)!;
+    expect(last.contributedReal).toBeCloseTo(last.contributed, 9);
+  });
+  it("discounts each end-of-month payment at the monthly equivalent of inflation", () => {
+    const last = project({ ...base, principal: 0, monthly: 100, inflationPct: 12, years: 1 }).at(-1)!;
+    const im = Math.pow(1.12, 1 / 12) - 1;
+    let expected = 0;
+    for (let k = 1; k <= 12; k++) expected += 100 / Math.pow(1 + im, k);
+    expect(last.contributedReal).toBeCloseTo(expected, 9);
+  });
+  it("stays positive with deflation (negative inflation) and exceeds contributed", () => {
+    const last = project({ ...base, monthly: 100, inflationPct: -2, years: 5 }).at(-1)!;
+    expect(last.contributedReal).toBeGreaterThan(last.contributed);
   });
 });
 
