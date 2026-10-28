@@ -67,7 +67,7 @@ export function IdentityStep({
 
   return (
     <form noValidate onSubmit={submit} aria-label="Pasul 1: cine ești">
-      <Card className="space-y-6 p-6 sm:p-8">
+      <Card className="space-y-5 p-5 sm:p-7 short:space-y-4 short:sm:p-6">
         <div className="space-y-2">
           <label htmlFor="alias" className="flex items-center gap-1.5 font-semibold text-ink">
             Cum să-ți spunem <span aria-hidden className="size-1.5 rounded-full bg-accent" />
@@ -192,7 +192,6 @@ export function IdentityStep({
               );
             })}
           </div>
-          <p className="text-xs text-ink-muted">Apasă din nou pe interval ca să renunți la selecție.</p>
         </fieldset>
 
         <p className="flex gap-2.5 rounded-[var(--radius-control)] border border-border bg-bg px-4 py-3 text-sm text-ink-muted">

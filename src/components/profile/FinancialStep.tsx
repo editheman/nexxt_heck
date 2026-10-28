@@ -1,13 +1,12 @@
 "use client";
 
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRef, useState } from "react";
-import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { NumberField } from "@/components/ui/NumberField";
-import { GOAL_LABELS, PLACEMENT_LABELS } from "@/content/labels";
+import { GOAL_LABELS } from "@/content/labels";
 import { validateSimInput } from "@/lib/finance";
 import { GOALS, PLACEMENTS, type Goal, type Placement, type Profile } from "@/lib/storage";
 import { cn } from "@/components/ui/cn";
@@ -16,6 +15,15 @@ type NumKey = "savings" | "nominalPct" | "monthly" | "years";
 export type FinancialDraft = { placement: Placement; goal: Goal } & Record<NumKey, number | null>;
 type Draft = FinancialDraft;
 type Errors = Partial<Record<NumKey, string>>;
+
+/** Short labels so the five options fit one row in the compact onboarding card. */
+const PLACEMENT_SHORT: Record<Placement, string> = {
+  numerar: "Numerar",
+  "cont-curent": "Cont curent",
+  depozit: "Depozit",
+  investitii: "Investiții",
+  mix: "Un mix",
+};
 
 const FIELD_ORDER: NumKey[] = ["savings", "nominalPct", "monthly", "years"];
 
@@ -99,7 +107,7 @@ export function FinancialStep({
   }
 
   return (
-    <form noValidate onSubmit={onSubmit} className="space-y-6" aria-label="Pasul 2: datele financiare">
+    <form noValidate onSubmit={onSubmit} className="space-y-4" aria-label="Pasul 2: datele financiare">
       {submitted && summaryErrors.length > 0 && (
         <div
           ref={summaryRef}
@@ -123,28 +131,41 @@ export function FinancialStep({
         </div>
       )}
 
-      <Card className="space-y-6">
-        <NumberField
-          id="savings"
-          label={FIELD_LABELS.savings}
-          helper="O aproximare e suficientă. Include doar banii pe care îi consideri economii."
-          suffix="lei"
-          value={draft.savings}
-          onChange={(v) => set("savings", v)}
-          onBlur={() => touch("savings")}
-          error={visible("savings")}
-          badge={<Badge kind="user" />}
-        />
+      <Card className="space-y-5 p-5 sm:p-7 short:space-y-4 short:sm:p-6">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <NumberField
+            id="savings"
+            label={FIELD_LABELS.savings}
+            helper="O aproximare e suficientă."
+            suffix="lei"
+            value={draft.savings}
+            onChange={(v) => set("savings", v)}
+            onBlur={() => touch("savings")}
+            error={visible("savings")}
+            badge={<Badge kind="user" />}
+          />
+          <NumberField
+            id="nominalPct"
+            label={FIELD_LABELS.nominalPct}
+            helper="Ex. dobânda din contract. Dacă nu știi, lasă 0%."
+            suffix="%"
+            value={draft.nominalPct}
+            onChange={(v) => set("nominalPct", v)}
+            onBlur={() => touch("nominalPct")}
+            error={visible("nominalPct")}
+            badge={<Badge kind="user" />}
+          />
+        </div>
 
         <fieldset className="space-y-2">
           <legend className="font-semibold">Unde ții acum acești bani?</legend>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
             {PLACEMENTS.map((p) => (
               <label
                 key={p}
                 className={cn(
-                  "flex min-h-11 items-center gap-3 rounded-[var(--radius-control)] border px-3 py-2 transition-colors",
-                  draft.placement === p ? "border-primary bg-surface-muted" : "border-border hover:border-border-strong",
+                  "flex min-h-11 items-center justify-center rounded-[var(--radius-control)] border px-2 text-center text-sm font-semibold transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring",
+                  draft.placement === p ? "border-primary bg-primary-soft text-primary" : "border-border text-ink hover:border-border-strong",
                 )}
               >
                 <input
@@ -153,31 +174,19 @@ export function FinancialStep({
                   value={p}
                   checked={draft.placement === p}
                   onChange={() => set("placement", p)}
-                  className="size-4 accent-[var(--color-primary)]"
+                  className="sr-only"
                 />
-                <span>{PLACEMENT_LABELS[p]}</span>
+                {PLACEMENT_SHORT[p]}
               </label>
             ))}
           </div>
         </fieldset>
 
-        <NumberField
-          id="nominalPct"
-          label={FIELD_LABELS.nominalPct}
-          helper="Estimarea ta pentru randamentul nominal pe an al acestor bani (de exemplu, dobânda din contract). Dacă nu știi, lasă 0%. Nu completăm automat rate de piață."
-          suffix="%"
-          value={draft.nominalPct}
-          onChange={(v) => set("nominalPct", v)}
-          onBlur={() => touch("nominalPct")}
-          error={visible("nominalPct")}
-          badge={<Badge kind="user" />}
-        />
-
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-3">
           <NumberField
             id="monthly"
             label={FIELD_LABELS.monthly}
-            helper="Opțional. Lasă 0 dacă nu economisești lunar."
+            helper="Opțional."
             suffix="lei"
             value={draft.monthly}
             onChange={(v) => set("monthly", v)}
@@ -187,51 +196,44 @@ export function FinancialStep({
           <NumberField
             id="years"
             label={FIELD_LABELS.years}
-            helper="În câți ani ai vrea să folosești banii (0–50)."
+            helper="Între 0 și 50."
             suffix="ani"
             value={draft.years}
             onChange={(v) => set("years", v)}
             onBlur={() => touch("years")}
             error={visible("years")}
           />
+          <div className="space-y-1.5">
+            <label htmlFor="goal" className="font-semibold">
+              Obiectivul principal
+            </label>
+            <p className="text-sm text-ink-muted">Pentru ce economisești.</p>
+            <select
+              id="goal"
+              value={draft.goal}
+              onChange={(e) => set("goal", e.target.value as Goal)}
+              className="min-h-11 w-full rounded-[var(--radius-control)] border border-border-strong bg-surface px-3 py-2"
+            >
+              {GOALS.map((g) => (
+                <option key={g} value={g}>
+                  {GOAL_LABELS[g]}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label htmlFor="goal" className="font-semibold">
-            Obiectivul principal
-          </label>
-          <select
-            id="goal"
-            value={draft.goal}
-            onChange={(e) => set("goal", e.target.value as Goal)}
-            className="min-h-11 w-full rounded-[var(--radius-control)] border border-border-strong bg-surface px-3 py-2"
-          >
-            {GOALS.map((g) => (
-              <option key={g} value={g}>
-                {GOAL_LABELS[g]}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-between">
+          <Button variant="secondary" onClick={onBack}>
+            <ArrowLeft aria-hidden className="size-4" /> Înapoi
+          </Button>
+          {/* preventDefault on mousedown keeps focus in the field until click, so a blur-triggered
+              inline error cannot shift the button away between mousedown and mouseup. */}
+          <Button type="submit" onMouseDown={(e) => e.preventDefault()}>
+            Salvează și vezi Reality Check
+          </Button>
         </div>
       </Card>
-
-      <Alert tone="info" title="Confidențialitate">
-        <span className="inline-flex items-start gap-1.5">
-          <Lock aria-hidden className="mt-0.5 size-4 shrink-0" />
-          Datele rămân doar în acest browser. Nu cerem venitul exact, CNP, IBAN sau date de card.
-        </span>
-      </Alert>
-
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-        <Button variant="secondary" onClick={onBack}>
-          <ArrowLeft aria-hidden className="size-4" /> Înapoi
-        </Button>
-        {/* preventDefault on mousedown keeps focus in the field until click, so a blur-triggered
-            inline error cannot shift the button away between mousedown and mouseup. */}
-        <Button type="submit" onMouseDown={(e) => e.preventDefault()}>
-          Salvează și vezi Reality Check
-        </Button>
-      </div>
     </form>
   );
 }

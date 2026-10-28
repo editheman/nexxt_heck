@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/components/ui/cn";
 import type { Profile } from "@/lib/storage";
 import { actions } from "@/lib/useDemoState";
@@ -12,8 +11,8 @@ import { FinancialStep, initialFinancial, type FinancialDraft } from "./Financia
 import { IdentityStep, type Identity } from "./IdentityStep";
 
 const STEPS = [
-  { title: "Să facem cunoștință", label: "Cine ești?", lead: "Câteva detalii ca să adaptăm exemplele. Totul rămâne în browserul tău." },
-  { title: "Banii tăi, pe scurt", label: "Banii tăi", lead: "Cifre aproximative, ca să vezi exemple calculate pe situația ta. Durează sub un minut." },
+  { title: "Să facem cunoștință", label: "Cine ești?" },
+  { title: "Banii tăi, pe scurt", label: "Banii tăi" },
 ] as const;
 
 export function OnboardingWizard({ initial, subscriber }: { initial: Profile | null; subscriber: Subscriber | null }) {
@@ -50,7 +49,7 @@ export function OnboardingWizard({ initial, subscriber }: { initial: Profile | n
   }
 
   return (
-    <div className="mx-auto w-full max-w-[640px] space-y-10">
+    <div className="mx-auto w-full max-w-[680px] space-y-6 short:space-y-4">
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3 text-sm">
           <span className="eyebrow text-ink-muted">Profilul tău</span>
@@ -72,17 +71,10 @@ export function OnboardingWizard({ initial, subscriber }: { initial: Profile | n
         </div>
       </div>
 
-      <header className="space-y-3 text-center">
-        <h1 ref={headingRef} tabIndex={-1} className="text-3xl text-ink outline-none sm:text-[2.6rem]">
-          {s.title}
-        </h1>
-        <p className="mx-auto max-w-[52ch] text-lg text-ink-muted">{s.lead}</p>
-        {initial?.isDemo && step === 0 && (
-          <p className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-muted">
-            <Badge kind="fictional" /> Acum folosești profilul exemplu; completarea îl înlocuiește cu datele tale.
-          </p>
-        )}
-      </header>
+      {/* Visually hidden: the step title stays available to screen readers and as a focus target. */}
+      <h1 ref={headingRef} tabIndex={-1} className="sr-only">
+        Pasul {step + 1} din 2: {s.title}
+      </h1>
 
       {step === 0 ? (
         <IdentityStep value={identity} onChange={setIdentity} onNext={next} subscriber={subscriber} />
