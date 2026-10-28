@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Lexend, Source_Sans_3 } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import "./globals.css";
 
-const display = Lexend({ variable: "--font-display", subsets: ["latin", "latin-ext"], weight: ["500", "600"] });
-const body = Source_Sans_3({ variable: "--font-body", subsets: ["latin", "latin-ext"], weight: ["400", "600", "700"] });
+const body = Hanken_Grotesk({ variable: "--font-body", subsets: ["latin", "latin-ext"], weight: ["400", "500", "600", "700"] });
+const code = JetBrains_Mono({ variable: "--font-code", subsets: ["latin", "latin-ext"], weight: ["400", "500"] });
 
 export const metadata: Metadata = {
   title: { default: "Protejează ce ai construit", template: "%s · Protejează ce ai construit" },
@@ -13,11 +13,11 @@ export const metadata: Metadata = {
     "Învață să-ți protejezi banii, să recunoști fraudele și să înțelegi riscurile înainte să iei o decizie financiară.",
 };
 
-export const viewport: Viewport = { themeColor: "#16325c" };
+export const viewport: Viewport = { themeColor: "#4f46e5" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ro" className={`${display.variable} ${body.variable} h-full antialiased`}>
+    <html lang="ro" className={`${body.variable} ${code.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#continut"
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Sari la conținut
         </a>
         <SiteHeader />
-        <main id="continut" tabIndex={-1} className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-8 outline-none sm:px-6 sm:py-12 lg:px-8">
+        <main id="continut" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>
         <SiteFooter />

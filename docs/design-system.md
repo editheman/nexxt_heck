@@ -1,5 +1,17 @@
 # Design System — Protejează ce ai construit
 
+**Revision 2026-10-28 (b): "editorial indigo".** Re-skinned to match the owner's reference mockups (Stripe-style editorial look). This supersedes the navy/teal/Lexend direction below where they conflict; tokens in `src/app/globals.css` are the source of truth.
+
+- **Color:** indigo primary `#4F46E5` (6.3:1 on white), hover `#4338CA`, soft `#EEF0FF`; real-value green `#1E6B4E` / `#D5F5E8`; loss/danger rose `#B4322A` / `#FDE4DF`; ink `#0B1B33`, muted `#55607A`, page `#F5F6FC`. Assumptions now use the indigo family (the "x% / an" pill); estimates are mint; fictional data keeps the dashed neutral badge.
+- **Type:** Hanken Grotesk 400–700 for everything (tight −0.025em tracking on headings), JetBrains Mono for eyebrow labels, tags, chips and disclaimers (`eyebrow` utility, `font-mono`). Both loaded with `latin-ext`.
+- **Patterns:** mono uppercase eyebrow with dot/icon above every section title; lavender `hero-wash` backgrounds; pastel topic pills (`Tag`); cards with 18px radius, hairline border and a 4px colored top bar for feature/path cards (`Card bar=…`); pill-shaped chips for topics; segmented choice buttons (filled indigo = selected); progress bars green-on-rose for kept vs. eroded value.
+- **Gradients — allowed only here:** one headline line (`text-gradient`) and the top edge of the calculator card (`bar-gradient`). No gradient buttons, surfaces or body text.
+- **Content rule kept from CLAUDE.md:** the reference mockups' news items, BNR rates, "actualizat în timp real" and "medie istorică" labels were **not** reproduced — the decodificator shows module content and computed, labelled examples only.
+
+---
+
+## Original direction (v1)
+
 Source: UI UX Pro Max research (2026-10-28). The tool's top `--design-system` match (dark "Enterprise Gateway", navy + neon green, "light mode default" listed as an anti-pattern) was **rejected** because it reads like a trading terminal, which CLAUDE.md forbids. What was kept: the *Banking/Traditional Finance* palette (trust navy), the *LMS* teal for learning/progress, the *Corporate Trust* font pairing, the chart guidance for trends over time, and the form/accessibility guidance. Tokens are defined in `src/app/globals.css`; components never use raw hex.
 
 ## Direction

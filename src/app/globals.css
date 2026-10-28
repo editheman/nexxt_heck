@@ -2,32 +2,37 @@
 
 /* Design tokens — see docs/design-system.md. Components use these, never raw hex. */
 @theme {
-  --color-bg: #f6f7f9;
+  --color-bg: #f5f6fc;
   --color-surface: #ffffff;
-  --color-surface-muted: #eef1f5;
-  --color-ink: #0f1b2d;
-  --color-ink-muted: #4a5568;
-  --color-border: #d9dee6;
-  --color-border-strong: #8a94a6;
-  --color-primary: #16325c;
-  --color-primary-hover: #0f2647;
+  --color-surface-muted: #eef0fa;
+  --color-ink: #0b1b33;
+  --color-ink-muted: #55607a;
+  --color-border: #e3e6f0;
+  --color-border-strong: #8b95a8;
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-soft: #eef0ff;
   --color-on-primary: #ffffff;
-  --color-accent: #0f766e;
-  --color-accent-soft: #e6f4f2;
-  --color-assumption: #b45309;
-  --color-assumption-soft: #fdf3e7;
-  --color-danger: #b42318;
-  --color-danger-soft: #fdecea;
-  --color-success: #1f7a3d;
-  --color-success-soft: #e8f5ec;
-  --color-ring: #2563eb;
+  /* "Real value / protected" green */
+  --color-accent: #1e6b4e;
+  --color-accent-soft: #d5f5e8;
+  /* Assumptions use the indigo family (e.g. the "x% / an" pill) */
+  --color-assumption: #4338ca;
+  --color-assumption-soft: #eef0ff;
+  --color-danger: #b4322a;
+  --color-danger-soft: #fde4df;
+  --color-success: #1e6b4e;
+  --color-success-soft: #d5f5e8;
+  --color-ring: #4f46e5;
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-display), var(--font-body), ui-sans-serif, sans-serif;
+  --font-heading: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-code), ui-monospace, SFMono-Regular, monospace;
 
-  --radius-control: 8px;
-  --radius-card: 16px;
-  --shadow-card: 0 1px 2px rgb(15 27 45 / 0.06), 0 4px 16px rgb(15 27 45 / 0.05);
+  --radius-control: 10px;
+  --radius-card: 18px;
+  --shadow-card: 0 1px 2px rgb(11 27 51 / 0.05), 0 8px 24px rgb(11 27 51 / 0.06);
+  --shadow-raised: 0 2px 4px rgb(11 27 51 / 0.06), 0 16px 40px rgb(11 27 51 / 0.1);
 }
 
 @layer base {
@@ -45,8 +50,9 @@
   h3,
   h4 {
     font-family: var(--font-heading);
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 700;
     text-wrap: balance;
   }
   :focus-visible {
@@ -79,4 +85,30 @@
 .module-section:target {
   background: var(--color-assumption-soft);
   outline: 8px solid var(--color-assumption-soft);
+}
+
+/* Brand accents — used sparingly: one headline line and the top edge of feature cards. */
+@utility text-gradient {
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #b4322a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bar-gradient {
+  background: linear-gradient(90deg, #4f46e5 0%, #7dd3c0 50%, #b4322a 100%);
+}
+
+@utility hero-wash {
+  background:
+    radial-gradient(60% 70% at 70% 30%, rgb(124 58 237 / 0.1), transparent 70%),
+    radial-gradient(50% 60% at 20% 20%, rgb(79 70 229 / 0.08), transparent 70%),
+    var(--color-bg);
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }

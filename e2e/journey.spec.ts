@@ -145,3 +145,13 @@ test("mobile menu navigates", async ({ page, isMobile }) => {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
 });
+
+test("home calculator recomputes purchasing power", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("home-real")).toHaveText("7.835 lei"); // 10.000 / 1,05^5
+  await page.getByRole("button", { name: "10 ani", exact: true }).click();
+  await expect(page.getByTestId("home-real")).toHaveText("6.139 lei"); // 10.000 / 1,05^10
+  await page.getByRole("button", { name: "50.000 lei" }).click();
+  await expect(page.getByTestId("home-nominal")).toHaveText("50.000 lei");
+  await expect(page.getByTestId("home-real")).toHaveText("30.696 lei");
+});
