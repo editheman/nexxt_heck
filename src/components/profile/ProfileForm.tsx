@@ -246,7 +246,11 @@ export function ProfileForm({ initial }: { initial: Profile | null }) {
       </Alert>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button type="submit">Salvează și vezi Reality Check</Button>
+        {/* preventDefault on mousedown keeps focus in the field until click, so a blur-triggered
+            inline error cannot shift the button away between mousedown and mouseup. */}
+        <Button type="submit" onMouseDown={(e) => e.preventDefault()}>
+          Salvează și vezi Reality Check
+        </Button>
       </div>
     </form>
   );

@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { MODULES } from "./modules";
+import { MODULE_SLUGS } from "./moduleSlugs";
 import { SCAMS } from "./scams";
 
 describe("learning modules", () => {
@@ -9,6 +10,10 @@ describe("learning modules", () => {
     expect(new Set(MODULES.map((m) => m.slug)).size).toBe(MODULES.length);
     const ids = MODULES.flatMap((m) => m.quiz.map((q) => q.id));
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("match the slug list used by Proxy", () => {
+    expect(MODULES.map((m) => m.slug)).toEqual([...MODULE_SLUGS]);
   });
 
   it.each(MODULES.map((m) => [m.slug, m] as const))("%s: every question points to a real option and section", (_, m) => {
