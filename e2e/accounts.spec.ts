@@ -19,6 +19,7 @@ test("account menu: login/sign-up when logged out, portal/logout when logged in"
   menu = await openAccountMenu(page);
   await expect(menu).toContainText("Conectat ca ana");
   await expect(menu.getByRole("link", { name: "Portalul meu" })).toBeVisible();
+  await expect(menu.getByRole("link", { name: "Progres" })).toBeVisible();
   await menu.getByRole("button", { name: "Deconectare" }).click();
 
   await expect(page).toHaveURL(/\/$/);

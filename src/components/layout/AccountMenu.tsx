@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, ListChecks, LogIn, LogOut, UserPlus, UserRound } from "lucide-react";
+import { ChartColumn, LayoutDashboard, ListChecks, LogIn, LogOut, UserPlus, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -57,6 +57,9 @@ export function AccountMenu() {
               </Link>
               <Link href="/metode" className={item}>
                 <ListChecks aria-hidden className="size-4 text-primary" /> Metodele mele
+              </Link>
+              <Link href="/progres" className={item}>
+                <ChartColumn aria-hidden className="size-4 text-primary" /> Progres
               </Link>
               <button
                 type="button"

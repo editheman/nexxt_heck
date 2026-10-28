@@ -190,8 +190,8 @@ test("mobile menu navigates", async ({ page, isMobile }) => {
   );
   await page.reload();
   await page.getByRole("button", { name: "Meniu" }).click();
-  await page.locator("#mobile-nav").getByRole("link", { name: "Progres" }).click();
-  await expect(page).toHaveURL(/\/progres$/);
+  await page.locator("#mobile-nav").getByRole("link", { name: "Învață" }).click();
+  await expect(page).toHaveURL(/\/invata$/);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
 });
