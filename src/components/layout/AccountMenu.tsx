@@ -35,8 +35,11 @@ export function AccountMenu() {
 
   return (
     <div ref={ref} className="relative">
+      {/* Browser extensions (e.g. one adding `jf-ext-button-ct`) tag this button before hydration;
+          ignore attribute differences on this element only. */}
       <button
         type="button"
+        suppressHydrationWarning
         aria-expanded={open}
         aria-controls="account-menu"
         onClick={() => setOpen((v) => !v)}
