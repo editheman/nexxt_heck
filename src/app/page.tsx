@@ -42,12 +42,12 @@ export default function Home() {
         </div>
 
         <nav aria-label="Teme principale" className="mx-auto w-full max-w-[1040px]">
-          <ul className="grid gap-3 rounded-[var(--radius-card)] border border-border bg-surface/90 p-3 shadow-[var(--shadow-card)] md:grid-cols-3">
+          <ul className="grid gap-3 rounded-[var(--radius-card)] border border-white/50 bg-surface/35 p-3 shadow-[var(--shadow-card)] backdrop-blur-sm md:grid-cols-3">
             {PILLARS.map((p) => (
               <li key={p.n}>
                 <Link
                   href={p.href}
-                  className="group flex h-full min-h-16 items-center gap-4 rounded-[var(--radius-control)] border border-border bg-bg/60 px-4 py-3 transition-colors hover:border-primary hover:bg-primary-soft"
+                  className="group flex h-full min-h-16 items-center gap-4 rounded-[var(--radius-control)] border border-white/60 bg-surface/55 px-4 py-3 transition-colors hover:border-primary hover:bg-primary-soft"
                 >
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-border bg-surface text-primary">
                     <p.icon aria-hidden className="size-5" />
