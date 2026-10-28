@@ -51,4 +51,42 @@ describe("POST /api/recomandari with a model configured", () => {
     const data = await res.json();
     expect(data.items.map((i: { id: string }) => i.id)).toEqual(["tezaur"]);
   });
+
+  it("retries once without a system message when the model rejects it (e.g. Gemma) and reports why it fell back otherwise", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ error: { message: "System role not supported" } }), { status: 400 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ recomandari: [{ id: "etf-global", motiv: "Ok.", atentie: "-" }] }) } }] }), { status: 200 }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const data = await (await call()).json();
+    expect(data.source).toBe("ai");
+    const retryBody = JSON.parse(String((fetchMock.mock.calls[1] as unknown as [string, RequestInit])[1].body));
+    expect(retryBody.messages.map((m: { role: string }) => m.role)).toEqual(["user"]);
+    expect(retryBody.messages[0].content).toMatch(/Reguli stricte/);
+
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ error: { message: "model not found" } }), { status: 400 })));
+    const failed = await (await call()).json();
+    expect(failed.source).toBe("reguli");
+    expect(failed.fallbackReason).toMatch(/400/);
+    expect(failed.fallbackReason).toMatch(/model not found/);
+    expect(JSON.stringify(failed)).not.toContain("test-key");
+  });
+
+  it("sends Gemma models a single user message from the start", async () => {
+    vi.stubEnv("AI_MODEL", "OpenLLM-Ro/RoGemma2-9b-Instruct");
+    const fetchMock = modelSays(JSON.stringify({ recomandari: [{ id: "pilon3", motiv: "Pensie.", atentie: "-" }] }));
+    vi.stubGlobal("fetch", fetchMock);
+    expect((await (await call()).json()).source).toBe("ai");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const sent = JSON.parse(String((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body));
+    expect(sent.messages.map((m: { role: string }) => m.role)).toEqual(["user"]);
+  });
+
+  it("says when no model is configured", async () => {
+    vi.unstubAllEnvs();
+    vi.stubEnv("AI_API_KEY", "");
+    expect((await (await call()).json()).fallbackReason).toMatch(/nu este configurat/);
+  });
 });

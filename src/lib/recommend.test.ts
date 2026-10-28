@@ -62,6 +62,11 @@ describe("parseModelOutput", () => {
     expect(parseModelOutput(raw, eligible)).toBeNull();
   });
 
+  it("tolerates diacritics in the JSON keys (recomandări / atenție)", () => {
+    const raw = JSON.stringify({ "recomandări": [{ id: eligible[0], motiv: "Potrivit.", "atenție": "Volatil." }] });
+    expect(parseModelOutput(raw, eligible)).toEqual([{ id: eligible[0], why: "Potrivit.", watchOut: "Volatil." }]);
+  });
+
   it("returns null for garbage so the caller can fall back", () => {
     expect(parseModelOutput("nu știu", eligible)).toBeNull();
     expect(parseModelOutput(JSON.stringify({ recomandari: [] }), eligible)).toBeNull();

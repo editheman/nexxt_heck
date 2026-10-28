@@ -114,11 +114,16 @@ function Ranked({ data }: { data: RecommendResponse }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="clasament" className="text-2xl text-ink">Recomandările tale</h2>
         {data.source === "ai" ? (
-          <Badge kind="estimate">Generat cu AI · verificat după reguli</Badge>
+          <Badge kind="estimate">Generat cu AI ({data.model}) · verificat după reguli</Badge>
         ) : (
           <Badge kind="estimate">Calculat după reguli</Badge>
         )}
       </div>
+      {data.source === "reguli" && data.fallbackReason && (
+        <p className="text-sm text-ink-muted" data-testid="fallback-reason">
+          Am folosit regulile pentru că: {data.fallbackReason}
+        </p>
+      )}
       <ol className="space-y-4">
         {data.items.map((r, i) => {
           const p = productById(r.id);

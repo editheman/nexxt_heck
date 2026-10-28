@@ -13,7 +13,7 @@ export type RecommendRequest = FitInput & { savings: number; monthly: number; pl
 
 export type Recommendation = { id: ProductId; why: string; watchOut: string };
 
-export type RecommendResponse = { items: Recommendation[]; source: "ai" | "reguli"; model?: string };
+export type RecommendResponse = { items: Recommendation[]; source: "ai" | "reguli"; model?: string; fallbackReason?: string };
 
 const LEI = new Intl.NumberFormat("ro-RO");
 
@@ -68,6 +68,13 @@ export function buildMessages(user: ReturnType<typeof anonymize>, fits: ProductF
 
 const PERCENT = /\d+([.,]\d+)?\s?%/;
 const PROMISE = /\b(garantat\w*\s+de\s+\d|randament(ul)?\s+de\s+\d|câștig\w*\s+sigur)/i;
+/** "recomandări" → "recomandari": models trained on Romanian often add diacritics to JSON keys. */
+const plainKey = (k: string) => k.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+function field(obj: object, name: string): unknown {
+  for (const [k, v] of Object.entries(obj)) if (plainKey(k) === name) return v;
+  return undefined;
+}
+
 const clean = (s: unknown) => (typeof s === "string" ? s.trim().replace(/\s+/g, " ").slice(0, 280) : "");
 
 /** Validated recommendations from the model's text, or null if unusable (caller falls back to rules). */
@@ -80,16 +87,16 @@ export function parseModelOutput(text: string, eligible: readonly ProductId[]): 
   } catch {
     return null;
   }
-  const list = (data as { recomandari?: unknown }).recomandari;
+  const list = typeof data === "object" && data !== null ? field(data, "recomandari") : undefined;
   if (!Array.isArray(list)) return null;
 
   const out: Recommendation[] = [];
   for (const item of list) {
     if (typeof item !== "object" || item === null) continue;
-    const id = (item as { id?: unknown }).id as ProductId;
+    const id = field(item, "id") as ProductId;
     if (!eligible.includes(id) || out.some((r) => r.id === id)) continue;
-    const why = clean((item as { motiv?: unknown }).motiv);
-    const watchOut = clean((item as { atentie?: unknown }).atentie);
+    const why = clean(field(item, "motiv"));
+    const watchOut = clean(field(item, "atentie"));
     if (!why) continue;
     // Any figure or promise means the model ignored the rules: discard the whole answer.
     if (PERCENT.test(why + watchOut) || PROMISE.test(why + watchOut)) return null;

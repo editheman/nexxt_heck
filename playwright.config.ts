@@ -21,5 +21,7 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     timeout: 240_000,
     reuseExistingServer: false,
+    // Never call a real model from tests (slow, non-deterministic, spends credits), even if .env.local has a key.
+    env: { AI_API_KEY: "", AI_MODEL: "" },
   },
 });
