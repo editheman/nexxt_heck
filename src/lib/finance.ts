@@ -192,6 +192,15 @@ export function wholeUnits(amount: number, price: number): number {
   return Math.floor(amount / price);
 }
 
+/**
+ * Share of purchasing power kept, %: balance in today's lei / contributions in today's lei.
+ * Independent of the amounts' scale (it reveals no sums); null when nothing was contributed.
+ */
+export function keptPurchasingPowerPct(input: SimInput): number | null {
+  const s = summarize(input);
+  return s.contributedReal > 0 ? (s.real / s.contributedReal) * 100 : null;
+}
+
 export function summarize(input: SimInput): SimSummary {
   const last = project(input).at(-1)!;
   return {

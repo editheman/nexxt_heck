@@ -182,7 +182,7 @@ function MethodsBar({ count }: { count: number }) {
       {/* Spacer so the bar never covers the end of the page. */}
       <div aria-hidden className="h-20" />
       <div
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 px-4 py-3 shadow-[var(--shadow-raised)] backdrop-blur motion-safe:animate-[bar-in_200ms_ease-out]"
+        className="fixed inset-x-0 bottom-0 z-30 xl:right-[var(--friends-rail)] border-t border-border bg-surface/95 px-4 py-3 shadow-[var(--shadow-raised)] backdrop-blur motion-safe:animate-[bar-in_200ms_ease-out]"
         data-testid="methods-bar"
       >
         <div className="mx-auto flex max-w-[1000px] items-center justify-between gap-3">

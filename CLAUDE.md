@@ -47,7 +47,7 @@ Core modules:
 - ~~Scam Awareness (interactive scenarios)~~: removed at the owner's request (2026-10-29); do not re-add `/fraude` without asking.
 - Adaptive Quiz: answer-level feedback and concept-specific revision.
 - Progress: persistent learning progress and completed modules.
-- Friends: opt-in, alias-based educational comparisons.
+- Friends (`src/lib/friends.ts`, `FriendsPanel`): every other account is a friend, shown by default in this demo (owner's decision, 2026-10-29 — no requests, no consent step). Compare only the % of purchasing power kept over a common 10-year horizon (`keptPurchasingPowerPct` in `finance.ts`), never amounts, savings, debt or other profile data. Right-edge rail from xl on every app page except home; below the content on smaller screens. Real cross-device friends need a backend.
 
 Build a complete core journey before adding secondary features.
 
