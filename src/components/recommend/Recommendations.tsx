@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Check, ChevronDown, History, Info, Plus, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, ChevronDown, History, Info, ListChecks, Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { LevelMeter, ProductFacts } from "@/components/products/ProductFacts";
@@ -166,7 +166,39 @@ export function Recommendations() {
         financiară — nu este consultanță de investiții autorizată. Înainte de orice decizie, verifică documentele produsului și
         instituția la ASF sau BNR.
       </Alert>
+
+      {!stale && chosen.length > 0 && <MethodsBar count={chosen.length} />}
     </div>
+  );
+}
+
+/**
+ * Appears once at least one method is chosen and stays at the bottom of the screen while the
+ * user scrolls the cards (thumb zone on phones), like a basket bar: count + one clear action.
+ */
+function MethodsBar({ count }: { count: number }) {
+  return (
+    <>
+      {/* Spacer so the bar never covers the end of the page. */}
+      <div aria-hidden className="h-20" />
+      <div
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 px-4 py-3 shadow-[var(--shadow-raised)] backdrop-blur motion-safe:animate-[bar-in_200ms_ease-out]"
+        data-testid="methods-bar"
+      >
+        <div className="mx-auto flex max-w-[1000px] items-center justify-between gap-3">
+          <p className="flex items-center gap-2 text-sm text-ink" aria-live="polite">
+            <ListChecks aria-hidden className="size-5 shrink-0 text-primary" />
+            <span>
+              Ai ales <strong className="tabular">{count === 1 ? "o metodă" : `${count} metode`}</strong>
+              <span className="hidden sm:inline"> — le găsești ca draft în Metodele mele</span>
+            </span>
+          </p>
+          <ButtonLink href="/metode" className="shrink-0" data-testid="methods-bar-link">
+            Mergi la Metodele mele <ArrowRight aria-hidden className="size-4" />
+          </ButtonLink>
+        </div>
+      </div>
+    </>
   );
 }
 
