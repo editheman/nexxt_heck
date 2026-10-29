@@ -1,7 +1,6 @@
 "use client";
 
 import { EyeOff, Users } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { cn } from "@/components/ui/cn";
 import { ACCOUNTS_KEY, accountStateKey, parseAccounts } from "@/lib/auth";
@@ -48,15 +47,12 @@ export function FriendsPanel() {
   const friends = rows.filter((r) => !r.isMe);
 
   return (
-    // Below xl: a block under the content. From xl: a rail fixed to the right edge, under the header
-    // (globals.css reserves its width for main/footer while it is present).
     <aside
       aria-labelledby="prieteni-titlu"
-      data-friends-rail
-      className="mx-auto mt-10 mb-20 max-w-[1120px] rounded-[var(--radius-card)] border border-border bg-surface p-4 shadow-[var(--shadow-card)] xl:fixed xl:top-16 xl:right-0 xl:bottom-0 xl:z-20 xl:m-0 xl:w-[var(--friends-rail)] xl:max-w-none xl:overflow-y-auto xl:rounded-none xl:border-y-0 xl:border-r-0 xl:px-5 xl:py-6 xl:shadow-none"
+      className="mx-auto mt-10 mb-20 max-w-[1120px] xl:mx-0 xl:mt-0 xl:mb-0 xl:w-[260px] xl:shrink-0"
       data-testid="friends-panel"
     >
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-[var(--radius-card)] border border-border bg-surface p-4 shadow-[var(--shadow-card)] xl:sticky xl:top-20">
         <div className="space-y-1">
           <h2 id="prieteni-titlu" className="flex items-center gap-2 text-base font-semibold text-ink">
             <Users aria-hidden className="size-4 text-primary" /> Prieteni
@@ -75,12 +71,6 @@ export function FriendsPanel() {
         {friends.length === 0 && (
           <p className="text-xs text-ink-muted" data-testid="friends-empty">
             Încă nu ai prieteni. Orice cont nou creat în aplicație apare aici automat.
-          </p>
-        )}
-
-        {state.profile === null && (
-          <p className="text-xs text-ink-muted">
-            <Link href="/profil" className="font-semibold text-primary underline underline-offset-2">Completează profilul</Link> ca să-ți vezi procentul.
           </p>
         )}
 

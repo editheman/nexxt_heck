@@ -110,17 +110,6 @@
     var(--color-bg);
 }
 
-/* Friends rail (FriendsPanel): fixed to the right edge from xl; keep page content and footer clear of it. */
-:root {
-  --friends-rail: 300px;
-}
-@media (min-width: 80rem) {
-  body:has([data-friends-rail]) main,
-  body:has([data-friends-rail]) footer {
-    padding-right: var(--friends-rail);
-  }
-}
-
 @keyframes bar-in {
   from { transform: translateY(100%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }

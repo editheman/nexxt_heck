@@ -36,13 +36,12 @@ test("every other account is a friend, compared only by % of purchasing power ke
   await expect(panel).not.toContainText("123");
   await expect(panel.getByRole("checkbox")).toHaveCount(0);
 
-  // Desktop (xl): fixed to the right edge; the page content does not run under it.
+  // Desktop (xl): a column to the right of the content, never overlapping it.
   if (!isMobile) {
     await page.setViewportSize({ width: 1440, height: 900 });
     const box = (await panel.boundingBox())!;
-    expect(Math.round(box.x + box.width)).toBe(1440);
-    const mainRight = await page.evaluate(() => document.querySelector("main > div")!.getBoundingClientRect().right);
-    expect(mainRight).toBeLessThanOrEqual(box.x + 1);
+    const contentRight = await page.evaluate(() => document.querySelector("main > div > div")!.getBoundingClientRect().right);
+    expect(contentRight).toBeLessThanOrEqual(box.x);
   }
 
   // Never on the home page.

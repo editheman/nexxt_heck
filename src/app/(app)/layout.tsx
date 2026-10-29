@@ -2,9 +2,9 @@ import { FriendsPanel } from "@/components/friends/FriendsPanel";
 
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="mx-auto w-full max-w-[1120px] px-4 py-6 sm:px-6 sm:py-14 short:sm:py-6 lg:px-8">
-      {children}
-      {/* Logged in only: a right-edge rail from xl, below the content on smaller screens. */}
+    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 sm:py-14 short:sm:py-6 lg:px-8 xl:flex xl:gap-8">
+      <div className="mx-auto w-full min-w-0 max-w-[1120px] xl:flex-1">{children}</div>
+      {/* Logged in only; a right column from xl (1280px), below the content on smaller screens. */}
       <FriendsPanel />
     </div>
   );
