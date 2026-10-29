@@ -13,7 +13,7 @@ export function SiteFooter() {
               <span className="font-bold tracking-[0.14em] uppercase">Llamora</span>
               <span className="text-sm text-ink-muted">· Protejează ce ai construit</span>
             </p>
-            <p className="text-sm text-ink-muted">Platformă educațională pentru decizii financiare informate.</p>
+            <p className="text-sm text-ink-muted">Te ajută să-ți protejezi banii și să iei decizii financiare informate.</p>
             <ul className="flex flex-wrap gap-x-5 gap-y-1 pt-2 text-sm">
               <li>
                 <Link href="/confidentialitate" className="font-semibold text-ink hover:text-primary">Confidențialitate</Link>

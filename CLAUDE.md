@@ -10,7 +10,7 @@ Core promise:
 Target audience:
 Romanian adults aged 20–35 who want to protect their savings, understand inflation and financial risks, and recognize scams.
 
-This is an educational product, not a bank, broker, investment advisor, or trading platform.
+Position Llamora as a tool that helps people protect their money and make informed decisions — not as „just a financial-education platform” (owner's decision, 2026-10-29). It is still not a bank, broker, investment advisor, or trading platform; keep the „nu este consultanță de investiții autorizată” disclaimer on recommendations.
 
 ## 2. Working Principles
 
