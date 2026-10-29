@@ -18,7 +18,7 @@ export async function finishProfiling(page: Page, { savings = "20.000", goal }: 
   if (goal) await page.getByLabel("Obiectivul principal").selectOption(goal);
   await page.getByRole("button", { name: "Salvează și vezi Reality Check" }).click();
   await expect(page).toHaveURL(/\/reality-check$/);
-  await page.getByRole("link", { name: /Proiectează viitorul în simulator/ }).click();
+  await page.getByRole("link", { name: /Mergi mai departe la simulare/ }).click();
   await expect(page).toHaveURL(/\/simulator$/);
   await page.getByRole("button", { name: "Finalizează și deschide portalul" }).click();
   await expect(page).toHaveURL(/\/portal$/);
