@@ -1,8 +1,8 @@
 # Llamora — Protejează ce ai construit
 
-O aplicație web educațională, în limba română, care te ajută să înțelegi cum îți afectează inflația economiile, să explorezi scenarii ipotetice transparente, să recunoști fraudele financiare și să-ți verifici cunoștințele.
+Llamora este un instrument, în limba română, care te ajută să-ți protejezi banii și să iei decizii informate: să înțelegi cum îți afectează inflația economiile, să explorezi scenarii ipotetice transparente, să recunoști fraudele financiare și să-ți verifici cunoștințele.
 
-> Proiect educațional. Nu este bancă, broker sau consultant de investiții. Nu folosește date de piață în timp real și nu oferă recomandări personalizate.
+> Nu este bancă, broker sau consultant de investiții autorizat. Nu folosește date de piață în timp real; recomandările se referă doar la categorii de produse, nu la produse sau instituții anume.
 
 ## Pornire
 

@@ -120,7 +120,7 @@ export const MODULES: LearningModule[] = [
       q("rr-3", "garantii", "Un simulator arată 8% randament pe an pentru 20 de ani. Cum ar trebui interpretat?", "b", [
         ["a", "Ca o estimare sigură a rezultatului", "Nu. Rezultatele viitoare nu sunt cunoscute; 8% este doar o ipoteză."],
         ["b", "Ca o ipoteză care ilustrează efectul compunerii", "Corect. Simularea arată mecanismul, nu un rezultat garantat."],
-        ["c", "Ca o recomandare de investiție", "Nu. O simulare educațională nu este o recomandare."],
+        ["c", "Ca o recomandare de investiție", "Nu. O simulare nu este o recomandare."],
       ]),
       q("rr-4", "formula", "Cu 10% nominal și 5% inflație, randamentul real exact este:", "b", [
         ["a", "Exact 5%", "Aproape, dar nu exact. Diferența simplă este doar o aproximare."],

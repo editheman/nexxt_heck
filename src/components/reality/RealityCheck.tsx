@@ -166,12 +166,12 @@ export function RealityCheck() {
           <p>
             Limitări: presupunem că suma nu a primit dobândă; o dobândă sau un randament ar fi redus pierderea. IPC
             măsoară un coș mediu de consum — inflația ta personală poate fi diferită. Echivalențele folosesc prețuri
-            orientative de azi și sunt o metaforă educațională, nu o sumă exactă. Nu este o recomandare financiară.
+            orientative de azi și sunt doar o comparație orientativă, nu o sumă exactă. Nu este o recomandare financiară.
           </p>
         </div>
       </details>
 
-      <OnboardingNext href="/simulator" label="Proiectează viitorul în simulator" hint="Acolo alegi tu ipotezele de randament și inflație — sunt ipoteze, nu date oficiale." />
+      <OnboardingNext href="/simulator" label="Mergi mai departe la simulare" hint="Acolo alegi tu ipotezele de randament și inflație — sunt ipoteze, nu date oficiale." />
     </div>
   );
 }

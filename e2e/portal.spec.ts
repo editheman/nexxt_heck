@@ -27,7 +27,7 @@ test("guided profiling: profil → Reality Check → simulator → portal, perso
 
   await expect(page).toHaveURL(/\/reality-check$/);
   await expect(page.getByText("Profilare · Pasul 2 din 3")).toBeVisible();
-  await page.getByRole("link", { name: /Proiectează viitorul în simulator/ }).click();
+  await page.getByRole("link", { name: /Mergi mai departe la simulare/ }).click();
 
   await expect(page).toHaveURL(/\/simulator$/);
   await expect(page.getByText("Profilare · Pasul 3 din 3")).toBeVisible();

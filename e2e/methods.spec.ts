@@ -16,8 +16,11 @@ test("choose methods as drafts, confirm one, re-profile and keep the old set in 
   await page.getByRole("button", { name: "Generează recomandările" }).click();
   await expect(page.getByTestId("recommendations")).toBeVisible();
 
+  // The shortcut bar appears only after the first choice.
+  await expect(page.getByTestId("methods-bar")).toHaveCount(0);
   // Pick two methods; picking again un-picks a draft.
   await page.getByTestId("choose-etf-global").click();
+  await expect(page.getByTestId("methods-bar")).toContainText("Ai ales o metodă");
   await expect(page.getByTestId("choose-etf-global")).toHaveAttribute("aria-pressed", "true");
   await page.getByTestId("choose-pilon3").click();
   const third = page.getByTestId("recommendations").locator('[data-testid^="choose-"]').nth(2);
@@ -30,6 +33,9 @@ test("choose methods as drafts, confirm one, re-profile and keep the old set in 
   await page.reload();
   await expect(page.getByTestId("choose-pilon3")).toHaveAttribute("aria-pressed", "true");
 
+  await expect(page.getByTestId("methods-bar")).toContainText("Ai ales 2 metode");
+  await page.getByTestId("methods-bar-link").click();
+  await expect(page).toHaveURL(/\/metode$/);
   await page.goto("/portal");
   await expect(page.getByTestId("portal-methods-counts")).toHaveText("2 în draft · 0 folosite");
   await page.getByTestId("portal-methods").click();
@@ -51,6 +57,7 @@ test("choose methods as drafts, confirm one, re-profile and keep the old set in 
   await page.goto("/recomandari");
   await expect(page.getByTestId("stale-notice")).toBeVisible();
   await expect(page.getByTestId("choose-etf-global")).toHaveCount(0);
+  await expect(page.getByTestId("methods-bar")).toHaveCount(0);
   await page.getByRole("button", { name: "Generează din nou" }).click();
   await expect(page.getByTestId("stale-notice")).toHaveCount(0);
   await page.getByTestId("choose-tezaur").click();

@@ -110,6 +110,11 @@
     var(--color-bg);
 }
 
+@keyframes bar-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 @utility eyebrow {
   font-family: var(--font-mono);
   font-size: 0.75rem;
